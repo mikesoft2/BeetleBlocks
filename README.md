@@ -1,4 +1,12 @@
+BeetleBlocks is a visual, blocks-based programming environment 
+3D design and fabrication. BeetleBlocks programs move a graphical
+"beetle" around a 3D world, where it can place 3D shapes, extrude 
+its path as a tube, and generate geometry in other ways. The
+resulting geometry can be exported as a 3D-printable file.
 
+BeetleBlocks is a project by Eric Rosenbaum and Duks Koschitz
+
+BeetleBlocks is based on:
 Snap! Build Your Own Blocks
 
 http://snap.berkeley.edu
