@@ -39,16 +39,9 @@ in order to display it- below is the strategy from the scratch extension
 
 // make a layer for the 3D window that sits on top of the scratch stage
 */
+
 var threeLayer = document.createElement('div');
 threeLayer.id = 'three';
-threeLayer.style.position = 'absolute';
-threeLayer.style.left = '6px';
-threeLayer.style.top = '72px';
-threeLayer.style.width = '480px';
-threeLayer.style.height = '360px';
-threeLayer.style.color = '#ffffff';
-threeLayer.style.textShadow = 'none';
-
 
 // download the STL file containing all the geometry in the scene (not incl. the beetle)
 // this function should probably be called from a menu item
@@ -182,6 +175,7 @@ function resetCamera() {
 	camera.position.y = 7;
 	camera.position.z = 5;
 	camera.lookAt(new THREE.Vector3());
+//	We need to rethink this, as we don't have a threeLayer anymore
 	controls = new THREE.OrbitControls( camera, threeLayer );
 	controls.addEventListener( 'change', render );
 	scene.add(camera);
@@ -196,10 +190,6 @@ function resetbeetleColor() {
 	beetleColor.setHSL(0.05,0.5,0.5);
 	beetle.getObjectByName("beetleShape").material.color = beetleColor;	
 }
-
-// BLOCKS
-// Moved to threads.js
-
 
 /*
 
