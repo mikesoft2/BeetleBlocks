@@ -265,6 +265,14 @@ SpriteMorph.prototype.blockTemplates = function(category) {
 	return blocks;
 }
 
+
+StageMorph.prototype.originalInit = StageMorph.prototype.init;
+
+StageMorph.prototype.init = function (globals) {
+    this.originalInit(globals);
+    this.trailsCanvas = renderer.domElement;
+};
+
 StageMorph.prototype.originalStep = StageMorph.prototype.step;
 
 StageMorph.prototype.step = function () {

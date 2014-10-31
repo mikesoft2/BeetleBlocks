@@ -49,10 +49,6 @@
 				ide = new IDE_Morph();
 				ide.openIn(world);
 				setInterval(loop, 1);
-
-				// of course, this is temporary and must go!
-				ide.stage.penTrails();
-				ide.stage.trailsCanvas = renderer.domElement;
 			};
 			function loop() {
 				world.doOneCycle();
