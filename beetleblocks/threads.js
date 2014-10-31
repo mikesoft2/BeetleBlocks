@@ -9,6 +9,7 @@ Process.prototype.clear = function() {
 	resetbeetle();
 	resetbeetleColor();
 	posAndRotStack = new Array();
+    reRender();
 };
 
 Process.prototype.goHome = function() {
@@ -16,10 +17,12 @@ Process.prototype.goHome = function() {
 	if (extruding) {
 		addPointToExtrusion();
 	}
+    reRender();
 };
 
 Process.prototype.resetCamera = function() {
 	resetCamera();
+    reRender();
 };
 
 Process.prototype.setPosition = function(x, y, z) {	
@@ -41,6 +44,7 @@ Process.prototype.setPosition = function(x, y, z) {
 		var endPoint = p.copy(beetle.position);
 		addLineGeom(startPoint, endPoint);
 	}	
+    reRender();
 };
 
 Process.prototype.setPositionOnAxis = function(axis, pos) {
@@ -68,6 +72,7 @@ Process.prototype.setPositionOnAxis = function(axis, pos) {
 		var endPoint = p.copy(beetle.position);
 		addLineGeom(startPoint, endPoint);
 	}	
+    reRender();
 };
 
 Process.prototype.changePositionBy = function(axis, dist) {
@@ -96,6 +101,7 @@ Process.prototype.changePositionBy = function(axis, dist) {
 		addLineGeom(startPoint, endPoint);
 	}	
 	
+    reRender();
 };
 
 Process.prototype.setRotationOnAxis = function(axis, angle) {
@@ -113,6 +119,7 @@ Process.prototype.setRotationOnAxis = function(axis, angle) {
 	if (extruding) {
 		addPointToExtrusion();
 	}
+    reRender();
 };
 
 Process.prototype.pointTowards = function(x, y, z) {
@@ -131,6 +138,7 @@ function addLineGeom(startPoint, endPoint) {
 	});
 	var line = new THREE.Line(geometry, lineMaterial);
 	myObjects.add(line);		
+    reRender();
 }
 
 Process.prototype.move = function(dist) {
@@ -149,6 +157,7 @@ Process.prototype.move = function(dist) {
 		var endPoint = p.copy(beetle.position);
 		addLineGeom(startPoint, endPoint);
 	}
+    reRender();
 };
 
 Process.prototype.rotate = function(axis, angle) {
@@ -162,12 +171,14 @@ Process.prototype.rotate = function(axis, angle) {
 	if (axis == 'z') {
 		beetle.rotateY(toRad(angle));
 	}	
+    reRender();
 };
 
 
 Process.prototype.cube = function(size) {
 	size = Number(size);
 	addBoxGeom(size, size, size);
+    reRender();
 };
 
 Process.prototype.cuboid = function(length, width, height) {
@@ -175,6 +186,7 @@ Process.prototype.cuboid = function(length, width, height) {
 	width = Number(width);
 	height = Number(height);
 	addBoxGeom(width, height, length); 
+    reRender();
 };
 
 function addBoxGeom(length, width, height) {
@@ -184,11 +196,13 @@ function addBoxGeom(length, width, height) {
 	box.position.copy(beetle.position);
 	box.rotation.copy(beetle.rotation);	
 	myObjects.add(box);
+    reRender();
 }
 
 Process.prototype.sphere = function(diam) {
 	diam = Number(diam);
 	addSphereGeom(diam);
+    reRender();
 };
 
 function addSphereGeom(diam) {
@@ -205,6 +219,7 @@ Process.prototype.tube = function(length, outer, inner) {
 	outer = Number(outer);
 	inner = Number(inner);
 	addTubeGeom(length, outer, inner);
+    reRender();
 };
 
 // this needs to be cleaned up
@@ -258,6 +273,7 @@ Process.prototype.text = function(textString, height, depth) {
 	t.position.copy(beetle.position);
 	t.rotation.copy(beetle.rotation);	
 	myObjects.add(t);
+    reRender();
 };
 
 // plan for extrusions appearing as you move:
@@ -270,6 +286,7 @@ Process.prototype.startExtrusion = function() {
 	extrusionPoints = new Array();
 	addPointToExtrusion();
 	addSphereGeom(1); // start cap
+    reRender();
 };
 
 Process.prototype.stopExtrusion = function() {
@@ -285,6 +302,7 @@ Process.prototype.stopExtrusion = function() {
 		myObjects.add(mesh);
 		addSphereGeom(1); // end cap
 	}
+    reRender();
 };
 
 function addPointToExtrusion() {
@@ -317,6 +335,7 @@ Process.prototype.setHSL = function(channel, value) {
 	}
 	beetleColor.setHSL(hsl.h, hsl.s, hsl.l);
 	beetle.beetleShape.material.color = beetleColor;		
+    reRender();
 };
 
 Process.prototype.changeHSL = function(channel, value) {	
@@ -333,6 +352,7 @@ Process.prototype.changeHSL = function(channel, value) {
 		beetleColor.offsetHSL(0,0,value);
 	}
 	beetle.beetleShape.material.color = beetleColor;		
+    reRender();
 };
 
 Process.prototype.getHSL = function(channel) {
@@ -345,6 +365,7 @@ Process.prototype.getHSL = function(channel) {
 	if (channel == 'lightness') {
 		return(beetleColor.getHSL().l * 100);
 	}
+    reRender();
 };
 
 Process.prototype.getPosition = function(axis) {

@@ -264,3 +264,12 @@ SpriteMorph.prototype.blockTemplates = function(category) {
 
 	return blocks;
 }
+
+StageMorph.prototype.originalStep = StageMorph.prototype.step;
+
+StageMorph.prototype.step = function () {
+    this.originalStep();
+
+    // update Beetleblocks, if needed
+    renderCycle(this);
+};

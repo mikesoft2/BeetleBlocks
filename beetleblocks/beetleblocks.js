@@ -153,9 +153,23 @@ pointLight.position.set( 10, 10, 10 );
 scene.add( pointLight );
 
 // renderer
-var render = function () {
+
+var bbChanged = false;
+
+function reRender() {
+    bbChanged = true;
+}
+
+function renderCycle (aStageMorph) {
+    if (bbChanged) {
+        render();
+        aStageMorph.changed();
+        bbChanged = false;
+    }
+}
+
+function render() {
 	pointLight.position.copy(camera.position); // pointlight moves with the camera
-	requestAnimationFrame(render);
 	renderer.render(scene, camera);
 };
 render();
