@@ -265,7 +265,6 @@ SpriteMorph.prototype.blockTemplates = function(category) {
 	return blocks;
 }
 
-
 StageMorph.prototype.originalInit = StageMorph.prototype.init;
 
 StageMorph.prototype.init = function (globals) {
@@ -281,3 +280,13 @@ StageMorph.prototype.step = function () {
     // update Beetleblocks, if needed
     renderCycle(this);
 };
+
+StageMorph.prototype.mouseScroll = function (x, y) {
+    if (y > 0) {
+        controls.dollyOut();
+    } else if (y < 0) {
+        controls.dollyIn();
+    }
+    controls.update();
+    reRender();
+}
