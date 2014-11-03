@@ -191,7 +191,7 @@ SpriteMorph.prototype.initBlocks = function() {
 			type:'command', 
 			spec: 'set %hsl to %n',	
 			category: 'beetleblocks',
-			defaults: [50]
+			defaults: ['hue', 50]
 	};
 	this.blocks.changeHSL =
 	{
@@ -199,7 +199,7 @@ SpriteMorph.prototype.initBlocks = function() {
 			type:'command', 
 			spec: 'change %hsl by %n',
 			category: 'beetleblocks',
-			defaults: [10]
+			defaults: ['hue', 10]
 	};
 	this.blocks.getHSL =
 	{

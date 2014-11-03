@@ -334,7 +334,7 @@ Process.prototype.setHSL = function(channel, value) {
 		hsl.l = value;
 	}
 	beetleColor.setHSL(hsl.h, hsl.s, hsl.l);
-	beetle.beetleShape.material.color = beetleColor;		
+	beetleShape.material.color = beetleColor;		
     reRender();
 };
 
@@ -351,7 +351,7 @@ Process.prototype.changeHSL = function(channel, value) {
 	if (channel == 'lightness') {
 		beetleColor.offsetHSL(0,0,value);
 	}
-	beetle.beetleShape.material.color = beetleColor;		
+	beetleShape.material.color = beetleColor;		
     reRender();
 };
 
