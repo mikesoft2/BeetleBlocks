@@ -283,7 +283,7 @@ StageMorph.prototype.step = function () {
 
 StageMorph.prototype.referencePos = null;
 
-StageMorph.prototype.mouseScroll = function (x, y) {
+StageMorph.prototype.mouseScroll = function (y, x) {
     if (y > 0) {
         controls.dollyOut();
     } else if (y < 0) {
