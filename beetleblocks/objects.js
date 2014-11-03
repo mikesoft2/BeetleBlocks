@@ -297,14 +297,23 @@ StageMorph.prototype.mouseDownLeft = function (pos) {
     this.referencePos = pos;
 };
 
+StageMorph.prototype.mouseDownRight = function (pos) {
+    this.referencePos = pos;
+};
+
 StageMorph.prototype.mouseMove = function (pos) {
     deltaX = pos.x - this.referencePos.x;
     deltaY = pos.y - this.referencePos.y;
     this.referencePos = pos
-    horzAngle = deltaX / (this.dimensions.x * this.scale) * 360;
-    vertAngle = deltaY / (this.dimensions.y * this.scale) * 360;
-    controls.rotateLeft(radians(horzAngle));
-    controls.rotateUp(radians(vertAngle));
+    if (this.world().currentKey === 16) { // shiftClicked
+        controls.panLeft(deltaX / this.dimensions.x / this.scale * 15);
+        controls.panUp(deltaY / this.dimensions.y / this.scale * 10);
+    } else {
+        horzAngle = deltaX / (this.dimensions.x * this.scale) * 360;
+        vertAngle = deltaY / (this.dimensions.y * this.scale) * 360;
+        controls.rotateLeft(radians(horzAngle));
+        controls.rotateUp(radians(vertAngle));
+    }
     controls.update();
     reRender();
 };
