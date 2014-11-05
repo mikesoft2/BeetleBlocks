@@ -196,4 +196,38 @@ IDE_Morph.prototype.createControlBar = function () {
 	};
 }
 
+IDE_Morph.prototype.cameraMenu = function () {
+	var menu,
+	    stage = this.stage,
+	    world = this.world(),
+	    myself = this,
+	    pos = this.controlBar.cameraButton.bottomLeft(),
+	    shiftClicked = (world.currentKey === 16);
+
+	function addPreference(label, toggle, test, onHint, offHint, hide) {
+		var on = '\u2611 ',
+		    off = '\u2610 ';
+		if (!hide || shiftClicked) {
+			menu.addItem(
+					(test ? on : off) + localize(label),
+					toggle,
+					test ? onHint : offHint,
+					hide ? new Color(100, 0, 0) : null
+				    );
+		}
+	}
+
+	menu = new MenuMorph(this);
+	menu.addItem('Reset camera', resetCamera);
+/*	menu.addLine();
+	addPreference(
+			'Toggle axis',
+			toggleAxis,
+			showingAxis,
+			'uncheck to hide x/y/z axis',
+			'check to show x/y/z axis',
+			false
+		     );
+	menu.popup(world, pos);*/
+};
 

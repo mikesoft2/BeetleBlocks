@@ -189,10 +189,10 @@ function resetCamera() {
 	camera.position.y = 7;
 	camera.position.z = 5;
 	camera.lookAt(new THREE.Vector3());
-//	We need to rethink this, as we don't have a threeLayer anymore
 	controls = new THREE.OrbitControls( camera, threeLayer );
 	controls.addEventListener( 'change', render );
 	scene.add(camera);
+	reRender();
 }
 
 function resetbeetle() {	
