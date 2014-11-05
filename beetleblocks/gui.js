@@ -227,7 +227,7 @@ IDE_Morph.prototype.cameraMenu = function () {
 			'uncheck to hide x/y/z axis',
 			'check to show x/y/z axis',
 			false
-		     );
-	menu.popup(world, pos);*/
+		     );*/
+	menu.popup(world, pos);
 };
 
