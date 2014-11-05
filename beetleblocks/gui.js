@@ -145,28 +145,55 @@ IDE_Morph.prototype.projectMenu = function () {
 
 	menu.popup(world, pos);
 }
-/*
-// settingsButton
-button = new PushButtonMorph(
-this,
-'cameraMenu',
-new SymbolMorph('camera', 14)
-//'\u2699'
-);
-button.corner = 12;
-button.color = colors[0];
-button.highlightColor = colors[1];
-button.pressColor = colors[2];
-button.labelMinExtent = new Point(36, 18);
-button.padding = 0;
-button.labelShadowOffset = new Point(-1, -1);
-button.labelShadowColor = colors[1];
-button.labelColor = this.buttonLabelColor;
-button.contrast = this.buttonContrast;
-button.drawNew();
-// button.hint = 'edit settings';
-button.fixLayout();
-settingsButton = button;
-this.controlBar.add(cameraButton);
-this.controlBar.cameraButton = cameraButton; // for menu positioning
- */
+
+// IDE_Morph.prototype.createControlBar proxy
+IDE_Morph.prototype.originalCreateControlBar = IDE_Morph.prototype.createControlBar;
+
+IDE_Morph.prototype.createControlBar = function () {
+	this.originalCreateControlBar();
+
+	var myself = this,
+	    colors = [
+		    this.groupColor,
+	    this.frameColor.darker(50),
+	    this.frameColor.darker(50)
+		    ];
+
+	// cameraButton
+	button = new PushButtonMorph(
+			this,
+			'cameraMenu',
+			new SymbolMorph('camera', 14)
+			);
+	button.corner = 12;
+	button.color = colors[0];
+	button.highlightColor = colors[1];
+	button.pressColor = colors[2];
+	button.labelMinExtent = new Point(36, 18);
+	button.padding = 0;
+	button.labelShadowOffset = new Point(-1, -1);
+	button.labelShadowColor = colors[1];
+	button.labelColor = this.buttonLabelColor;
+	button.contrast = this.buttonContrast;
+	button.drawNew();
+	// button.hint = 'edit settings';
+	button.fixLayout();
+	cameraButton = button;
+	this.controlBar.add(cameraButton);
+	this.controlBar.cameraButton = cameraButton; // for menu positioning	
+
+	this.controlBar.originalFixLayout = this.controlBar.fixLayout;
+
+	this.controlBar.fixLayout = function () {
+		this.originalFixLayout();
+
+		cameraButton.setCenter(myself.controlBar.center());
+		cameraButton.setLeft(this.settingsButton.right() + 5);
+
+		this.updateLabel();
+
+		this.label.setLeft(cameraButton.right() + 5);
+	};
+}
+
+
