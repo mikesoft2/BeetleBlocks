@@ -92,7 +92,7 @@ IDE_Morph.prototype.projectMenu = function () {
 
 	menu.addItem(
 			'Export 3D model as STL',
-			function() { downloadSTL() },
+			function() { downloadSTL(myself.projectName) },
 			'download the currently rendered 3D model\ninto an STL file ready to be printed'
 		    )
 
@@ -191,9 +191,14 @@ IDE_Morph.prototype.createControlBar = function () {
 		cameraButton.setLeft(this.settingsButton.right() + 5);
 
 		this.updateLabel();
-
-		this.label.setLeft(cameraButton.right() + 5);
 	};
+
+    	this.controlBar.originalUpdateLabel = this.controlBar.updateLabel;
+
+    	this.controlBar.updateLabel = function() {
+		this.originalUpdateLabel();
+		this.label.setLeft(cameraButton.right() + 5);
+	}
 }
 
 IDE_Morph.prototype.cameraMenu = function () {

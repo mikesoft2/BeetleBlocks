@@ -1,7 +1,7 @@
 /*
 Beetleblocks
 
-A 3D world for moving a "beetle" in 3D space using Snap blocks,
+A 3D world for moving a 'beetle' in 3D space using Snap blocks,
 positioning 3D shapes and tracing extrusions, and exporting
 the resulting geometry from 3D printing
 
@@ -10,9 +10,9 @@ the resulting geometry from 3D printing
 /*
 Coordinate system remapping
 
-Note that the "internal" axis names used by three.js functions
-are different from the "external" axis names used by beetleblocks
-functions and their corresponding block labels. The "forward" axis
+Note that the 'internal' axis names used by three.js functions
+are different from the 'external' axis names used by beetleblocks
+functions and their corresponding block labels. The 'forward' axis
 is the direction along which the beetle moves forward
 
 red  	internal Z	beetleblocks X	(forward)
@@ -44,13 +44,11 @@ var threeLayer = document.createElement('div');
 threeLayer.id = 'three';
 
 // download the STL file containing all the geometry in the scene (not incl. the beetle)
-// this function should probably be called from a menu item
-function downloadSTL () {
+function downloadSTL (filename) {
 	var exporter = new THREE.STLExporter();
 	var stlString = exporter.exportScene(scene);
-	var blob = new Blob([stlString], {type: "text/plain;charset=utf-8"});
-	saveAs(blob, "myObjects.stl"); // better to generate a unique filename
-								   // and/or use snap project filename
+	var blob = new Blob([stlString], {type: 'text/plain;charset=utf-8'});
+	saveAs(blob, (filename ? filename : 'beetleblocks_export') + '.stl'); 
 };
 
 /*
@@ -74,28 +72,14 @@ OBJButton.onclick = function () {
 		objString += exporter.parse(geom);
 	}		
 	
-	var blob = new Blob([objString], {type: "text/plain;charset=utf-8"});
-	saveAs(blob, "myObjects.obj"); // maybe at least add a datetime string for unique filenames?
+	var blob = new Blob([objString], {type: 'text/plain;charset=utf-8'});
+	saveAs(blob, 'myObjects.obj'); // maybe at least add a datetime string for unique filenames?
 };
 */
  
 // setup camera
 var camera, controls;
 resetCamera();
-
-// create the beetle
-var beetle = new THREE.Object3D();
-var beetleColor = new THREE.Color();
-var material = new THREE.MeshLambertMaterial( { color: beetleColor } );
-var beetleGeometry = new THREE.CylinderGeometry( 0, 0.25, 0.7, 32);
-var beetleShape = new THREE.Mesh(beetleGeometry, material);
-beetleShape.rotation.x = toRad(90);
-beetleShape.position.z = 0.35;
-beetleShape.name = "beetleShape";
-beetle.add(beetleShape);
-scene.add(beetle);
-resetbeetle();
-resetbeetleColor();
 
 function addLineToPointWithColorToObject(point, color, object) {
 	geometry = new THREE.Geometry();
@@ -107,14 +91,6 @@ function addLineToPointWithColorToObject(point, color, object) {
 	var line = new THREE.Line(geometry, lineMaterial);
 	object.add(line);		
 }
-
-// beetle's local axis lines
-p = new THREE.Vector3(1,0,0);
-addLineToPointWithColorToObject(p, 0x00FF00, beetle);
-p = new THREE.Vector3(0,1,0);
-addLineToPointWithColorToObject(p, 0x0000FF, beetle);
-p = new THREE.Vector3(0,0,1);
-addLineToPointWithColorToObject(p, 0xFF0000, beetle);
 
 // global axis lines
 p = new THREE.Vector3(5,0,0);
@@ -135,13 +111,6 @@ function posAndRot(position, rotation) {
 	this.position = position;
 	this.rotation = rotation;
 }
-
-// extrusion
-var extruding = false;
-var currentExtrusion; 
-
-// drawing
-var drawing = false;
 
 // lights
 var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
@@ -172,6 +141,7 @@ function render() {
 	pointLight.position.copy(camera.position); // pointlight moves with the camera
 	renderer.render(scene, camera);
 };
+
 render();
 
 // UTILITY FUNCTIONS
@@ -195,15 +165,6 @@ function resetCamera() {
 	reRender();
 }
 
-function resetbeetle() {	
-	beetle.position.set(0,0,0);
-	beetle.rotation.set(0,0,0);
-
-}
-function resetbeetleColor() {	
-	beetleColor.setHSL(0.05,0.5,0.5);
-	beetle.getObjectByName("beetleShape").material.color = beetleColor;	
-}
 
 /*
 
@@ -221,12 +182,13 @@ Process.prototype.cameraPan = function(direction, dist) {
 };
 
 Process.prototype.lookAt = function(target) {
-	if (target == "beetle") {
+	if (target == 'beetle') {
 		controls.target = beetle.position.clone();
 	} 
-	if (target == "origin") {
+	if (target == 'origin') {
 		controls.target = new THREE.Vector3();
 	}
 	controls.update();
 };
 */
+

@@ -1,8 +1,65 @@
+SpriteMorph.prototype.initBeetle = function() {
+	var myself = this;
+
+	this.beetle = new THREE.Object3D();
+	this.beetle.name = 'beetle';
+
+	this.beetle.color = new THREE.Color();
+	this.beetle.material = new THREE.MeshLambertMaterial( { color: this.beetle.color } );
+	this.beetle.geometry = new THREE.CylinderGeometry( 0, 0.25, 0.7, 32);
+
+	this.beetle.shape = new THREE.Mesh(this.beetle.geometry, this.beetle.material);
+	this.beetle.shape.rotation.x = toRad(90);
+	this.beetle.shape.position.z = 0.35;
+	this.beetle.shape.name = 'beetleShape';
+
+	this.beetle.posAndRotStack = new Array();
+
+	// extrusion
+	this.beetle.extruding = false;
+	this.beetle.currentExtrusion = null;
+
+	// drawing
+	this.beetle.drawing = false;
+
+	this.beetle.reset = function() {	
+		this.position.set(0,0,0);
+		this.rotation.set(0,0,0);
+	}
+
+	this.beetle.resetColor = function() {	
+		myself.beetle.color.setHSL(0.05,0.5,0.5);
+		myself.beetle.getObjectByName("beetleShape").material.color = myself.beetle.color;
+	}
+
+	this.beetle.add(this.beetle.shape);
+
+	this.beetle.reset();
+	this.beetle.resetColor()
+
+	// beetle's local axis lines
+	p = new THREE.Vector3(1,0,0);
+	addLineToPointWithColorToObject(p, 0x00FF00, this.beetle);
+	p = new THREE.Vector3(0,1,0);
+	addLineToPointWithColorToObject(p, 0x0000FF, this.beetle);
+	p = new THREE.Vector3(0,0,1);
+	addLineToPointWithColorToObject(p, 0xFF0000, this.beetle);
+
+	scene.add(this.beetle);
+}
+
+SpriteMorph.prototype.originalInit = SpriteMorph.prototype.init;
+
+SpriteMorph.prototype.init = function (globals) {
+	this.initBeetle();
+	this.originalInit(globals);
+}
+
+
 // Definition of a new BeetleBlocks Category
 
 SpriteMorph.prototype.categories.push('beetleblocks');
 SpriteMorph.prototype.blockColor['beetleblocks'] = new Color(154, 149, 9);
-
 
 // Block specs
 
