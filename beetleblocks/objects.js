@@ -301,11 +301,11 @@ StageMorph.prototype.mouseDownRight = function (pos) {
     this.referencePos = pos;
 };
 
-StageMorph.prototype.mouseMove = function (pos) {
+StageMorph.prototype.mouseMove = function (pos, button) {
     deltaX = pos.x - this.referencePos.x;
     deltaY = pos.y - this.referencePos.y;
     this.referencePos = pos
-    if (this.world().currentKey === 16) { // shiftClicked
+    if (button === 'right' || this.world().currentKey === 16) { // shiftClicked
         controls.panLeft(deltaX / this.dimensions.x / this.scale * 15);
         controls.panUp(deltaY / this.dimensions.y / this.scale * 10);
     } else {
