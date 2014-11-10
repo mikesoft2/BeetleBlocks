@@ -5,10 +5,10 @@ SpriteMorph.prototype.initBeetle = function() {
 	this.beetle.name = 'beetle';
 
 	this.beetle.color = new THREE.Color();
-	this.beetle.material = new THREE.MeshLambertMaterial( { color: this.beetle.color } );
-	this.beetle.geometry = new THREE.CylinderGeometry( 0, 0.25, 0.7, 32);
+	var material = new THREE.MeshLambertMaterial( { color: this.beetle.color } );
+	var geometry = new THREE.CylinderGeometry( 0, 0.25, 0.7, 32);
 
-	this.beetle.shape = new THREE.Mesh(this.beetle.geometry, this.beetle.material);
+	this.beetle.shape = new THREE.Mesh(geometry, material);
 	this.beetle.shape.rotation.x = toRad(90);
 	this.beetle.shape.position.z = 0.35;
 	this.beetle.shape.name = 'beetleShape';
