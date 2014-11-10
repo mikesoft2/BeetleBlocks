@@ -213,6 +213,7 @@ Process.prototype.addBoxGeom = function(length, width, height) {
 	var beetle = this.homeContext.receiver.beetle;
 	var boxGeometry = new THREE.BoxGeometry(length, width, height);
 	var material = new THREE.MeshLambertMaterial( { color: beetle.color } );
+	material.wireframe = isWireframeMode();
 	var box = new THREE.Mesh(boxGeometry, material);
 	box.position.copy(beetle.position);
 	box.rotation.copy(beetle.rotation);	
@@ -230,6 +231,7 @@ Process.prototype.addSphereGeom = function(diam) {
 	var beetle = this.homeContext.receiver.beetle;
 	var sphereGeometry = new THREE.SphereGeometry(diam/2);
 	var material = new THREE.MeshLambertMaterial( { color: beetle.color } );
+	material.wireframe = isWireframeMode();
 	var sphere = new THREE.Mesh(sphereGeometry, material);
 	sphere.position.copy(beetle.position);
 	sphere.rotation.copy(beetle.rotation);	
@@ -274,6 +276,7 @@ Process.prototype.addTubeGeom = function(length, outer, inner) {
 
 	var tubeGeom = new THREE.ExtrudeGeometry( shape, options );
 	var material = new THREE.MeshLambertMaterial( { color: beetle.color } );
+	material.wireframe = isWireframeMode();
 	var tube = new THREE.Mesh(tubeGeom, material);
 
 	tube.position.copy(beetle.position);
@@ -292,6 +295,7 @@ Process.prototype.text = function(textString, height, depth) {
 		height: depth
 	});
 	var material = new THREE.MeshLambertMaterial( { color: beetle.color } );
+	material.wireframe = isWireframeMode();
 	var t = new THREE.Mesh(textGeometry, material);
 	t.position.copy(beetle.position);
 	t.rotation.copy(beetle.rotation);	
@@ -321,7 +325,9 @@ Process.prototype.stopExtrusion = function() {
 
 		var extrudeBend = new THREE.SplineCurve3(beetle.extrusionPoints);
 		var path = new THREE.TubeGeometry(extrudeBend, beetle.extrusionPoints.length, 0.5, 8, false);
-		var mesh = new THREE.Mesh( path, new THREE.MeshLambertMaterial({ color: beetle.color, }));
+		var material = new THREE.MeshLambertMaterial({ color: beetle.color, });
+		material.wireframe = isWireframeMode();
+		var mesh = new THREE.Mesh(path, material);
 		myObjects.add(mesh);
 		this.addSphereGeom(1); // end cap
 	}

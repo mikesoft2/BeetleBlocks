@@ -235,7 +235,7 @@ IDE_Morph.prototype.cameraMenu = function () {
 	addPreference(
 			'Wireframe mode',
 			toggleWireframe,
-			isWireframe(),
+			isWireframeMode(),
 			'uncheck to disable wireframe mode',
 			'check to enable wireframe mode',
 			false
