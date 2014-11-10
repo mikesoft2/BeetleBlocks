@@ -434,14 +434,12 @@ Process.prototype.pushPosition = function() {
 
 Process.prototype.popPosition = function() {
 	var beetle = this.homeContext.receiver.beetle;
-	if (beetle.posAndRotStack.length > 0) {
+	if (beetle.posAndRotStack.length) {
 		var posAndRot = beetle.posAndRotStack.pop();	
 		beetle.position.set(posAndRot.position.x, posAndRot.position.y, posAndRot.position.z);
 		beetle.rotation.set(posAndRot.rotation.x,posAndRot.rotation.y,posAndRot.rotation.z);
-
-		if (beetle.extruding) {
-			this.addPointToExtrusion();
-		}
+		reRender();
+		if (beetle.extruding) { this.addPointToExtrusion() }
 	}
 };
 
