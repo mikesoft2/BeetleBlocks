@@ -8,7 +8,7 @@ Process.prototype.clear = function() {
 	beetle.extruding = false; 
 
 	beetle.reset();
-	beetle.color.reset();
+	beetle.resetColor();
 	beetle.posAndRotStack = new Array();
 	reRender();
 };

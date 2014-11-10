@@ -3,8 +3,8 @@ SpriteMorph.prototype.initBeetle = function() {
 
 	this.beetle = new THREE.Object3D();
 	this.beetle.name = 'beetle';
-
 	this.beetle.color = new THREE.Color();
+
 	var material = new THREE.MeshLambertMaterial( { color: this.beetle.color } );
 	var geometry = new THREE.CylinderGeometry( 0, 0.25, 0.7, 32);
 
@@ -46,6 +46,7 @@ SpriteMorph.prototype.initBeetle = function() {
 	addLineToPointWithColorToObject(p, 0xFF0000, this.beetle);
 
 	scene.add(this.beetle);
+	resetCamera();
 }
 
 SpriteMorph.prototype.originalInit = SpriteMorph.prototype.init;
