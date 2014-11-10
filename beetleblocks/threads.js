@@ -22,6 +22,18 @@ Process.prototype.goHome = function() {
 	reRender();
 };
 
+Process.prototype.showBeetle = function() {
+	var beetle = this.homeContext.receiver.beetle;
+	beetle.shape.visible = 1;
+	reRender();
+};
+
+Process.prototype.hideBeetle = function() {
+	var beetle = this.homeContext.receiver.beetle;
+	beetle.shape.visible = 0;
+	reRender();
+};
+
 Process.prototype.resetCamera = function() {
 	resetCamera();
 	reRender();

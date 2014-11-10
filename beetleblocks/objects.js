@@ -85,6 +85,20 @@ SpriteMorph.prototype.initBlocks = function() {
 			category: 'beetleblocks'
 	};		
 
+	this.blocks.showBeetle =
+	{
+			only: SpriteMorph,
+			type:'command',
+			spec: 'show beetle',
+			category: 'beetleblocks'
+	};	
+	this.blocks.hideBeetle =
+	{
+			only: SpriteMorph,
+			type:'command',
+			spec: 'hide beetle',
+			category: 'beetleblocks'
+	};	
 	this.blocks.move =
 	{
 			only: SpriteMorph,
@@ -291,6 +305,9 @@ SpriteMorph.prototype.blockTemplates = function(category) {
 	if (category === 'beetleblocks') {
 		blocks.push(blockBySelector('clear'));
 		blocks.push(blockBySelector('goHome'));
+		blocks.push('-');
+		blocks.push(blockBySelector('showBeetle'));
+		blocks.push(blockBySelector('hideBeetle'));
 		blocks.push('-');
 		blocks.push(blockBySelector('move'));
 		blocks.push(blockBySelector('rotate'));
