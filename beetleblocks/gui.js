@@ -224,6 +224,14 @@ IDE_Morph.prototype.cameraMenu = function () {
 
 	menu = new MenuMorph(this);
 	menu.addItem('Reset camera', resetCamera);
+	menu.addItem(
+		'Select background color', 
+		function(){ 
+			this.pickColor(null, function(color) { 
+				renderer.setClearColor('rgb(' + color.r + ',' + color.g + ',' + color.b + ')', 1);
+				reRender();
+			})
+		});
 	addPreference(
 			'Wireframe mode',
 			toggleWireframe,

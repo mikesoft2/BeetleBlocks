@@ -26,7 +26,7 @@ also note that rotations around X and Z are inverted
 var scene = new THREE.Scene();
 	
 // setup renderer
-var renderer = new THREE.WebGLRenderer();
+var renderer = new THREE.WebGLRenderer({ antialias: true });
 var stageWidth = 480; 
 var stageHeight = 360;
 renderer.setSize(stageWidth, stageHeight);
