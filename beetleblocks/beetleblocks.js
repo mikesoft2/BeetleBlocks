@@ -79,6 +79,7 @@ OBJButton.onclick = function () {
  
 // setup camera
 var camera, controls;
+var axes = {visible: true, lines: []};
 resetCamera();
 
 function addLineToPointWithColorToObject(point, color, object) {
@@ -89,7 +90,8 @@ function addLineToPointWithColorToObject(point, color, object) {
 		color: color
 	});
 	var line = new THREE.Line(geometry, lineMaterial);
-	object.add(line);		
+	object.add(line);
+	axes.lines.push(line);
 }
 
 // global axis lines
