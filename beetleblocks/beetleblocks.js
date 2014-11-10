@@ -165,6 +165,16 @@ function resetCamera() {
 	reRender();
 }
 
+function toggleWireframe() {
+	myObjects.children.forEach(function(eachObject) {
+			eachObject.material.wireframe = !eachObject.material.wireframe;
+	});
+	reRender();
+}
+
+function isWireframe() {
+	return (myObjects.children.length ? myObjects.children[0].material.wireframe : false);
+}
 
 /*
 
