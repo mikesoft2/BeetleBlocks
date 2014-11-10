@@ -224,6 +224,17 @@ IDE_Morph.prototype.cameraMenu = function () {
 
 	menu = new MenuMorph(this);
 	menu.addItem('Reset camera', resetCamera);
+
+	menu.addLine();
+	addPreference(
+			'Wireframe mode',
+			toggleWireframe,
+			isWireframe(),
+			'uncheck to disable wireframe mode',
+			'check to enable wireframe mode',
+			false
+		     );
+
 /*	menu.addLine();
 	addPreference(
 			'Toggle axis',
