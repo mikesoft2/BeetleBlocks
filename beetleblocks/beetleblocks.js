@@ -24,6 +24,7 @@ also note that rotations around X and Z are inverted
 
 // setup THREE.js
 var scene = new THREE.Scene();
+scene.isWireframeMode = false;
 	
 // setup renderer
 var renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -168,14 +169,15 @@ function resetCamera() {
 }
 
 function toggleWireframe() {
+	scene.isWireframeMode = !scene.isWireframeMode;
 	myObjects.children.forEach(function(eachObject) {
-			eachObject.material.wireframe = !eachObject.material.wireframe;
+			eachObject.material.wireframe = scene.isWireframeMode;
 	});
 	reRender();
 }
 
-function isWireframe() {
-	return (myObjects.children.length ? myObjects.children[0].material.wireframe : false);
+function isWireframeMode() {
+	return scene.isWireframeMode;
 }
 
 /*
