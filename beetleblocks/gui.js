@@ -240,17 +240,18 @@ IDE_Morph.prototype.cameraMenu = function () {
 			'check to enable wireframe mode',
 			false
 		     );
-	menu.addLine();
-
-/*	menu.addLine();
 	addPreference(
-			'Toggle axis',
-			toggleAxis,
-			showingAxis,
-			'uncheck to hide x/y/z axis',
-			'check to show x/y/z axis',
+			'Show axes',
+			function(){ 
+				axes.lines.forEach(function(line){ line.visible = !line.visible });
+				axes.visible = !axes.visible;
+				reRender();
+			},
+			axes.visible,
+			'uncheck to hide x/y/z axes',
+			'check to show x/y/z axes',
 			false
-		     );*/
+		     );
 	menu.popup(world, pos);
 };
 
