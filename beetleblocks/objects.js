@@ -18,6 +18,7 @@ SpriteMorph.prototype.initBeetle = function() {
 	// extrusion
 	this.beetle.extruding = false;
 	this.beetle.currentExtrusion = null;
+	this.beetle.extrusionRadius = 1;
 
 	// drawing
 	this.beetle.drawing = false;
@@ -256,6 +257,22 @@ SpriteMorph.prototype.initBlocks = function() {
 			spec: 'stop extruding',
 			category: 'beetleblocks'
 	};
+	this.blocks.setExtrusionRadius =
+	{
+			only: SpriteMorph,
+			type:'command',
+			spec: 'set extrusion radius to %n',
+			category: 'beetleblocks',
+			defaults: [1]
+	};
+	this.blocks.changeExtrusionRadius =
+	{
+			only: SpriteMorph,
+			type:'command',
+			spec: 'change extrusion radius by %n',
+			category: 'beetleblocks',
+			defaults: [1]
+	};
 
 	this.blocks.setHSL =
 	{
@@ -331,6 +348,8 @@ SpriteMorph.prototype.blockTemplates = function(category) {
 		blocks.push(blockBySelector('stopDrawing'));
 		blocks.push(blockBySelector('startExtrusion'));
 		blocks.push(blockBySelector('stopExtrusion'));
+		blocks.push(blockBySelector('setExtrusionRadius'));
+		blocks.push(blockBySelector('changeExtrusionRadius'));
 		blocks.push('-');
 		blocks.push(blockBySelector('setHSL'));
 		blocks.push(blockBySelector('changeHSL'));

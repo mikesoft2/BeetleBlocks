@@ -313,7 +313,7 @@ Process.prototype.startExtrusion = function() {
 	beetle.extruding = true;
 	beetle.extrusionPoints = new Array();
 	this.addPointToExtrusion();
-	this.addSphereGeom(1); // start cap
+	this.addSphereGeom(beetle.extrusionRadius); // start cap
 	reRender();
 };
 
@@ -324,15 +324,23 @@ Process.prototype.stopExtrusion = function() {
 		//addPointToExtrusion();
 
 		var extrudeBend = new THREE.SplineCurve3(beetle.extrusionPoints);
-		var path = new THREE.TubeGeometry(extrudeBend, beetle.extrusionPoints.length, 0.5, 8, false);
+		var path = new THREE.TubeGeometry(extrudeBend, beetle.extrusionPoints.length, beetle.extrusionRadius/2, 8, false);
 		var material = new THREE.MeshLambertMaterial({ color: beetle.color, });
 		material.wireframe = isWireframeMode();
 		var mesh = new THREE.Mesh(path, material);
 		myObjects.add(mesh);
-		this.addSphereGeom(1); // end cap
+		this.addSphereGeom(beetle.extrusionRadius); // end cap
 	}
 	reRender();
 };
+
+Process.prototype.setExtrusionRadius = function(radius) {
+	this.homeContext.receiver.beetle.extrusionRadius = radius;
+}
+
+Process.prototype.changeExtrusionRadius = function(delta) {
+	this.homeContext.receiver.beetle.extrusionRadius += delta;
+}
 
 Process.prototype.addPointToExtrusion = function() {
 	var beetle = this.homeContext.receiver.beetle;
