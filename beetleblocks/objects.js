@@ -57,7 +57,6 @@ SpriteMorph.prototype.init = function (globals) {
 	this.originalInit(globals);
 }
 
-
 // Definition of a new BeetleBlocks Category
 
 SpriteMorph.prototype.categories.push('beetleblocks');
@@ -357,6 +356,19 @@ SpriteMorph.prototype.blockTemplates = function(category) {
 	};
 
 	return blocks;
+}
+
+// StageMorph
+
+StageMorph.prototype.originalDestroy = StageMorph.prototype.destroy;
+
+StageMorph.prototype.destroy = function () {
+	var myself = this;
+	scene.remove(myObjects);
+	this.children.forEach(function(eachSprite) {
+		myself.parentThatIsA(IDE_Morph).removeSprite(eachSprite);
+	});
+	this.originalDestroy();
 }
 
 StageMorph.prototype.originalInit = StageMorph.prototype.init;

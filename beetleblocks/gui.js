@@ -1,3 +1,11 @@
+IDE_Morph.prototype.originalRemoveSprite = IDE_Morph.prototype.removeSprite;
+
+IDE_Morph.prototype.removeSprite = function (sprite) {
+	scene.remove(sprite.beetle);
+	reRender();
+	this.originalRemoveSprite(sprite);
+}
+
 // Overriding this function as we cannot proxy it since it doesn't return a menu, but instead creates it and pops it up
 
 IDE_Morph.prototype.projectMenu = function () {
