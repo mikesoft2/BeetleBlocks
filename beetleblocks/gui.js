@@ -1,8 +1,9 @@
 IDE_Morph.prototype.originalRemoveSprite = IDE_Morph.prototype.removeSprite;
 
 IDE_Morph.prototype.removeSprite = function (sprite) {
-	scene.remove(sprite.beetle);
-	reRender();
+	var stage = sprite.parentThatIsA(StageMorph);
+	stage.scene.remove(sprite.beetle);
+	stage.reRender();
 	this.originalRemoveSprite(sprite);
 }
 
@@ -231,19 +232,19 @@ IDE_Morph.prototype.cameraMenu = function () {
 	}
 
 	menu = new MenuMorph(this);
-	menu.addItem('Reset camera', resetCamera);
+	menu.addItem('Reset camera', stage.resetCamera);
 	menu.addItem(
 		'Select background color', 
 		function(){ 
 			this.pickColor(null, function(color) { 
-				renderer.setClearColor('rgb(' + color.r + ',' + color.g + ',' + color.b + ')', 1);
-				reRender();
+				stage.renderer.setClearColor('rgb(' + color.r + ',' + color.g + ',' + color.b + ')', 1);
+				stage.reRender();
 			})
 		});
 	addPreference(
 			'Wireframe mode',
-			toggleWireframe,
-			isWireframeMode(),
+			function() { stage.renderer.toggleWireframe() },
+			stage.renderer.isWireframeMode,
 			'uncheck to disable wireframe mode',
 			'check to enable wireframe mode',
 			false
@@ -253,7 +254,7 @@ IDE_Morph.prototype.cameraMenu = function () {
 			function(){ 
 				axes.lines.forEach(function(line){ line.visible = !line.visible });
 				axes.visible = !axes.visible;
-				reRender();
+				stage.reRender();
 			},
 			axes.visible,
 			'uncheck to hide x/y/z axes',
@@ -266,6 +267,6 @@ IDE_Morph.prototype.cameraMenu = function () {
 IDE_Morph.prototype.originalSetStageExtent = IDE_Morph.prototype.setStageExtent;
 IDE_Morph.prototype.setStageExtent = function (aPoint) {
 	this.originalSetStageExtent(aPoint);
-	renderer.setSize(aPoint.x, aPoint.y);
-	reRender();
+	this.stage.renderer.setSize(aPoint.x, aPoint.y);
+	this.stage.reRender();
 }

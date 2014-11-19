@@ -22,28 +22,6 @@ blue	internal Y 	beetleblocks Z
 also note that rotations around X and Z are inverted
 */
 
-// setup THREE.js
-var scene = new THREE.Scene();
-scene.isWireframeMode = false;
-	
-// setup renderer
-var renderer = new THREE.WebGLRenderer({ antialias: true });
-var stageWidth = 480; 
-var stageHeight = 360;
-renderer.setSize(stageWidth, stageHeight);
-renderer.setClearColor( 0xCCCCCC, 1);
-
-/*
-
-we need to put the renderer.domElement somewhere in the DOM
-in order to display it- below is the strategy from the scratch extension
-
-// make a layer for the 3D window that sits on top of the scratch stage
-*/
-
-var threeLayer = document.createElement('div');
-threeLayer.id = 'three';
-
 // download the STL file containing all the geometry in the scene (not incl. the beetle)
 function downloadSTL (filename) {
 	var exporter = new THREE.STLExporter();
@@ -78,10 +56,7 @@ OBJButton.onclick = function () {
 };
 */
  
-// setup camera
-var camera, controls;
 var axes = {visible: true, lines: []};
-resetCamera();
 
 function addLineToPointWithColorToObject(point, color, object) {
 	geometry = new THREE.Geometry();
@@ -95,18 +70,6 @@ function addLineToPointWithColorToObject(point, color, object) {
 	axes.lines.push(line);
 }
 
-// global axis lines
-p = new THREE.Vector3(5,0,0);
-addLineToPointWithColorToObject(p, 0x00FF00, scene);
-p = new THREE.Vector3(0,5,0);
-addLineToPointWithColorToObject(p, 0x0000FF, scene);
-p = new THREE.Vector3(0,0,5);
-addLineToPointWithColorToObject(p, 0xFF0000, scene);
-
-// the user's creation gets added to myObjects (so we can easily clear, export, etc)
-var myObjects = new THREE.Object3D();
-scene.add(myObjects);
-
 // a stack to push and pop position and rotation states
 // this stores an array of posAndRot objects
 var posAndRotStack = new Array();
@@ -114,38 +77,6 @@ function posAndRot(position, rotation) {
 	this.position = position;
 	this.rotation = rotation;
 }
-
-// lights
-var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-directionalLight.position.set( 1, 1, 0 );
-scene.add( directionalLight );
-
-var pointLight = new THREE.PointLight( 0xffffff, 1, 200 );
-pointLight.position.set( 10, 10, 10 );
-scene.add( pointLight );
-
-// renderer
-
-var bbChanged = false;
-
-function reRender() {
-    bbChanged = true;
-}
-
-function renderCycle (aStageMorph) {
-    if (bbChanged) {
-        render();
-        aStageMorph.changed();
-        bbChanged = false;
-    }
-}
-
-function render() {
-	pointLight.position.copy(camera.position); // pointlight moves with the camera
-	renderer.render(scene, camera);
-};
-
-render();
 
 // UTILITY FUNCTIONS
 
@@ -155,54 +86,3 @@ function toRad(Value) {
 function toDeg(Value) {
    return Value * 180 / Math.PI;
 }
-
-function resetCamera() {
-	camera = new THREE.PerspectiveCamera( 60, 480/360, 1, 1000 );
-	camera.position.x = -5;
-	camera.position.y = 7;
-	camera.position.z = 5;
-	camera.lookAt(new THREE.Vector3());
-	controls = new THREE.OrbitControls( camera, threeLayer );
-	controls.addEventListener( 'change', render );
-	scene.add(camera);
-	reRender();
-}
-
-function toggleWireframe() {
-	scene.isWireframeMode = !scene.isWireframeMode;
-	myObjects.children.forEach(function(eachObject) {
-			eachObject.material.wireframe = scene.isWireframeMode;
-	});
-	reRender();
-}
-
-function isWireframeMode() {
-	return scene.isWireframeMode;
-}
-
-/*
-
-camera control functions - not working correctly
-
-Process.prototype.cameraPan = function(direction, dist) {
-	dist = Number(dist);
-	if (direction == 'up') {
-		controls.pan(0, dist);
-	}
-	if (direction == 'right') {
-		controls.pan(-1 * dist, 0);
-	}
-	controls.update();
-};
-
-Process.prototype.lookAt = function(target) {
-	if (target == 'beetle') {
-		controls.target = beetle.position.clone();
-	} 
-	if (target == 'origin') {
-		controls.target = new THREE.Vector3();
-	}
-	controls.update();
-};
-*/
-
