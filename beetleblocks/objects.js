@@ -423,3 +423,9 @@ StageMorph.prototype.mouseMove = function (pos, button) {
     controls.update();
     reRender();
 };
+
+StageMorph.prototype.clearPenTrails = function () {
+    // We never need to clear the pen trails in BeetleBlocks, it only causes
+	// the renderer to disappear
+	nop(); 
+};

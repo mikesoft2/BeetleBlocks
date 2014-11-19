@@ -263,3 +263,9 @@ IDE_Morph.prototype.cameraMenu = function () {
 	menu.popup(world, pos);
 };
 
+IDE_Morph.prototype.originalSetStageExtent = IDE_Morph.prototype.setStageExtent;
+IDE_Morph.prototype.setStageExtent = function (aPoint) {
+	this.originalSetStageExtent(aPoint);
+	renderer.setSize(aPoint.x, aPoint.y);
+	reRender();
+}
