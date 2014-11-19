@@ -23,12 +23,6 @@ also note that rotations around X and Z are inverted
 */
 
 // download the STL file containing all the geometry in the scene (not incl. the beetle)
-function downloadSTL (filename) {
-	var exporter = new THREE.STLExporter();
-	var stlString = exporter.exportScene(scene);
-	var blob = new Blob([stlString], {type: 'text/plain;charset=utf-8'});
-	saveAs(blob, (filename ? filename : 'beetleblocks_export') + '.stl'); 
-};
 
 /*
 OBJ export not working yet... this is a research topic 

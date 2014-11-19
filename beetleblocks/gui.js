@@ -1,5 +1,4 @@
 IDE_Morph.prototype.originalRemoveSprite = IDE_Morph.prototype.removeSprite;
-
 IDE_Morph.prototype.removeSprite = function (sprite) {
 	var stage = sprite.parentThatIsA(StageMorph);
 	stage.scene.remove(sprite.beetle);
@@ -86,14 +85,14 @@ IDE_Morph.prototype.projectMenu = function () {
 
 	menu.addItem(
 			'Export blocks...',
-			function () {myself.exportGlobalBlocks(); },
+			function () { myself.exportGlobalBlocks(); },
 			'show global custom block definitions as XML\nin a new browser window'
 		    );
 
 	if (shiftClicked) {
 		menu.addItem(
 				'Export all scripts as pic...',
-				function () {myself.exportScriptsPicture(); },
+				function () { myself.exportScriptsPicture(); },
 				'show a picture of all scripts\nand block definitions',
 				new Color(100, 0, 0)
 			    );
@@ -101,7 +100,7 @@ IDE_Morph.prototype.projectMenu = function () {
 
 	menu.addItem(
 			'Export 3D model as STL',
-			function() { downloadSTL(myself.projectName) },
+			function() { myself.downloadSTL() },
 			'download the currently rendered 3D model\ninto an STL file ready to be printed'
 		    )
 
@@ -153,6 +152,13 @@ IDE_Morph.prototype.projectMenu = function () {
 
 
 	menu.popup(world, pos);
+}
+
+IDE_Morph.prototype.downloadSTL = function() {
+	var exporter = new THREE.STLExporter();
+	var stlString = exporter.exportScene(this.stage.scene);
+	var blob = new Blob([stlString], {type: 'text/plain;charset=utf-8'});
+	saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_export') + '.stl'); 
 }
 
 // IDE_Morph.prototype.createControlBar proxy
