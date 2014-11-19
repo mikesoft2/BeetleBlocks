@@ -257,12 +257,8 @@ IDE_Morph.prototype.cameraMenu = function () {
 		     );
 	addPreference(
 			'Show axes',
-			function(){ 
-				axes.lines.forEach(function(line){ line.visible = !line.visible });
-				axes.visible = !axes.visible;
-				stage.reRender();
-			},
-			axes.visible,
+			function(){ stage.renderer.toggleAxes()	},
+			stage.renderer.showingAxes,
 			'uncheck to hide x/y/z axes',
 			'check to show x/y/z axes',
 			false

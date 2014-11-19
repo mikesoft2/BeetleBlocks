@@ -50,8 +50,6 @@ OBJButton.onclick = function () {
 };
 */
  
-var axes = {visible: true, lines: []};
-
 function addLineToPointWithColorToObject(point, color, object) {
 	geometry = new THREE.Geometry();
 	geometry.vertices.push(new THREE.Vector3());
@@ -61,7 +59,7 @@ function addLineToPointWithColorToObject(point, color, object) {
 	});
 	var line = new THREE.Line(geometry, lineMaterial);
 	object.add(line);
-	axes.lines.push(line);
+	object.axes.push(line);
 }
 
 // a stack to push and pop position and rotation states

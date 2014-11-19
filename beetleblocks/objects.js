@@ -38,6 +38,7 @@ SpriteMorph.prototype.initBeetle = function() {
 	this.beetle.reset();
 	this.beetle.resetColor()
 
+	this.beetle.axes = [];
 	// beetle's local axis lines
 	p = new THREE.Vector3(1,0,0);
 	addLineToPointWithColorToObject(p, 0x00FF00, this.beetle);
@@ -385,6 +386,8 @@ StageMorph.prototype.init = function(globals) {
 
 StageMorph.prototype.initScene = function() {
 	this.scene = new THREE.Scene();
+	this.scene.axes = [];
+
 	p = new THREE.Vector3(5,0,0);
 	addLineToPointWithColorToObject(p, 0x00FF00, this.scene);
 	p = new THREE.Vector3(0,5,0);
@@ -401,6 +404,7 @@ StageMorph.prototype.initRenderer = function() {
 	this.renderer.setClearColor(0xCCCCCC, 1);
 	this.renderer.changed = false;
 	this.renderer.isWireframeMode = false;
+	this.renderer.showingAxes = true;
 
 	this.renderer.toggleWireframe = function() {
 		var myInnerSelf = this;
@@ -408,6 +412,19 @@ StageMorph.prototype.initRenderer = function() {
 		myself.myObjects.children.forEach(function(eachObject) {
 			eachObject.material.wireframe = myInnerSelf.isWireframeMode;
 		});
+		myself.reRender();
+	}
+
+	this.renderer.toggleAxes = function() {
+		var myInnerSelf = this;
+		this.showingAxes = !this.showingAxes;
+
+		myself.scene.axes.forEach(function(line){ line.visible = myInnerSelf.showingAxes });
+		myself.children.forEach(function(morph) {
+			if (morph instanceof SpriteMorph) {
+				morph.beetle.axes.forEach(function(line){ line.visible = myInnerSelf.showingAxes });
+			}
+		})
 		myself.reRender();
 	}
 }
