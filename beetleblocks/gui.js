@@ -1,3 +1,11 @@
+IDE_Morph.prototype.originalRemoveSprite = IDE_Morph.prototype.removeSprite;
+IDE_Morph.prototype.removeSprite = function (sprite) {
+	var stage = sprite.parentThatIsA(StageMorph);
+	stage.scene.remove(sprite.beetle);
+	stage.reRender();
+	this.originalRemoveSprite(sprite);
+}
+
 // Overriding this function as we cannot proxy it since it doesn't return a menu, but instead creates it and pops it up
 
 IDE_Morph.prototype.projectMenu = function () {
@@ -77,14 +85,14 @@ IDE_Morph.prototype.projectMenu = function () {
 
 	menu.addItem(
 			'Export blocks...',
-			function () {myself.exportGlobalBlocks(); },
+			function () { myself.exportGlobalBlocks(); },
 			'show global custom block definitions as XML\nin a new browser window'
 		    );
 
 	if (shiftClicked) {
 		menu.addItem(
 				'Export all scripts as pic...',
-				function () {myself.exportScriptsPicture(); },
+				function () { myself.exportScriptsPicture(); },
 				'show a picture of all scripts\nand block definitions',
 				new Color(100, 0, 0)
 			    );
@@ -92,7 +100,7 @@ IDE_Morph.prototype.projectMenu = function () {
 
 	menu.addItem(
 			'Export 3D model as STL',
-			function() { downloadSTL(myself.projectName) },
+			function() { myself.downloadSTL() },
 			'download the currently rendered 3D model\ninto an STL file ready to be printed'
 		    )
 
@@ -144,6 +152,13 @@ IDE_Morph.prototype.projectMenu = function () {
 
 
 	menu.popup(world, pos);
+}
+
+IDE_Morph.prototype.downloadSTL = function() {
+	var exporter = new THREE.STLExporter();
+	var stlString = exporter.exportScene(this.stage.scene);
+	var blob = new Blob([stlString], {type: 'text/plain;charset=utf-8'});
+	saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_export') + '.stl'); 
 }
 
 // IDE_Morph.prototype.createControlBar proxy
@@ -223,31 +238,27 @@ IDE_Morph.prototype.cameraMenu = function () {
 	}
 
 	menu = new MenuMorph(this);
-	menu.addItem('Reset camera', resetCamera);
+	menu.addItem('Reset camera', stage.resetCamera);
 	menu.addItem(
 		'Select background color', 
 		function(){ 
 			this.pickColor(null, function(color) { 
-				renderer.setClearColor('rgb(' + color.r + ',' + color.g + ',' + color.b + ')', 1);
-				reRender();
+				stage.renderer.setClearColor('rgb(' + color.r + ',' + color.g + ',' + color.b + ')', 1);
+				stage.reRender();
 			})
 		});
 	addPreference(
 			'Wireframe mode',
-			toggleWireframe,
-			isWireframeMode(),
+			function() { stage.renderer.toggleWireframe() },
+			stage.renderer.isWireframeMode,
 			'uncheck to disable wireframe mode',
 			'check to enable wireframe mode',
 			false
 		     );
 	addPreference(
 			'Show axes',
-			function(){ 
-				axes.lines.forEach(function(line){ line.visible = !line.visible });
-				axes.visible = !axes.visible;
-				reRender();
-			},
-			axes.visible,
+			function(){ stage.renderer.toggleAxes()	},
+			stage.renderer.showingAxes,
 			'uncheck to hide x/y/z axes',
 			'check to show x/y/z axes',
 			false
@@ -255,3 +266,9 @@ IDE_Morph.prototype.cameraMenu = function () {
 	menu.popup(world, pos);
 };
 
+IDE_Morph.prototype.originalSetStageExtent = IDE_Morph.prototype.setStageExtent;
+IDE_Morph.prototype.setStageExtent = function (aPoint) {
+	this.originalSetStageExtent(aPoint);
+	this.stage.renderer.setSize(aPoint.x, aPoint.y);
+	this.stage.reRender();
+}

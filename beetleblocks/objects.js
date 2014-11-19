@@ -38,6 +38,7 @@ SpriteMorph.prototype.initBeetle = function() {
 	this.beetle.reset();
 	this.beetle.resetColor()
 
+	this.beetle.axes = [];
 	// beetle's local axis lines
 	p = new THREE.Vector3(1,0,0);
 	addLineToPointWithColorToObject(p, 0x00FF00, this.beetle);
@@ -45,18 +46,15 @@ SpriteMorph.prototype.initBeetle = function() {
 	addLineToPointWithColorToObject(p, 0x0000FF, this.beetle);
 	p = new THREE.Vector3(0,0,1);
 	addLineToPointWithColorToObject(p, 0xFF0000, this.beetle);
-
-	scene.add(this.beetle);
-	resetCamera();
 }
 
 SpriteMorph.prototype.originalInit = SpriteMorph.prototype.init;
 
-SpriteMorph.prototype.init = function (globals) {
+SpriteMorph.prototype.init = function(globals) {
 	this.initBeetle();
 	this.originalInit(globals);
-}
 
+}
 
 // Definition of a new BeetleBlocks Category
 
@@ -359,55 +357,180 @@ SpriteMorph.prototype.blockTemplates = function(category) {
 	return blocks;
 }
 
-StageMorph.prototype.originalInit = StageMorph.prototype.init;
+// StageMorph
 
-StageMorph.prototype.init = function (globals) {
+StageMorph.prototype.originalDestroy = StageMorph.prototype.destroy;
+
+StageMorph.prototype.destroy = function() {
+	var myself = this;
+	this.scene.remove(myObjects);
+	this.children.forEach(function(eachSprite) {
+		myself.parentThatIsA(IDE_Morph).removeSprite(eachSprite);
+	});
+	this.originalDestroy();
+}
+
+StageMorph.prototype.originalInit = StageMorph.prototype.init;
+StageMorph.prototype.init = function(globals) {
     this.originalInit(globals);
-    this.trailsCanvas = renderer.domElement;
+	this.initScene();
+	this.initLights();
+	this.initRenderer();
+	this.initCamera();
+	
+	this.myObjects = new THREE.Object3D();
+	this.scene.add(this.myObjects);
+
+    this.trailsCanvas = this.renderer.domElement;
 };
 
-StageMorph.prototype.originalStep = StageMorph.prototype.step;
+StageMorph.prototype.initScene = function() {
+	this.scene = new THREE.Scene();
+	this.scene.axes = [];
 
-StageMorph.prototype.step = function () {
+	p = new THREE.Vector3(5,0,0);
+	addLineToPointWithColorToObject(p, 0x00FF00, this.scene);
+	p = new THREE.Vector3(0,5,0);
+	addLineToPointWithColorToObject(p, 0x0000FF, this.scene);
+	p = new THREE.Vector3(0,0,5);
+	addLineToPointWithColorToObject(p, 0xFF0000, this.scene);
+}
+
+StageMorph.prototype.initRenderer = function() {
+	var myself = this;
+	
+	this.renderer = new THREE.WebGLRenderer({ antialias: true });
+	this.renderer.setSize(480, 360); // ugly! this.width(), this.height() is not set yet!
+	this.renderer.setClearColor(0xCCCCCC, 1);
+	this.renderer.changed = false;
+	this.renderer.isWireframeMode = false;
+	this.renderer.showingAxes = true;
+
+	this.renderer.toggleWireframe = function() {
+		var myInnerSelf = this;
+		this.isWireframeMode = !this.isWireframeMode;
+		myself.myObjects.children.forEach(function(eachObject) {
+			eachObject.material.wireframe = myInnerSelf.isWireframeMode;
+		});
+		myself.reRender();
+	}
+
+	this.renderer.toggleAxes = function() {
+		var myInnerSelf = this;
+		this.showingAxes = !this.showingAxes;
+
+		myself.scene.axes.forEach(function(line){ line.visible = myInnerSelf.showingAxes });
+		myself.children.forEach(function(morph) {
+			if (morph instanceof SpriteMorph) {
+				morph.beetle.axes.forEach(function(line){ line.visible = myInnerSelf.showingAxes });
+			}
+		})
+		myself.reRender();
+	}
+}
+
+StageMorph.prototype.render = function() {
+	this.pointLight.position.copy(this.camera.position); // pointlight moves with the camera
+	this.renderer.render(this.scene, this.camera);
+};
+
+StageMorph.prototype.renderCycle = function() {
+   	if (this.renderer.changed){
+		this.render();
+		this.changed();
+		this.renderer.changed = false;
+	}
+}
+
+StageMorph.prototype.reRender = function() {
+    this.renderer.changed = true;
+}
+
+StageMorph.prototype.initCamera = function() {
+	var myself = this;
+	this.camera = new THREE.PerspectiveCamera(60, 480/360, 1, 1000);
+	this.scene.add(this.camera);
+	this.resetCamera();
+
+	var threeLayer = document.createElement('div');
+
+	this.controls = new THREE.OrbitControls(this.camera, threeLayer);
+	this.controls.addEventListener('change', function(event) { myself.render });
+}
+
+StageMorph.prototype.resetCamera = function() {
+	this.camera.position.x = -5;
+	this.camera.position.y = 7;
+	this.camera.position.z = 5;
+	this.camera.lookAt(new THREE.Vector3());
+	this.reRender();
+}
+
+StageMorph.prototype.initLights = function() {
+	var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+	directionalLight.position.set(1, 1, 0);
+	this.scene.add(directionalLight);
+
+	this.pointLight = new THREE.PointLight(0xffffff, 1, 200);
+	this.pointLight.position.set(10, 10, 10);
+	this.scene.add(this.pointLight);
+}
+
+StageMorph.prototype.originalStep = StageMorph.prototype.step;
+StageMorph.prototype.step = function() {
     this.originalStep();
 
     // update Beetleblocks, if needed
-    renderCycle(this);
+    this.renderCycle();
 };
 
 StageMorph.prototype.referencePos = null;
 
-StageMorph.prototype.mouseScroll = function (y, x) {
+StageMorph.prototype.mouseScroll = function(y, x) {
     if (y > 0) {
-        controls.dollyOut();
+        this.controls.dollyOut();
     } else if (y < 0) {
-        controls.dollyIn();
+        this.controls.dollyIn();
     }
-    controls.update();
-    reRender();
+    this.controls.update();
+    this.reRender();
 };
 
-StageMorph.prototype.mouseDownLeft = function (pos) {
+StageMorph.prototype.mouseDownLeft = function(pos) {
     this.referencePos = pos;
 };
 
-StageMorph.prototype.mouseDownRight = function (pos) {
+StageMorph.prototype.mouseDownRight = function(pos) {
     this.referencePos = pos;
 };
 
-StageMorph.prototype.mouseMove = function (pos, button) {
+StageMorph.prototype.mouseMove = function(pos, button) {
     deltaX = pos.x - this.referencePos.x;
     deltaY = pos.y - this.referencePos.y;
     this.referencePos = pos
     if (button === 'right' || this.world().currentKey === 16) { // shiftClicked
-        controls.panLeft(deltaX / this.dimensions.x / this.scale * 15);
-        controls.panUp(deltaY / this.dimensions.y / this.scale * 10);
+        this.controls.panLeft(deltaX / this.dimensions.x / this.scale * 15);
+        this.controls.panUp(deltaY / this.dimensions.y / this.scale * 10);
     } else {
         horzAngle = deltaX / (this.dimensions.x * this.scale) * 360;
         vertAngle = deltaY / (this.dimensions.y * this.scale) * 360;
-        controls.rotateLeft(radians(horzAngle));
-        controls.rotateUp(radians(vertAngle));
+        this.controls.rotateLeft(radians(horzAngle));
+        this.controls.rotateUp(radians(vertAngle));
     }
-    controls.update();
-    reRender();
+    this.controls.update();
+    this.reRender();
+};
+
+StageMorph.prototype.originalAdd = StageMorph.prototype.add;
+StageMorph.prototype.add = function(morph) {
+	this.originalAdd(morph);
+	if (morph instanceof SpriteMorph) {
+		this.scene.add(morph.beetle);
+		this.reRender();
+	}
+}
+
+StageMorph.prototype.clearPenTrails = function() {
+    // We'll never need to clear the pen trails in BeetleBlocks, it only causes the renderer to disappear
+	nop(); 
 };
