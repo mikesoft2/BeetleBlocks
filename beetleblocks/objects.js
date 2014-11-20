@@ -1,3 +1,15 @@
+// THREE additions
+THREE.Object3D.prototype.addLineToPointWithColor = function(point, color) {
+	geometry = new THREE.Geometry();
+	geometry.vertices.push(new THREE.Vector3());
+	geometry.vertices.push(point);
+	var lineMaterial = new THREE.LineBasicMaterial({ color: color });
+	var line = new THREE.Line(geometry, lineMaterial);
+	this.add(line);
+	this.axes.push(line);
+}
+
+// SpriteMorph
 SpriteMorph.prototype.initBeetle = function() {
 	var myself = this;
 
@@ -9,7 +21,7 @@ SpriteMorph.prototype.initBeetle = function() {
 	var geometry = new THREE.CylinderGeometry( 0, 0.25, 0.7, 32);
 
 	this.beetle.shape = new THREE.Mesh(geometry, material);
-	this.beetle.shape.rotation.x = toRad(90);
+	this.beetle.shape.rotation.x = radians(90);
 	this.beetle.shape.position.z = 0.35;
 	this.beetle.shape.name = 'beetleShape';
 
@@ -41,11 +53,11 @@ SpriteMorph.prototype.initBeetle = function() {
 	this.beetle.axes = [];
 	// beetle's local axis lines
 	p = new THREE.Vector3(1,0,0);
-	addLineToPointWithColorToObject(p, 0x00FF00, this.beetle);
+	this.beetle.addLineToPointWithColor(p, 0x00FF00);
 	p = new THREE.Vector3(0,1,0);
-	addLineToPointWithColorToObject(p, 0x0000FF, this.beetle);
+	this.beetle.addLineToPointWithColor(p, 0x0000FF);
 	p = new THREE.Vector3(0,0,1);
-	addLineToPointWithColorToObject(p, 0xFF0000, this.beetle);
+	this.beetle.addLineToPointWithColor(p, 0xFF0000);
 }
 
 SpriteMorph.prototype.originalInit = SpriteMorph.prototype.init;
@@ -389,11 +401,11 @@ StageMorph.prototype.initScene = function() {
 	this.scene.axes = [];
 
 	p = new THREE.Vector3(5,0,0);
-	addLineToPointWithColorToObject(p, 0x00FF00, this.scene);
+	this.scene.addLineToPointWithColor(p, 0x00FF00);
 	p = new THREE.Vector3(0,5,0);
-	addLineToPointWithColorToObject(p, 0x0000FF, this.scene);
+	this.scene.addLineToPointWithColor(p, 0x0000FF);
 	p = new THREE.Vector3(0,0,5);
-	addLineToPointWithColorToObject(p, 0xFF0000, this.scene);
+	this.scene.addLineToPointWithColor(p, 0xFF0000);
 }
 
 StageMorph.prototype.initRenderer = function() {

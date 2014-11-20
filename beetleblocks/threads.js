@@ -136,13 +136,13 @@ Process.prototype.setRotationOnAxis = function(axis, angle) {
 
 	angle = Number(angle);
 	if (axis == 'x') {
-		beetle.rotation.z = toRad(angle * -1);
+		beetle.rotation.z = radians(angle * -1);
 	}
 	if (axis == 'y') {
-		beetle.rotation.x = toRad(angle * -1);
+		beetle.rotation.x = radians(angle * -1);
 	}
 	if (axis == 'z') {
-		beetle.rotation.y = toRad(angle);
+		beetle.rotation.y = radians(angle);
 	}
 
 	if (beetle.extruding) {
@@ -203,13 +203,13 @@ Process.prototype.rotate = function(axis, angle) {
 	angle = Number(angle);
 
 	if (axis == 'x') {
-		beetle.rotateZ(toRad(angle) * -1);
+		beetle.rotateZ(radians(angle) * -1);
 	}
 	if (axis == 'y') {
-		beetle.rotateX(toRad(angle) * -1);
+		beetle.rotateX(radians(angle) * -1);
 	}
 	if (axis == 'z') {
-		beetle.rotateY(toRad(angle));
+		beetle.rotateY(radians(angle));
 	}	
 
 	stage.reRender();
@@ -479,12 +479,12 @@ Process.prototype.getRotation = function(axis) {
 	if (axis == 'z') {
 		rot = beetle.rotation.y;
 	}
-	return toDeg(rot);
+	return degrees(rot);
 };
 
 Process.prototype.pushPosition = function() {
 	var beetle = this.homeContext.receiver.beetle;
-	beetle.posAndRotStack.push(new posAndRot(beetle.position.clone(), beetle.rotation.clone()));
+	beetle.posAndRotStack.push({position: beetle.position.clone(), rotation: beetle.rotation.clone()});
 };
 
 Process.prototype.popPosition = function() {
@@ -494,7 +494,7 @@ Process.prototype.popPosition = function() {
 	if (beetle.posAndRotStack.length) {
 		var posAndRot = beetle.posAndRotStack.pop();	
 		beetle.position.set(posAndRot.position.x, posAndRot.position.y, posAndRot.position.z);
-		beetle.rotation.set(posAndRot.rotation.x,posAndRot.rotation.y,posAndRot.rotation.z);
+		beetle.rotation.set(posAndRot.rotation.x, posAndRot.rotation.y, posAndRot.rotation.z);
 		stage.reRender();
 		if (beetle.extruding) { this.addPointToExtrusion() }
 	}
