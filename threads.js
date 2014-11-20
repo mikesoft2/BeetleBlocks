@@ -83,7 +83,7 @@ ArgLabelMorph, localize, XML_Element, hex_sha512*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.threads = '2014-November-17';
+modules.threads = '2014-November-20';
 
 var ThreadManager;
 var Process;
@@ -136,7 +136,8 @@ ThreadManager.prototype.toggleProcess = function (block) {
 ThreadManager.prototype.startProcess = function (
     block,
     isThreadSafe,
-    exportResult
+    exportResult,
+    callback
 ) {
     var active = this.findProcess(block),
         top = block.topBlock(),
@@ -149,7 +150,7 @@ ThreadManager.prototype.startProcess = function (
         this.removeTerminatedProcesses();
     }
     top.addHighlight();
-    newProc = new Process(block.topBlock());
+    newProc = new Process(block.topBlock(), callback);
     newProc.exportResult = exportResult;
     this.processes.push(newProc);
     return newProc;
@@ -225,8 +226,9 @@ ThreadManager.prototype.removeTerminatedProcesses = function () {
     var remaining = [];
     this.processes.forEach(function (proc) {
         if (!proc.isRunning() && !proc.errorFlag && !proc.isDead) {
-            proc.topBlock.removeHighlight();
-
+            if (proc.topBlock instanceof BlockMorph) {
+                proc.topBlock.removeHighlight();
+            }
             if (proc.prompter) {
                 proc.prompter.destroy();
                 if (proc.homeContext.receiver.stopTalking) {
@@ -235,18 +237,22 @@ ThreadManager.prototype.removeTerminatedProcesses = function () {
             }
 
             if (proc.topBlock instanceof ReporterBlockMorph) {
-                if (proc.homeContext.inputs[0] instanceof List) {
-                    proc.topBlock.showBubble(
-                        new ListWatcherMorph(
-                            proc.homeContext.inputs[0]
-                        ),
-                        proc.exportResult
-                    );
+                if (proc.onComplete instanceof Function) {
+                    proc.onComplete(proc.homeContext.inputs[0]);
                 } else {
-                    proc.topBlock.showBubble(
-                        proc.homeContext.inputs[0],
-                        proc.exportResult
-                    );
+                    if (proc.homeContext.inputs[0] instanceof List) {
+                        proc.topBlock.showBubble(
+                            new ListWatcherMorph(
+                                proc.homeContext.inputs[0]
+                            ),
+                            proc.exportResult
+                        );
+                    } else {
+                        proc.topBlock.showBubble(
+                            proc.homeContext.inputs[0],
+                            proc.exportResult
+                        );
+                    }
                 }
             }
         } else {
@@ -295,9 +301,9 @@ ThreadManager.prototype.findProcess = function (block) {
                         are children
     receiver            object (sprite) to which the process applies,
                         cached from the top block
-    context                the Context describing the current state
+    context             the Context describing the current state
                         of this process
-    homeContext            stores information relevant to the whole process,
+    homeContext         stores information relevant to the whole process,
                         i.e. its receiver, result etc.
     isPaused            boolean indicating whether to pause
     readyToYield        boolean indicating whether to yield control to
@@ -305,15 +311,17 @@ ThreadManager.prototype.findProcess = function (block) {
     readyToTerminate    boolean indicating whether the stop method has
                         been called
     isDead              boolean indicating a terminated clone process
-    timeout                msecs after which to force yield
-    lastYield            msecs when the process last yielded
-    errorFlag            boolean indicating whether an error was encountered
+    timeout             msecs after which to force yield
+    lastYield           msecs when the process last yielded
+    errorFlag           boolean indicating whether an error was encountered
     prompter            active instance of StagePrompterMorph
     httpRequest         active instance of an HttpRequest or null
     pauseOffset         msecs between the start of an interpolated operation
                         and when the process was paused
     exportResult        boolean flag indicating whether a picture of the top
                         block along with the result bubble shoud be exported
+    onComplete          an optional callback function to be executed when
+                        the process is done
 */
 
 Process.prototype = {};
@@ -321,7 +329,7 @@ Process.prototype.contructor = Process;
 Process.prototype.timeout = 500; // msecs after which to force yield
 Process.prototype.isCatchingErrors = true;
 
-function Process(topBlock) {
+function Process(topBlock, onComplete) {
     this.topBlock = topBlock || null;
 
     this.readyToYield = false;
@@ -338,6 +346,7 @@ function Process(topBlock) {
     this.pauseOffset = null;
     this.frameCount = 0;
     this.exportResult = false;
+    this.onComplete = onComplete || null;
 
     if (topBlock) {
         this.homeContext.receiver = topBlock.receiver();
@@ -435,7 +444,6 @@ Process.prototype.pauseStep = function () {
 
 Process.prototype.evaluateContext = function () {
     var exp = this.context.expression;
-
     this.frameCount += 1;
     if (exp instanceof Array) {
         return this.evaluateSequence(exp);
@@ -850,8 +858,9 @@ Process.prototype.evaluate = function (
 
             } else if (context.emptySlots !== 1) {
                 throw new Error(
-                    'expecting ' + context.emptySlots + ' input(s), '
-                        + 'but getting ' + parms.length
+                    localize('expecting') + ' ' + context.emptySlots + ' '
+                        + localize('input(s), but getting') + ' '
+                        + parms.length
                 );
             }
         }
@@ -879,6 +888,9 @@ Process.prototype.fork = function (context, args) {
         throw new Error(
             'continuations cannot be forked'
         );
+    }
+    if (!(context instanceof Context)) {
+        throw new Error('expecting a ring but getting ' + context);
     }
 
     var outer = new Context(null, null, context.outerContext),
@@ -926,8 +938,9 @@ Process.prototype.fork = function (context, args) {
 
             } else if (context.emptySlots !== 1) {
                 throw new Error(
-                    'expecting ' + context.emptySlots + ' input(s), '
-                        + 'but getting ' + parms.length
+                    localize('expecting') + ' ' + context.emptySlots + ' '
+                        + localize('input(s), but getting') + ' '
+                        + parms.length
                 );
             }
         }
@@ -1145,7 +1158,7 @@ Process.prototype.doShowVar = function (varName) {
             if (isGlobal || target.owner) {
                 label = name;
             } else {
-                label = name + ' (temporary)';
+                label = name + ' ' + localize('(temporary)');
             }
             watcher = new WatcherMorph(
                 label,
@@ -2115,7 +2128,7 @@ Process.prototype.reportTextSplit = function (string, delimiter) {
     str = (string || '').toString();
     switch (this.inputOption(delimiter)) {
     case 'line':
-        del = '\n';
+        del = '\r?\n';
         break;
     case 'tab':
         del = '\t';
@@ -2973,9 +2986,9 @@ VariableFrame.prototype.find = function (name) {
     var frame = this.silentFind(name);
     if (frame) {return frame; }
     throw new Error(
-        'a variable of name \''
+        localize('a variable of name \'')
             + name
-            + '\'\ndoes not exist in this context'
+            + localize('\'\ndoes not exist in this context')
     );
 };
 
@@ -3040,9 +3053,9 @@ VariableFrame.prototype.getVar = function (name) {
         return '';
     }
     throw new Error(
-        'a variable of name \''
+        localize('a variable of name \'')
             + name
-            + '\'\ndoes not exist in this context'
+            + localize('\'\ndoes not exist in this context')
     );
 };
 
