@@ -239,14 +239,16 @@ IDE_Morph.prototype.cameraMenu = function () {
 
 	menu = new MenuMorph(this);
 	menu.addItem('Reset camera', stage.resetCamera);
+	menu.addLine();
 	menu.addItem(
-		'Select background color', 
+		'Set background color', 
 		function(){ 
 			this.pickColor(null, function(color) { 
 				stage.renderer.setClearColor('rgb(' + color.r + ',' + color.g + ',' + color.b + ')', 1);
 				stage.reRender();
 			})
 		});
+	menu.addLine();
 	addPreference(
 			'Wireframe mode',
 			function() { stage.renderer.toggleWireframe() },
@@ -257,12 +259,47 @@ IDE_Morph.prototype.cameraMenu = function () {
 		     );
 	addPreference(
 			'Show axes',
-			function(){ stage.renderer.toggleAxes()	},
+			function(){ stage.renderer.toggleAxes() },
 			stage.renderer.showingAxes,
 			'uncheck to hide x/y/z axes',
 			'check to show x/y/z axes',
 			false
+			);
+	menu.addLine();
+	addPreference(
+			'Show grid',
+			function(){ stage.scene.grid.toggle() },
+			stage.scene.grid.visible,
+			'uncheck to hide x/y grid',
+			'check to show x/y grid',
+			false
 		     );
+	menu.addItem(
+		'Set grid interval',
+		function(){
+			new DialogBoxMorph(
+		        this,
+		        function(point) { stage.scene.grid.setInterval(point) },
+		        this
+		    ).promptVector(
+		        'Grid intervals',
+		        stage.scene.grid.interval, // current
+		        new Point(1, 1), // default
+		        'x interval',
+		        'y interval',
+		        this.world(),
+		        null, // pic
+		        null // msg
+		    );
+		});
+	menu.addItem(
+		'Set grid color', 
+		function(){ 
+			this.pickColor(null, function(color) { 
+				stage.scene.grid.setColor('0x' + color.r.toString(16) + color.g.toString(16) + color.b.toString(16));
+				stage.reRender();
+			})
+		});
 	menu.popup(world, pos);
 };
 
