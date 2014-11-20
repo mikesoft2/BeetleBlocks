@@ -1,13 +1,18 @@
 // THREE additions
 THREE.Object3D.prototype.addLineToPointWithColor = function(point, color) {
+	return this.addLineFromPointToPointWithColor(new THREE.Vector3(), point, color)
+}
+
+THREE.Object3D.prototype.addLineFromPointToPointWithColor = function(originPoint, destinationPoint, color) {
 	geometry = new THREE.Geometry();
-	geometry.vertices.push(new THREE.Vector3());
-	geometry.vertices.push(point);
+	geometry.vertices.push(originPoint);
+	geometry.vertices.push(destinationPoint);
 	var lineMaterial = new THREE.LineBasicMaterial({ color: color });
 	var line = new THREE.Line(geometry, lineMaterial);
 	this.add(line);
-	this.axes.push(line);
+	return line;
 }
+
 
 // SpriteMorph
 SpriteMorph.prototype.initBeetle = function() {
@@ -53,11 +58,11 @@ SpriteMorph.prototype.initBeetle = function() {
 	this.beetle.axes = [];
 	// beetle's local axis lines
 	p = new THREE.Vector3(1,0,0);
-	this.beetle.addLineToPointWithColor(p, 0x00FF00);
+	this.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0x00FF00));
 	p = new THREE.Vector3(0,1,0);
-	this.beetle.addLineToPointWithColor(p, 0x0000FF);
+	this.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0x0000FF));
 	p = new THREE.Vector3(0,0,1);
-	this.beetle.addLineToPointWithColor(p, 0xFF0000);
+	this.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0xFF0000));
 }
 
 SpriteMorph.prototype.originalInit = SpriteMorph.prototype.init;
@@ -399,13 +404,14 @@ StageMorph.prototype.init = function(globals) {
 StageMorph.prototype.initScene = function() {
 	this.scene = new THREE.Scene();
 	this.scene.axes = [];
+	this.scene.gridLines = [];
 
 	p = new THREE.Vector3(5,0,0);
-	this.scene.addLineToPointWithColor(p, 0x00FF00);
+	this.scene.axes.push(this.scene.addLineToPointWithColor(p, 0x00FF00));
 	p = new THREE.Vector3(0,5,0);
-	this.scene.addLineToPointWithColor(p, 0x0000FF);
+	this.scene.axes.push(this.scene.addLineToPointWithColor(p, 0x0000FF));
 	p = new THREE.Vector3(0,0,5);
-	this.scene.addLineToPointWithColor(p, 0xFF0000);
+	this.scene.axes.push(this.scene.addLineToPointWithColor(p, 0xFF0000));
 }
 
 StageMorph.prototype.initRenderer = function() {
@@ -437,6 +443,13 @@ StageMorph.prototype.initRenderer = function() {
 				morph.beetle.axes.forEach(function(line){ line.visible = myInnerSelf.showingAxes });
 			}
 		})
+		myself.reRender();
+	}
+
+	this.renderer.toggleGrid = function () {
+		var myInnerSelf = this;
+		this.showingGrid = !this.showingGrid;
+		myself.scene.gridLines.forEach(function(line){ line.visible = myInnerSelf.showingGrid });
 		myself.reRender();
 	}
 }
