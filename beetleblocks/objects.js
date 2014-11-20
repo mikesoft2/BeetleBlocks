@@ -390,9 +390,9 @@ StageMorph.prototype.destroy = function() {
 StageMorph.prototype.originalInit = StageMorph.prototype.init;
 StageMorph.prototype.init = function(globals) {
     this.originalInit(globals);
+	this.initRenderer();
 	this.initScene();
 	this.initLights();
-	this.initRenderer();
 	this.initCamera();
 	
 	this.myObjects = new THREE.Object3D();
@@ -402,10 +402,62 @@ StageMorph.prototype.init = function(globals) {
 };
 
 StageMorph.prototype.initScene = function() {
+	var myself = this;
 	this.scene = new THREE.Scene();
 	this.scene.axes = [];
-	this.scene.gridLines = [];
+	this.scene.grid = {};
+	this.scene.grid.defaultColor = 0xAAAAAA;
+	this.scene.grid.visible = false;
+	this.scene.grid.interval = new Point(1, 1);
 
+	// Grid
+	this.scene.grid.draw = function() {
+		var color = this.lines? this.lines[0].material.color : this.defaultColor;
+		if (this.lines) {
+			this.lines.forEach(function(eachLine){
+				myself.scene.remove(eachLine)
+			});
+			this.lines = [];
+		}
+		this.lines = [];
+		for (x = 0; x <= 10 / this.interval.x; x++) {
+			p1 = new THREE.Vector3(x * this.interval.x, 0, 0);
+			p2 = new THREE.Vector3(x * this.interval.x, 0, 10);
+			l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color);
+			l.visible = this.visible;
+			this.lines.push(l);
+		}
+		for (y = 0; y <= 10 / this.interval.y; y++) {
+			p1 = new THREE.Vector3(0, 0, y * this.interval.y);
+			p2 = new THREE.Vector3(10, 0, y * this.interval.y);
+			l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color);
+			l.visible = this.visible;
+			this.lines.push(l);
+		}
+		myself.reRender();
+	}
+
+	this.scene.grid.setInterval = function(aPoint) {
+		this.interval = aPoint;
+		this.draw();
+	}
+
+	this.scene.grid.setColor = function(color) {
+		this.lines.forEach(function(eachLine) {
+			eachLine.material.color.setHex(color);
+		})
+	};
+
+	this.scene.grid.toggle = function() {
+		var myInnerSelf = this;
+		this.visible = !this.visible;
+		this.lines.forEach(function(line){ line.visible = myInnerSelf.visible });
+		myself.reRender();
+	}
+
+	this.scene.grid.draw();
+
+	// Axes
 	p = new THREE.Vector3(5,0,0);
 	this.scene.axes.push(this.scene.addLineToPointWithColor(p, 0x00FF00));
 	p = new THREE.Vector3(0,5,0);
@@ -446,12 +498,6 @@ StageMorph.prototype.initRenderer = function() {
 		myself.reRender();
 	}
 
-	this.renderer.toggleGrid = function () {
-		var myInnerSelf = this;
-		this.showingGrid = !this.showingGrid;
-		myself.scene.gridLines.forEach(function(line){ line.visible = myInnerSelf.showingGrid });
-		myself.reRender();
-	}
 }
 
 StageMorph.prototype.render = function() {
