@@ -375,7 +375,7 @@ StageMorph.prototype.originalDestroy = StageMorph.prototype.destroy;
 
 StageMorph.prototype.destroy = function() {
 	var myself = this;
-	this.scene.remove(myObjects);
+	this.scene.remove(this.myObjects);
 	this.children.forEach(function(eachSprite) {
 		myself.parentThatIsA(IDE_Morph).removeSprite(eachSprite);
 	});
