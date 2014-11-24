@@ -313,3 +313,78 @@ IDE_Morph.prototype.setStageExtent = function (aPoint) {
 	this.stage.reRender();
 }
 
+// Single Morph mode
+
+IDE_Morph.prototype.createCorral = function(){}
+IDE_Morph.prototype.createCorralBar = function(){}
+
+IDE_Morph.prototype.fixLayout = function (situation) {
+    // situation is a string, i.e.
+    // 'selectSprite' or 'refreshPalette' or 'tabEditor'
+    var padding = this.padding;
+
+    Morph.prototype.trackChanges = false;
+
+    if (situation !== 'refreshPalette') {
+        // controlBar
+        this.controlBar.setPosition(this.logo.topRight());
+        this.controlBar.setWidth(this.right() - this.controlBar.left());
+        this.controlBar.fixLayout();
+
+        // categories
+        this.categories.setLeft(this.logo.left());
+        this.categories.setTop(this.logo.bottom());
+    }
+
+    // palette
+    this.palette.setLeft(this.logo.left());
+    this.palette.setTop(this.categories.bottom());
+    this.palette.setHeight(this.bottom() - this.palette.top());
+
+    if (situation !== 'refreshPalette') {
+        // stage
+        if (this.isAppMode) {
+            this.stage.setScale(Math.floor(Math.min(
+                (this.width() - padding * 2) / this.stage.dimensions.x,
+                (this.height() - this.controlBar.height() * 2 - padding * 2)
+                    / this.stage.dimensions.y
+            ) * 10) / 10);
+            this.stage.setCenter(this.center());
+        } else {
+//            this.stage.setScale(this.isSmallStage ? 0.5 : 1);
+            this.stage.setScale(this.isSmallStage ? this.stageRatio : 1);
+            this.stage.setTop(this.logo.bottom() + padding);
+            this.stage.setRight(this.right());
+        }
+
+        // spriteBar
+        this.spriteBar.setPosition(this.logo.bottomRight().add(padding));
+        this.spriteBar.setExtent(new Point(
+            Math.max(0, this.stage.left() - padding - this.spriteBar.left()),
+            this.categories.bottom() - this.spriteBar.top() - padding
+        ));
+        this.spriteBar.fixLayout();
+
+        // spriteEditor
+        if (this.spriteEditor.isVisible) {
+            this.spriteEditor.setPosition(this.spriteBar.bottomLeft());
+            this.spriteEditor.setExtent(new Point(
+                this.spriteBar.width(),
+                this.bottom() - this.spriteEditor.top()
+            ));
+        }
+    }
+
+    Morph.prototype.trackChanges = true;
+    this.changed();
+};
+
+IDE_Morph.prototype.selectSprite = function (sprite) {
+    this.currentSprite = sprite;
+    this.createPalette();
+    this.createSpriteBar();
+    this.createSpriteEditor();
+    this.fixLayout('selectSprite');
+    this.currentSprite.scripts.fixMultiArgs();
+};
+
