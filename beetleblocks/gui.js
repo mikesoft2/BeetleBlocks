@@ -312,3 +312,4 @@ IDE_Morph.prototype.setStageExtent = function (aPoint) {
 	this.stage.renderer.setSize(aPoint.x, aPoint.y);
 	this.stage.reRender();
 }
+

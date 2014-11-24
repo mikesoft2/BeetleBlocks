@@ -374,6 +374,10 @@ SpriteMorph.prototype.blockTemplates = function(category) {
 	return blocks;
 }
 
+// Single Sprite mode
+
+SpriteMorph.prototype.drawNew = function () { this.hide() }
+
 // StageMorph
 
 StageMorph.prototype.originalDestroy = StageMorph.prototype.destroy;
