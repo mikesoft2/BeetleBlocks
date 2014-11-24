@@ -238,7 +238,10 @@ IDE_Morph.prototype.cameraMenu = function () {
 	}
 
 	menu = new MenuMorph(this);
-	menu.addItem('Reset camera', stage.resetCamera);
+	menu.addItem(
+		'Reset camera',
+		function() { stage.resetCamera() }
+		);
 	menu.addLine();
 	menu.addItem(
 		'Set background color', 
