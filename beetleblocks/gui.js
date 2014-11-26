@@ -388,3 +388,55 @@ IDE_Morph.prototype.selectSprite = function (sprite) {
     this.currentSprite.scripts.fixMultiArgs();
 };
 
+IDE_Morph.prototype.toggleAppMode = function (appMode) {
+    var world = this.world(),
+        elements = [
+            this.logo,
+            this.controlBar.cameraButton,
+            this.controlBar.cloudButton,
+            this.controlBar.projectButton,
+            this.controlBar.settingsButton,
+            this.controlBar.stageSizeButton,
+            this.spriteBar,
+            this.palette,
+            this.categories
+        ];
+
+    this.isAppMode = isNil(appMode) ? !this.isAppMode : appMode;
+
+    Morph.prototype.trackChanges = false;
+    if (this.isAppMode) {
+        this.setColor(this.appModeColor);
+        this.controlBar.setColor(this.color);
+        this.controlBar.appModeButton.refresh();
+        elements.forEach(function (e) {
+            e.hide();
+        });
+        world.children.forEach(function (morph) {
+            if (morph instanceof DialogBoxMorph) {
+                morph.hide();
+            }
+        });
+    } else {
+        this.setColor(this.backgroundColor);
+        this.controlBar.setColor(this.frameColor);
+        elements.forEach(function (e) {
+            e.show();
+        });
+        this.stage.setScale(1);
+        // show all hidden dialogs
+        world.children.forEach(function (morph) {
+            if (morph instanceof DialogBoxMorph) {
+                morph.show();
+            }
+        });
+        // prevent scrollbars from showing when morph appears
+        world.allChildren().filter(function (c) {
+            return c instanceof ScrollFrameMorph;
+        }).forEach(function (s) {
+            s.adjustScrollBars();
+        });
+    }
+    this.setExtent(this.world().extent()); // resume trackChanges
+};
+
