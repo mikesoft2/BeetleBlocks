@@ -15,7 +15,7 @@ THREE.STLExporter.prototype = {
 		var current;
 		scene.traverse (function (current) {
 			if (current instanceof THREE.Mesh) {
-				if (current.name != "coneShape") { // do not export the beetle
+				if (current.name != 'beetleShape') { // do not export the beetle
 					meshes.push (current);
 				}
 			}

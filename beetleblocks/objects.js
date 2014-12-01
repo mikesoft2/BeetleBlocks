@@ -47,7 +47,7 @@ SpriteMorph.prototype.initBeetle = function() {
 
 	this.beetle.resetColor = function() {	
 		myself.beetle.color.setHSL(0.05,0.5,0.5);
-		myself.beetle.getObjectByName("beetleShape").material.color = myself.beetle.color;
+		myself.beetle.getObjectByName('beetleShape').material.color = myself.beetle.color;
 	}
 
 	this.beetle.add(this.beetle.shape);
