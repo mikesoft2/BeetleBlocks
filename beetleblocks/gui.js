@@ -6,7 +6,10 @@ IDE_Morph.prototype.removeSprite = function (sprite) {
 	this.originalRemoveSprite(sprite);
 }
 
-// Overriding this function as we cannot proxy it since it doesn't return a menu, but instead creates it and pops it up
+// Force flat design
+IDE_Morph.prototype.setDefaultDesign = IDE_Morph.prototype.setFlatDesign; 
+
+// Overriding these functions as we cannot proxy them. They don't return a menu, they create one and pop it up
 
 IDE_Morph.prototype.projectMenu = function () {
 	var menu,
@@ -153,6 +156,203 @@ IDE_Morph.prototype.projectMenu = function () {
 
 	menu.popup(world, pos);
 }
+
+IDE_Morph.prototype.settingsMenu = function () {
+    var menu,
+        stage = this.stage,
+        world = this.world(),
+        myself = this,
+        pos = this.controlBar.settingsButton.bottomLeft(),
+        shiftClicked = (world.currentKey === 16);
+
+    function addPreference(label, toggle, test, onHint, offHint, hide) {
+        var on = '\u2611 ',
+            off = '\u2610 ';
+        if (!hide || shiftClicked) {
+            menu.addItem(
+                (test ? on : off) + localize(label),
+                toggle,
+                test ? onHint : offHint,
+                hide ? new Color(100, 0, 0) : null
+            );
+        }
+    }
+
+    menu = new MenuMorph(this);
+    menu.addItem('Language...', 'languageMenu');
+    menu.addItem(
+        'Zoom blocks...',
+        'userSetBlocksScale'
+    );
+    menu.addItem(
+        'Stage size...',
+        'userSetStageSize'
+    );
+    menu.addLine();
+    addPreference(
+        'Blurred shadows',
+        'toggleBlurredShadows',
+        useBlurredShadows,
+        'uncheck to use solid drop\nshadows and highlights',
+        'check to use blurred drop\nshadows and highlights',
+        true
+    );
+    addPreference(
+        'Zebra coloring',
+        'toggleZebraColoring',
+        BlockMorph.prototype.zebraContrast,
+        'uncheck to disable alternating\ncolors for nested block',
+        'check to enable alternating\ncolors for nested blocks',
+        true
+    );
+    addPreference(
+        'Dynamic input labels',
+        'toggleDynamicInputLabels',
+        SyntaxElementMorph.prototype.dynamicInputLabels,
+        'uncheck to disable dynamic\nlabels for variadic inputs',
+        'check to enable dynamic\nlabels for variadic inputs',
+        true
+    );
+    addPreference(
+        'Prefer empty slot drops',
+        'togglePreferEmptySlotDrops',
+        ScriptsMorph.prototype.isPreferringEmptySlots,
+        'uncheck to allow dropped\nreporters to kick out others',
+        'settings menu prefer empty slots hint',
+        true
+    );
+    addPreference(
+        'Long form input dialog',
+        'toggleLongFormInputDialog',
+        InputSlotDialogMorph.prototype.isLaunchingExpanded,
+        'uncheck to use the input\ndialog in short form',
+        'check to always show slot\ntypes in the input dialog'
+    );
+    addPreference(
+        'Plain prototype labels',
+        'togglePlainPrototypeLabels',
+        BlockLabelPlaceHolderMorph.prototype.plainLabel,
+        'uncheck to always show (+) symbols\nin block prototype labels',
+        'check to hide (+) symbols\nin block prototype labels'
+    );
+    addPreference(
+        'Virtual keyboard',
+        'toggleVirtualKeyboard',
+        MorphicPreferences.useVirtualKeyboard,
+        'uncheck to disable\nvirtual keyboard support\nfor mobile devices',
+        'check to enable\nvirtual keyboard support\nfor mobile devices',
+        true
+    );
+    addPreference(
+        'Input sliders',
+        'toggleInputSliders',
+        MorphicPreferences.useSliderForInput,
+        'uncheck to disable\ninput sliders for\nentry fields',
+        'check to enable\ninput sliders for\nentry fields'
+    );
+    if (MorphicPreferences.useSliderForInput) {
+        addPreference(
+            'Execute on slider change',
+            'toggleSliderExecute',
+            InputSlotMorph.prototype.executeOnSliderEdit,
+            'uncheck to supress\nrunning scripts\nwhen moving the slider',
+            'check to run\nthe edited script\nwhen moving the slider'
+        );
+    }
+    addPreference(
+        'Clicking sound',
+        function () {
+            BlockMorph.prototype.toggleSnapSound();
+            if (BlockMorph.prototype.snapSound) {
+                myself.saveSetting('click', true);
+            } else {
+                myself.removeSetting('click');
+            }
+        },
+        BlockMorph.prototype.snapSound,
+        'uncheck to turn\nblock clicking\nsound off',
+        'check to turn\nblock clicking\nsound on'
+    );
+    addPreference(
+        'Animations',
+        function () {myself.isAnimating = !myself.isAnimating; },
+        myself.isAnimating,
+        'uncheck to disable\nIDE animations',
+        'check to enable\nIDE animations',
+        true
+    );
+    addPreference(
+        'Turbo mode',
+        'toggleFastTracking',
+        this.stage.isFastTracked,
+        'uncheck to run scripts\nat normal speed',
+        'check to prioritize\nscript execution'
+    );
+    addPreference(
+        'Rasterize SVGs',
+        function () {
+            MorphicPreferences.rasterizeSVGs =
+                !MorphicPreferences.rasterizeSVGs;
+        },
+        MorphicPreferences.rasterizeSVGs,
+        'uncheck for smooth\nscaling of vector costumes',
+        'check to rasterize\nSVGs on import',
+        true
+    );
+    addPreference(
+        'Sprite Nesting',
+        function () {
+            SpriteMorph.prototype.enableNesting =
+                !SpriteMorph.prototype.enableNesting;
+        },
+        SpriteMorph.prototype.enableNesting,
+        'uncheck to disable\nsprite composition',
+        'check to enable\nsprite composition',
+        true
+    );
+    menu.addLine(); // everything below this line is stored in the project
+    addPreference(
+        'Thread safe scripts',
+        function () {stage.isThreadSafe = !stage.isThreadSafe; },
+        this.stage.isThreadSafe,
+        'uncheck to allow\nscript reentrance',
+        'check to disallow\nscript reentrance'
+    );
+    addPreference(
+        'Prefer smooth animations',
+        'toggleVariableFrameRate',
+        StageMorph.prototype.frameRate,
+        'uncheck for greater speed\nat variable frame rates',
+        'check for smooth, predictable\nanimations across computers'
+    );
+    addPreference(
+        'Flat line ends',
+        function () {
+            SpriteMorph.prototype.useFlatLineEnds =
+                !SpriteMorph.prototype.useFlatLineEnds;
+        },
+        SpriteMorph.prototype.useFlatLineEnds,
+        'uncheck for round ends of lines',
+        'check for flat ends of lines'
+    );
+    addPreference(
+        'Codification support',
+        function () {
+            StageMorph.prototype.enableCodeMapping =
+                !StageMorph.prototype.enableCodeMapping;
+            myself.currentSprite.blocksCache.variables = null;
+            myself.currentSprite.paletteCache.variables = null;
+            myself.refreshPalette();
+        },
+        StageMorph.prototype.enableCodeMapping,
+        'uncheck to disable\nblock to text mapping features',
+        'check for block\nto text mapping features',
+        false
+    );
+    menu.popup(world, pos);
+};
+
+// STL export
 
 IDE_Morph.prototype.downloadSTL = function() {
 	var exporter = new THREE.STLExporter();
