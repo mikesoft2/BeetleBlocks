@@ -468,6 +468,15 @@ IDE_Morph.prototype.cameraMenu = function () {
 			'check to show x/y/z axes',
 			false
 			);
+	addPreference(
+			'Toggle parallel projection',
+			function(){ stage.renderer.toggleParallelProjection() },
+			stage.renderer.isParallelProjection,
+			'check to render in parallel projection',
+			'uncheck to render in perspective projection',
+			false
+			);
+
 	menu.addLine();
 	addPreference(
 			'Show grid',

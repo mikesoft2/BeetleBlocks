@@ -558,15 +558,16 @@ StageMorph.prototype.initCamera = function() {
 	// We need to implement zooming ourselves for parallel projection
 
 	this.camera.zoomIn = function() {
-		this.zoomFactor /= 1.1;
+		this.zoomFactor = this.zoomFactor < 1? this.zoomFactor * 0.99: this.zoomFactor - 10;
 		this.applyZoom();
 	}
 	this.camera.zoomOut = function() {
-		this.zoomFactor *= 1.1;
+		this.zoomFactor += 10;
 		this.applyZoom();
 	}
 
 	this.camera.applyZoom = function() {
+		console.log(this.zoomFactor);
 		this.left = myself.width() / - this.zoomFactor;
 	    this.right = myself.width() / this.zoomFactor;
 	    this.top = myself.height() / this.zoomFactor;
