@@ -471,10 +471,11 @@ StageMorph.prototype.initScene = function() {
 }
 
 StageMorph.prototype.initRenderer = function() {
-	var myself = this;
+	var myself = this,
+      dpr = window.devicePixelRatio;
 	
 	this.renderer = new THREE.WebGLRenderer({ antialias: true });
-	this.renderer.setSize(480, 360); // ugly! this.width(), this.height() is not set yet!
+	this.renderer.setSize(480 / dpr, 360 / dpr); // ugly! this.width(), this.height() is not set yet!
 	this.renderer.setClearColor(0xCCCCCC, 1);
 	this.renderer.changed = false;
 	this.renderer.isWireframeMode = false;
