@@ -534,21 +534,18 @@ StageMorph.prototype.initCamera = function() {
 
 	if (this.renderer.isParallelProjection) { 
 		// At init time Stage size is not yet set, so this cannot be the default projection
-		var zoomFactor = 82;
 		this.camera = new THREE.OrthographicCamera(
-			this.width() / - zoomFactor,
-			this.width() / zoomFactor,
-			this.height() / zoomFactor,
-			this.height() / - zoomFactor,
+			this.width() / - this.camera.zoomFactor,
+			this.width() / this.camera.zoomFactor,
+			this.height() / this.camera.zoomFactor,
+			this.height() / - this.camera.zoomFactor,
 			0.1, 
 			1000);
-		this.camera.zoomFactor = zoomFactor;
 	} else {
 		this.camera = new THREE.PerspectiveCamera(60, 480/360, 1, 1000)
 	};
 	
 	this.scene.add(this.camera);
-	this.resetCamera();
 
 	var threeLayer = document.createElement('div');
 
@@ -573,14 +570,20 @@ StageMorph.prototype.initCamera = function() {
 	    this.bottom = myself.height() / - this.zoomFactor;
     	this.updateProjectionMatrix();	
 	}
-}
 
-StageMorph.prototype.resetCamera = function() {
-	this.camera.position.x = -5;
-	this.camera.position.y = 7;
-	this.camera.position.z = 5;
-	this.camera.lookAt(new THREE.Vector3());
-	this.reRender();
+	this.camera.reset = function() {
+		if (myself.renderer.isParallelProjection) {
+			this.zoomFactor = 82;
+			this.applyZoom();
+		}
+		this.position.x = -5;
+		this.position.y = 7;
+		this.position.z = 5;
+		this.lookAt(new THREE.Vector3());
+		myself.reRender();
+	}
+
+	this.camera.reset();
 }
 
 StageMorph.prototype.initLights = function() {

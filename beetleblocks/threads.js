@@ -38,12 +38,6 @@ Process.prototype.hideBeetle = function() {
 	stage.reRender();
 };
 
-Process.prototype.resetCamera = function() {
-	var stage = this.homeContext.receiver.parentThatIsA(StageMorph);
-	stage.resetCamera();
-	stage.reRender();
-};
-
 Process.prototype.setPosition = function(x, y, z) {	
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph);

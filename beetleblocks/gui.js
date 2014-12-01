@@ -440,7 +440,7 @@ IDE_Morph.prototype.cameraMenu = function () {
 	menu = new MenuMorph(this);
 	menu.addItem(
 		'Reset camera',
-		function() { stage.resetCamera() }
+		function() { stage.camera.reset() }
 		);
 	menu.addLine();
 	menu.addItem(
