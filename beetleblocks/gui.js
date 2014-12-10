@@ -184,10 +184,6 @@ IDE_Morph.prototype.settingsMenu = function () {
         'Zoom blocks...',
         'userSetBlocksScale'
     );
-    menu.addItem(
-        'Stage size...',
-        'userSetStageSize'
-    );
     menu.addLine();
     addPreference(
         'Blurred shadows',
