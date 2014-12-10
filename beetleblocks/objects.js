@@ -396,8 +396,8 @@ StageMorph.prototype.init = function(globals) {
     this.originalInit(globals);
 	this.initRenderer();
 	this.initScene();
-	this.initLights();
 	this.initCamera();
+	this.initLights();
 	
 	this.myObjects = new THREE.Object3D();
 	this.scene.add(this.myObjects);
@@ -512,7 +512,8 @@ StageMorph.prototype.initRenderer = function() {
 
 
 StageMorph.prototype.render = function() {
-	this.pointLight.position.copy(this.camera.position); // pointlight moves with the camera
+	this.pointLight.position.copy(this.camera.position); // lights move with the camera
+	this.directionalLight.position.copy(this.camera.position);
 	this.renderer.render(this.scene, this.camera);
 };
 
@@ -588,12 +589,12 @@ StageMorph.prototype.initCamera = function() {
 }
 
 StageMorph.prototype.initLights = function() {
-	var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-	directionalLight.position.set(1, 1, 0);
-	this.scene.add(directionalLight);
+	this.directionalLight = new THREE.DirectionalLight(0x4c4c4c, 1);
+	this.directionalLight.position.set(this.camera.position);
+	this.scene.add(this.directionalLight);
 
 	this.pointLight = new THREE.PointLight(0xffffff, 1, 200);
-	this.pointLight.position.set(10, 10, 10);
+	this.pointLight.position.set(this.camera.position);
 	this.scene.add(this.pointLight);
 }
 
