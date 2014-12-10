@@ -512,8 +512,8 @@ StageMorph.prototype.initRenderer = function() {
 
 
 StageMorph.prototype.render = function() {
-	this.pointLight.position.copy(this.camera.position); // lights move with the camera
-	this.directionalLight.position.copy(this.camera.position);
+	this.pointLight.position = this.camera.position; // lights move with the camera
+	this.directionalLight.position = this.camera.position;
 	this.renderer.render(this.scene, this.camera);
 };
 
