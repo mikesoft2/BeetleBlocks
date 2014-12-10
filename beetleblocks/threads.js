@@ -390,20 +390,21 @@ Process.prototype.stopDrawing = function() {
 
 Process.prototype.setHSL = function(channel, value) {
 	var beetle = this.homeContext.receiver.beetle,
-		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
-	value = Number(value);
-	value %= 100; // wrap
-	value /= 100; // scale from 0-100 to 0-1
-
+		stage = this.homeContext.receiver.parentThatIsA(StageMorph),
+		value = Number(value);
 	var hsl = beetle.color.getHSL();
 	if (channel == 'hue') {
+		value %= 360; // wrap
+		value /= 360; // scale from 0-360 to 0-1
 		hsl.h = value;
-	}
-	if (channel == 'saturation') {
-		hsl.s = value;
-	}
-	if (channel == 'lightness') {
-		hsl.l = value;
+	} else {
+		value %= 100; // wrap
+		value /= 100; // scale from 0-100 to 0-1
+		if (channel == 'saturation') {
+			hsl.s = value;
+		} else if (channel == 'lightness') {
+			hsl.l = value;
+		}
 	}
 	beetle.color.setHSL(hsl.h, hsl.s, hsl.l);
 	beetle.shape.material.color = beetle.color;		
@@ -412,18 +413,20 @@ Process.prototype.setHSL = function(channel, value) {
 
 Process.prototype.changeHSL = function(channel, value) {	
 	var beetle = this.homeContext.receiver.beetle,
-		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
-	value = Number(value);
-	value %= 100; // wrap
-	value /= 100; // scale from 0-100 to 0-1
+		stage = this.homeContext.receiver.parentThatIsA(StageMorph),
+		value = Number(value);
 	if (channel == 'hue') {
+		value %= 360; // wrap
+		value /= 360; // scale from 0-360 to 0-1
 		beetle.color.offsetHSL(value,0,0);
-	}
-	if (channel == 'saturation') {
-		beetle.color.offsetHSL(0,value,0);
-	}
-	if (channel == 'lightness') {
-		beetle.color.offsetHSL(0,0,value);
+	} else {
+		value %= 100; // wrap
+		value /= 100; // scale from 0-100 to 0-1
+		if (channel == 'saturation') {
+			beetle.color.offsetHSL(0,value,0);
+		} else if (channel == 'lightness') {
+			beetle.color.offsetHSL(0,0,value);
+		}
 	}
 	beetle.shape.material.color = beetle.color;	
 	stage.reRender();
@@ -433,7 +436,7 @@ Process.prototype.getHSL = function(channel) {
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
 	if (channel == 'hue') {
-		return(beetle.color.getHSL().h * 100);
+		return(beetle.color.getHSL().h * 360);
 	}
 	if (channel == 'saturation') {
 		return(beetle.color.getHSL().s * 100);
