@@ -50,6 +50,12 @@ SpriteMorph.prototype.initBeetle = function() {
 		myself.beetle.getObjectByName('beetleShape').material.color = myself.beetle.color;
 	}
 
+	// visibility
+	this.beetle.toggleVisibility = function() {
+		this.shape.visible = this.shape.visible ? 0 : 1;
+		myself.parentThatIsA(StageMorph).reRender();
+	}
+
 	this.beetle.add(this.beetle.shape);
 
 	this.beetle.reset();
@@ -123,20 +129,6 @@ SpriteMorph.prototype.initBlocks = function() {
 			spec: 'go home',
 			category: 'motion'
 	};		
-	this.blocks.showBeetle =
-	{
-			only: SpriteMorph,
-			type:'command',
-			spec: 'show beetle',
-			category: 'motion'
-	};	
-	this.blocks.hideBeetle =
-	{
-			only: SpriteMorph,
-			type:'command',
-			spec: 'hide beetle',
-			category: 'motion'
-	};	
 	this.blocks.move =
 	{
 			only: SpriteMorph,
@@ -438,9 +430,6 @@ SpriteMorph.prototype.blockTemplates = function(category) {
 
 	if (cat === 'motion') {
 		blocks.push(block('goHome'));
-		blocks.push('-');
-		blocks.push(block('showBeetle'));
-		blocks.push(block('hideBeetle'));
 		blocks.push('-');
 		blocks.push(block('move'));
 		blocks.push(block('rotate'));

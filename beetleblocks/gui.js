@@ -464,6 +464,14 @@ IDE_Morph.prototype.cameraMenu = function () {
 			false
 			);
 	addPreference(
+			'Show beetle',
+			function(){ myself.currentSprite.beetle.toggleVisibility() },
+			myself.currentSprite.beetle.shape.visible,
+			'uncheck to hide the beetle',
+			'check to show the beetle',
+			false
+			);
+	addPreference(
 			'Toggle parallel projection',
 			function(){ stage.renderer.toggleParallelProjection() },
 			stage.renderer.isParallelProjection,

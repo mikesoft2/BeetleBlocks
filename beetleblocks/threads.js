@@ -24,20 +24,6 @@ Process.prototype.goHome = function() {
 	stage.reRender();
 };
 
-Process.prototype.showBeetle = function() {
-	var beetle = this.homeContext.receiver.beetle,
-		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
-	beetle.shape.visible = 1;
-	stage.reRender();
-};
-
-Process.prototype.hideBeetle = function() {
-	var beetle = this.homeContext.receiver.beetle,
-		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
-	beetle.shape.visible = 0;
-	stage.reRender();
-};
-
 Process.prototype.setPosition = function(x, y, z) {	
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
