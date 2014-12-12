@@ -359,7 +359,6 @@ IDE_Morph.prototype.downloadSTL = function() {
 
 // IDE_Morph.prototype.createControlBar proxy
 IDE_Morph.prototype.originalCreateControlBar = IDE_Morph.prototype.createControlBar;
-
 IDE_Morph.prototype.createControlBar = function () {
 	this.originalCreateControlBar();
 
@@ -667,10 +666,10 @@ ProjectDialogMorph.prototype.openProject = function () {
 };
 
 
-// Single Morph mode
+// Single Morph mode, no corral and no tabs in the scripting area
 
-IDE_Morph.prototype.createCorral = function(){}
-IDE_Morph.prototype.createCorralBar = function(){}
+IDE_Morph.prototype.createCorralBar = nop;
+IDE_Morph.prototype.createCorral = nop;
 
 IDE_Morph.prototype.fixLayout = function (situation) {
     // situation is a string, i.e.
@@ -711,20 +710,12 @@ IDE_Morph.prototype.fixLayout = function (situation) {
             this.stage.setRight(this.right());
         }
 
-        // spriteBar
-        this.spriteBar.setPosition(this.logo.bottomRight().add(padding));
-        this.spriteBar.setExtent(new Point(
-            Math.max(0, this.stage.left() - padding - this.spriteBar.left()),
-            this.categories.bottom() - this.spriteBar.top() - padding
-        ));
-        this.spriteBar.fixLayout();
-
         // spriteEditor
         if (this.spriteEditor.isVisible) {
-            this.spriteEditor.setPosition(this.spriteBar.bottomLeft());
+            this.spriteEditor.setPosition(this.categories.topRight());
             this.spriteEditor.setExtent(new Point(
-                this.spriteBar.width(),
-                this.bottom() - this.spriteEditor.top()
+                Math.max(0, this.stage.left() - padding - this.spriteEditor.left()),
+                this.bottom()
             ));
         }
     }
@@ -733,10 +724,24 @@ IDE_Morph.prototype.fixLayout = function (situation) {
     this.changed();
 };
 
+IDE_Morph.prototype.buildPanes = function () {
+    this.createLogo();
+    this.createControlBar();
+    this.createCategories();
+    this.createPalette();
+    this.createStage();
+    this.createSpriteEditor();
+	// It's easier to make a bogus spriteBar object than to remove all references to it
+	this.spriteBar = { 
+		tabBar: { 
+			tabTo: nop
+		}
+	};
+};
+
 IDE_Morph.prototype.selectSprite = function (sprite) {
     this.currentSprite = sprite;
     this.createPalette();
-    this.createSpriteBar();
     this.createSpriteEditor();
     this.fixLayout('selectSprite');
     this.currentSprite.scripts.fixMultiArgs();
@@ -751,7 +756,6 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
             this.controlBar.projectButton,
             this.controlBar.settingsButton,
             this.controlBar.stageSizeButton,
-            this.spriteBar,
             this.spriteEditor,
             this.palette,
             this.categories
@@ -794,4 +798,3 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
     }
     this.setExtent(this.world().extent()); // resume trackChanges
 };
-
