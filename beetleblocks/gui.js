@@ -522,26 +522,16 @@ IDE_Morph.prototype.setStageExtent = function (aPoint) {
 ProjectDialogMorph.prototype.getExamplesProjectList = function () {
     var dir,
         projects = [];
-
-    dir = this.ide.getURL('beetleblocks/examples/');
-    dir.split('\n').filter(function(each) { return each.indexOf('xml') > -1 }).forEach(
-        function (line) {
-            var startIdx = line.lastIndexOf('">'),
-                endIdx,
-                name,
-                dta;
-            if (startIdx) {
-                endIdx = line.lastIndexOf('&period;xml');
-                name = line.substring(startIdx + 2, endIdx);
-                dta = {
-                    name: name,
-                    thumb: null,
-                    notes: null
-                };
-                projects.push(dta);
-            }
-        }
-    );
+    dir = JSON.parse(this.ide.getURL('https://api.github.com/repos/ericrosenbaum/BeetleBlocks/contents/beetleblocks/examples'));
+	dir.forEach(function(each){
+		var dta = {
+			name: each.name.replace('.xml',''),
+			thumb: null,
+			notes: null,
+			path: each.path
+		};
+		projects.push(dta)
+	})
     projects.sort(function (x, y) {
         return x.name < y.name ? -1 : 1;
     });
@@ -630,7 +620,7 @@ ProjectDialogMorph.prototype.setSource = function (source) {
             if (myself.nameField) {
                 myself.nameField.setContents(item.name || '');
             }
-            src = myself.ide.getURL('beetleblocks/examples/' + item.name + '.xml');
+            src = myself.ide.getURL(item.path);
 
             xml = myself.ide.serializer.parse(src);
             myself.notesText.text = xml.childNamed('notes').contents
