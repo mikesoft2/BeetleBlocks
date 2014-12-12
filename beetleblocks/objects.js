@@ -262,7 +262,7 @@ SpriteMorph.prototype.initBlocks = function() {
 			type:'command', 
 			spec: 'text %s height %n depth %n',
 			category: 'shapes',
-			defaults: ['hello world', 1, 0.5]
+			defaults: ['hello', 1, 0.5]
 	};
 	this.blocks.startDrawing =
 	{
