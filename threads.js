@@ -83,7 +83,7 @@ ArgLabelMorph, localize, XML_Element, hex_sha512*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.threads = '2014-November-20';
+modules.threads = '2014-December-11';
 
 var ThreadManager;
 var Process;
@@ -100,7 +100,17 @@ function snapEquals(a, b) {
 
     var x = +a,
         y = +b,
+        i,
         specials = [true, false, ''];
+
+    // "zum Schneckengang verdorben, was Adlerflug geworden wäre"
+    // collecting edge-cases that somebody complained about
+    // on Github. Folks, take it easy and keep it fun, okay?
+    // Shit like this is patently ugly and slows Snap down. Tnx!
+    for (i = 9; i <= 13; i += 1) {
+        specials.push(String.fromCharCode(i));
+    }
+    specials.push(String.fromCharCode(160));
 
     // check for special values before coercing to numbers
     if (isNaN(x) || isNaN(y) ||
@@ -110,7 +120,7 @@ function snapEquals(a, b) {
         y = b;
     }
 
-    // handle text comparision case-insensitive.
+    // handle text comparison case-insensitive.
     if (isString(x) && isString(y)) {
         return x.toLowerCase() === y.toLowerCase();
     }
@@ -208,11 +218,10 @@ ThreadManager.prototype.resumeAll = function (stage) {
 };
 
 ThreadManager.prototype.step = function () {
-/*
-    run each process until it gives up control, skipping processes
-    for sprites that are currently picked up, then filter out any
-    processes that have been terminated
-*/
+    // run each process until it gives up control, skipping processes
+    // for sprites that are currently picked up, then filter out any
+    // processes that have been terminated
+
     this.processes.forEach(function (proc) {
         if (!proc.homeContext.receiver.isPickedUp() && !proc.isDead) {
             proc.runStep();
@@ -322,6 +331,9 @@ ThreadManager.prototype.findProcess = function (block) {
                         block along with the result bubble shoud be exported
     onComplete          an optional callback function to be executed when
                         the process is done
+    procedureCount      number counting procedure call entries,
+                        used to tag custom block calls, so "stop block"
+                        invocations can catch them
 */
 
 Process.prototype = {};
@@ -347,6 +359,7 @@ function Process(topBlock, onComplete) {
     this.frameCount = 0;
     this.exportResult = false;
     this.onComplete = onComplete || null;
+    this.procedureCount = 0;
 
     if (topBlock) {
         this.homeContext.receiver = topBlock.receiver();
@@ -370,13 +383,13 @@ Process.prototype.isRunning = function () {
 // Process entry points
 
 Process.prototype.runStep = function () {
-/*
-    a step is an an uninterruptable 'atom', it can consist
-    of several contexts, even of several blocks
-*/
+    // a step is an an uninterruptable 'atom', it can consist
+    // of several contexts, even of several blocks
+
     if (this.isPaused) { // allow pausing in between atomic steps:
         return this.pauseStep();
     }
+
     this.readyToYield = false;
     while (!this.readyToYield
             && this.context
@@ -445,6 +458,9 @@ Process.prototype.pauseStep = function () {
 Process.prototype.evaluateContext = function () {
     var exp = this.context.expression;
     this.frameCount += 1;
+    if (this.context.tag === 'exit') {
+        this.expectReport();
+    }
     if (exp instanceof Array) {
         return this.evaluateSequence(exp);
     }
@@ -468,7 +484,7 @@ Process.prototype.evaluateContext = function () {
 
 Process.prototype.evaluateBlock = function (block, argCount) {
     // check for special forms
-    if (contains(['reportOr', 'reportAnd'], block.selector)) {
+    if (contains(['reportOr', 'reportAnd', 'doReport'], block.selector)) {
         return this[block.selector](block);
     }
 
@@ -532,6 +548,35 @@ Process.prototype.reportAnd = function (block) {
         this.returnValueToParentContext(inputs[1] === true);
         this.popContext();
     }
+};
+
+Process.prototype.doReport = function (block) {
+    var outer = this.context.outerContext;
+    if (this.context.expression.partOfCustomCommand) {
+        this.doStopCustomBlock();
+        this.popContext();
+    } else {
+        while (this.context && this.context.tag !== 'exit') {
+            if (this.context.expression === 'doStopWarping') {
+                this.doStopWarping();
+            } else {
+                this.popContext();
+            }
+        }
+        if (this.context) {
+            if (this.context.expression === 'expectReport') {
+                // pop off inserted top-level exit context
+                this.popContext();
+            } else {
+                // un-tag and preserve original caller
+                this.context.tag = null;
+            }
+        }
+    }
+    // in any case evaluate (and ignore)
+    // the input, because it could be
+    // and HTTP Request for a hardware extension
+    this.pushContext(block.inputs()[0], outer);
 };
 
 // Process: Non-Block evaluation
@@ -682,9 +727,8 @@ Process.prototype.doYield = function () {
     }
 };
 
-Process.prototype.exitReporter = function () {
-    // catch-tag for REPORT and STOP BLOCK primitives
-    this.popContext();
+Process.prototype.expectReport = function () {
+    this.handleError(new Error("reporter didn't report"));
 };
 
 // Process Exception Handling
@@ -765,12 +809,6 @@ Process.prototype.reportJSFunction = function (parmNames, body) {
     );
 };
 
-/*
-Process.prototype.doRun = function (context, args, isCustomBlock) {
-    return this.evaluate(context, args, true, isCustomBlock);
-};
-*/
-
 Process.prototype.doRun = function (context, args) {
     return this.evaluate(context, args, true);
 };
@@ -795,9 +833,9 @@ Process.prototype.evaluate = function (
     }
 
     var outer = new Context(null, null, context.outerContext),
-        runnable,
-        extra,
+        caller = this.context.parentContext,
         exit,
+        runnable,
         parms = args.asArray(),
         i,
         value;
@@ -811,17 +849,11 @@ Process.prototype.evaluate = function (
         outer,
         context.receiver
     );
-    extra = new Context(runnable, 'doYield');
-
-        // Note: if the context's expression is a ReporterBlockMorph,
-        // the extra context gets popped off immediately without taking
-        // effect (i.e. it doesn't yield within evaluating a stack of
-        // nested reporters)
+    this.context.parentContext = runnable;
 
     if (context.expression instanceof ReporterBlockMorph) {
-        this.context.parentContext = extra;
-    } else {
-        this.context.parentContext = runnable;
+        // auto-"warp" nested reporters
+        this.readyToYield = (Date.now() - this.lastYield > this.timeout);
     }
 
     // assign parameters if any were passed
@@ -868,17 +900,22 @@ Process.prototype.evaluate = function (
 
     if (runnable.expression instanceof CommandBlockMorph) {
         runnable.expression = runnable.expression.blockSequence();
-
-        // insert a reporter exit tag for the
-        // CALL SCRIPT primitive variant
         if (!isCommand) {
-            exit = new Context(
-                runnable.parentContext,
-                'exitReporter',
-                outer,
-                outer.receiver
-            );
-            runnable.parentContext = exit;
+            if (caller) {
+                // tag caller, so "report" can catch it later
+                caller.tag = 'exit';
+            } else {
+                // top-level context, insert a tagged exit context
+                // which "report" can catch later
+                exit = new Context(
+                    runnable.parentContext,
+                    'expectReport',
+                    outer,
+                    outer.receiver
+                );
+                exit.tag = 'exit';
+                runnable.parentContext = exit;
+            }
         }
     }
 };
@@ -957,21 +994,27 @@ Process.prototype.fork = function (context, args) {
     stage.threads.processes.push(proc);
 };
 
-Process.prototype.doReport = function (value) {
-    if (this.context.expression.partOfCustomCommand) {
-        return this.doStopBlock();
+// Process stopping blocks primitives
+
+Process.prototype.doStopBlock = function () {
+    var target = this.context.expression.exitTag;
+    if (isNil(target)) {
+        return this.doStopCustomBlock();
     }
-    while (this.context && this.context.expression !== 'exitReporter') {
+    while (this.context &&
+            (isNil(this.context.tag) || (this.context.tag > target))) {
         if (this.context.expression === 'doStopWarping') {
             this.doStopWarping();
         } else {
             this.popContext();
         }
     }
-    return value;
+    this.pushContext();
 };
 
-Process.prototype.doStopBlock = function () {
+Process.prototype.doStopCustomBlock = function () {
+    // fallback solution for "report" blocks inside
+    // custom command definitions and untagged "stop" blocks
     while (this.context && !this.context.isCustomBlock) {
         if (this.context.expression === 'doStopWarping') {
             this.doStopWarping();
@@ -1010,18 +1053,19 @@ Process.prototype.runContinuation = function (aContext, args) {
 // Process custom block primitives
 
 Process.prototype.evaluateCustomBlock = function () {
-    var context = this.context.expression.definition.body,
+    var caller = this.context.parentContext,
+        context = this.context.expression.definition.body,
         declarations = this.context.expression.definition.declarations,
         args = new List(this.context.inputs),
         parms = args.asArray(),
         runnable,
         exit,
-        extra,
         i,
         value,
         outer;
 
     if (!context) {return null; }
+    this.procedureCount += 1;
     outer = new Context();
     outer.receiver = this.context.receiver;
     outer.variables.parentFrame = outer.receiver ?
@@ -1034,8 +1078,7 @@ Process.prototype.evaluateCustomBlock = function () {
         outer.receiver
     );
     runnable.isCustomBlock = true;
-    extra = new Context(runnable, 'doYield');
-    this.context.parentContext = extra;
+    this.context.parentContext = runnable;
 
     // passing parameters if any were passed
     if (parms.length > 0) {
@@ -1057,24 +1100,43 @@ Process.prototype.evaluateCustomBlock = function () {
         }
     }
 
-    if (runnable.expression instanceof CommandBlockMorph) {
-        // insert a reporter exit tag for the
-        // CALL SCRIPT primitive variant
-        if (this.context.expression.definition.type !== 'command') {
+    // tag return target
+    if (this.context.expression.definition.type !== 'command') {
+        if (caller) {
+            // tag caller, so "report" can catch it later
+            caller.tag = 'exit';
+        } else {
+            // top-level context, insert a tagged exit context
+            // which "report" can catch later
             exit = new Context(
                 runnable.parentContext,
-                'exitReporter',
+                'expectReport',
                 outer,
                 outer.receiver
             );
+            exit.tag = 'exit';
             runnable.parentContext = exit;
-        } else { // mark all REPORT blocks as being part of a custom command
-            runnable.expression.allReportBlocks().forEach(function (rb) {
-                rb.partOfCustomCommand = true;
-            });
         }
-        runnable.expression = runnable.expression.blockSequence();
+        // auto-"warp" nested reporters
+        this.readyToYield = (Date.now() - this.lastYield > this.timeout);
+    } else {
+        // tag all "stop this block" blocks with the current
+        // procedureCount as exitTag, and mark all "report" blocks
+        // as being inside a custom command definition
+        runnable.expression.tagExitBlocks(this.procedureCount, true);
+
+        // tag the caller with the current procedure count, so
+        // "stop this block" blocks can catch it, but only
+        // if the caller hasn't been tagged already
+        if (caller && !caller.tag) {
+            caller.tag = this.procedureCount;
+        }
+        // yield commands unless explicitly "warped"
+        if (!this.isAtomic) {
+            this.readyToYield = true;
+        }
     }
+    runnable.expression = runnable.expression.blockSequence();
 };
 
 // Process variables primitives
@@ -1269,7 +1331,7 @@ Process.prototype.doInsertInList = function (element, index, list) {
         return null;
     }
     if (this.inputOption(index) === 'any') {
-        idx = this.reportRandom(1, list.length());
+        idx = this.reportRandom(1, list.length() + 1);
     }
     if (this.inputOption(index) === 'last') {
         idx = list.length() + 1;
@@ -1615,6 +1677,27 @@ Process.prototype.reportMap = function (reporter, list) {
         this.pushContext();
         this.evaluate(reporter, new List([next]));
     }
+};
+
+Process.prototype.doForEach = function (upvar, list, script) {
+    // perform a script for each element of a list, assigning the
+    // current iteration's element to a variable with the name
+    // specified in the "upvar" parameter, so it can be referenced
+    // within the script. Uses the context's - unused - fourth
+    // element as temporary storage for the current list index
+
+    if (isNil(this.context.inputs[3])) {this.context.inputs[3] = 1; }
+    var index = this.context.inputs[3];
+    this.context.outerContext.variables.addVar(upvar);
+    this.context.outerContext.variables.setVar(
+        upvar,
+        list.at(index)
+    );
+    if (index > list.length()) {return; }
+    this.context.inputs[3] += 1;
+    this.pushContext('doYield');
+    this.pushContext();
+    this.evaluate(script, new List(), true);
 };
 
 // Process interpolated primitives
@@ -2120,15 +2203,17 @@ Process.prototype.reportTextSplit = function (string, delimiter) {
         str,
         del;
     if (!contains(types, strType)) {
-        throw new Error('expecting a text instad of a ' + strType);
+        throw new Error('expecting text instead of a ' + strType);
     }
     if (!contains(types, delType)) {
-        throw new Error('expecting a text delimiter instad of a ' + delType);
+        throw new Error('expecting a text delimiter instead of a ' + delType);
     }
     str = (string || '').toString();
     switch (this.inputOption(delimiter)) {
     case 'line':
-        del = '\r?\n';
+        // Unicode Compliant Line Splitting (Platform independent)
+        // http://www.unicode.org/reports/tr18/#Line_Boundaries
+        del = /\r\n|[\n\v\f\r\x85\u2028\u2029]/;
         break;
     case 'tab':
         del = '\t';
@@ -2137,7 +2222,9 @@ Process.prototype.reportTextSplit = function (string, delimiter) {
         del = '\r';
         break;
     case 'whitespace':
-        return new List(str.trim().split(/[\t\r\n ]+/));
+        str = str.trim();
+        del = /\s+/;
+        break;
     case 'letter':
         del = '';
         break;
@@ -2302,6 +2389,7 @@ Process.prototype.objectTouchingObject = function (thisObj, name) {
     var myself = this,
         those,
         stage,
+        box,
         mouse;
 
     if (this.inputOption(name) === 'mouse-pointer') {
@@ -2313,9 +2401,14 @@ Process.prototype.objectTouchingObject = function (thisObj, name) {
     } else {
         stage = thisObj.parentThatIsA(StageMorph);
         if (stage) {
-            if (this.inputOption(name) === 'edge' &&
-                    !stage.bounds.containsRectangle(thisObj.bounds)) {
-                return true;
+            if (this.inputOption(name) === 'edge') {
+                box = thisObj.bounds;
+                if (!thisObj.costume && thisObj.penBounds) {
+                    box = thisObj.penBounds.translateBy(thisObj.position());
+                }
+                if (!stage.bounds.containsRectangle(box)) {
+                    return true;
+                }
             }
             if (this.inputOption(name) === 'pen trails' &&
                     thisObj.isTouching(stage.penTrailsMorph())) {
@@ -2746,23 +2839,25 @@ Process.prototype.reportFrameCount = function () {
 
     structure:
 
-    parentContext    the Context to return to when this one has
+    parentContext   the Context to return to when this one has
                     been evaluated.
     outerContext    the Context holding my lexical scope
-    expression        SyntaxElementMorph, an array of blocks to evaluate,
+    expression      SyntaxElementMorph, an array of blocks to evaluate,
                     null or a String denoting a selector, e.g. 'doYield'
     receiver        the object to which the expression applies, if any
-    variables        the current VariableFrame, if any
-    inputs            an array of input values computed so far
+    variables       the current VariableFrame, if any
+    inputs          an array of input values computed so far
                     (if expression is a    BlockMorph)
-    pc                the index of the next block to evaluate
+    pc              the index of the next block to evaluate
                     (if expression is an array)
-    startTime        time when the context was first evaluated
-    startValue        initial value for interpolated operations
+    startTime       time when the context was first evaluated
+    startValue      initial value for interpolated operations
     activeAudio     audio buffer for interpolated operations, don't persist
     activeNote      audio oscillator for interpolated ops, don't persist
     isCustomBlock   marker for return ops
-    emptySlots        caches the number of empty slots for reification
+    emptySlots      caches the number of empty slots for reification
+    tag             string or number to optionally identify the Context,
+                    as a "return" target (for the "stop block" primitive)
 */
 
 function Context(
@@ -2787,6 +2882,7 @@ function Context(
     this.activeNote = null;
     this.isCustomBlock = false; // marks the end of a custom block's stack
     this.emptySlots = 0; // used for block reification
+    this.tag = null;  // lexical catch-tag for custom blocks
 }
 
 Context.prototype.toString = function () {
@@ -2850,12 +2946,10 @@ Context.prototype.continuation = function () {
     } else if (this.parentContext) {
         cont = this.parentContext;
     } else {
-        return new Context(null, 'doStop');
-    }
-    if (cont.expression === 'exitReporter') {
-        return cont.continuation();
+        return new Context(null, 'doYield');
     }
     cont = cont.copyForContinuation();
+    cont.tag = null;
     cont.isContinuation = true;
     return cont;
 };
