@@ -73,54 +73,76 @@ SpriteMorph.prototype.init = function(globals) {
 
 }
 
-// Definition of a new BeetleBlocks Category
+// Definition of new BeetleBlocks categories
+SpriteMorph.prototype.categories =
+    [
+        'motion',
+        'control',
+        'shapes',
+		'colors',
+        'sensing',
+        'operators',
+        'variables',
+        'lists',
+        'my blocks'
+    ];
 
-SpriteMorph.prototype.categories.push('beetleblocks');
-SpriteMorph.prototype.blockColor['beetleblocks'] = new Color(154, 149, 9);
+SpriteMorph.prototype.blockColor = {
+    motion : new Color(74, 108, 212),
+    shapes : new Color(143, 86, 227),
+	colors : new Color(32, 128, 54),
+    control : new Color(230, 168, 34),
+    sensing : new Color(4, 148, 220),
+    operators : new Color(98, 194, 19),
+    variables : new Color(243, 118, 29),
+    lists : new Color(217, 77, 17),
+    other : new Color(150, 150, 150),
+    'my blocks': new Color(150, 150, 150),
+};
 
 // Block specs
 
 SpriteMorph.prototype.originalInitBlocks = SpriteMorph.prototype.initBlocks;
 
 SpriteMorph.prototype.initBlocks = function() {
-	
-	this.originalInitBlocks();
 
-	this.blocks.clear =
-	{
-			only: SpriteMorph,
-			type:'command',
-			spec: 'clear',
-			category: 'beetleblocks'
-	};
+	var myself = this;
+	this.originalInitBlocks();
+/*
+	Object.keys(this.blocks).forEach(function(eachKey) {
+		if (myself.blocks[eachKey].category === 'other') {
+			myself.blocks[eachKey].category = 'my blocks'
+		}
+	});
+*/
+	// motion
 	this.blocks.goHome =
 	{
 			only: SpriteMorph,
 			type:'command',
 			spec: 'go home',
-			category: 'beetleblocks'
+			category: 'motion'
 	};		
-
 	this.blocks.showBeetle =
 	{
 			only: SpriteMorph,
 			type:'command',
 			spec: 'show beetle',
-			category: 'beetleblocks'
+			category: 'motion'
 	};	
 	this.blocks.hideBeetle =
 	{
 			only: SpriteMorph,
 			type:'command',
 			spec: 'hide beetle',
-			category: 'beetleblocks'
+			category: 'motion'
 	};	
 	this.blocks.move =
 	{
 			only: SpriteMorph,
 			type:'command',
 			spec: 'move %n',
-			category: 'beetleblocks',
+			category: 'motion',
 			defaults: [1]
 	};
 	this.blocks.rotate =
@@ -128,16 +150,15 @@ SpriteMorph.prototype.initBlocks = function() {
 			only: SpriteMorph,
 			type:'command',
 			spec: 'rotate %axes by %n',
-			category: 'beetleblocks',
+			category: 'motion',
 			defaults: ['z',15]
 	};
-
 	this.blocks.setPosition =
 	{
 			only: SpriteMorph,
 			type:'command',
 			spec: 'go to x: %n y: %n z: %n',
-			category: 'beetleblocks',
+			category: 'motion',
 			defaults: [0, 0, 0]
 	};
 	this.blocks.setPositionOnAxis =
@@ -145,7 +166,7 @@ SpriteMorph.prototype.initBlocks = function() {
 			only: SpriteMorph,
 			type:'command',
 			spec: 'set %axes to %n',
-			category: 'beetleblocks',
+			category: 'motion',
 			defaults: ['x', 0]
 	};
 	this.blocks.changePositionBy =
@@ -153,7 +174,7 @@ SpriteMorph.prototype.initBlocks = function() {
 			only: SpriteMorph,
 			type:'command', 
 			spec: 'change %axes by %n',
-			category: 'beetleblocks',
+			category: 'motion',
 			defaults: ['x', 1]
 	};
 	this.blocks.setRotationOnAxis =
@@ -161,7 +182,7 @@ SpriteMorph.prototype.initBlocks = function() {
 			only: SpriteMorph,
 			type:'command',
 			spec: 'set %axes rotation to %n',	
-			category: 'beetleblocks',
+			category: 'motion',
 			defaults: ['z', 0]
 	};
 	this.blocks.pointTowards =
@@ -169,7 +190,7 @@ SpriteMorph.prototype.initBlocks = function() {
 			only: SpriteMorph,
 			type:'command',
 			spec: 'point towards x: %n y: %n z: %n',
-			category: 'beetleblocks',
+			category: 'motion',
 			defaults: [0, 0, 0]
 	};
 	this.blocks.getPosition =
@@ -177,7 +198,7 @@ SpriteMorph.prototype.initBlocks = function() {
 			only: SpriteMorph,
 			type:'reporter',
 			spec: '%axes position',
-			category: 'beetleblocks',
+			category: 'motion',
 			defaults: ['x']
 	};
 	this.blocks.getRotation =
@@ -185,7 +206,7 @@ SpriteMorph.prototype.initBlocks = function() {
 			only: SpriteMorph,
 			type:'reporter',
 			spec: '%axes rotation',
-			category: 'beetleblocks',
+			category: 'motion',
 			defaults: ['z']
 	};
 	this.blocks.pushPosition =
@@ -193,22 +214,30 @@ SpriteMorph.prototype.initBlocks = function() {
 			only: SpriteMorph,
 			type:'command',
 			spec: 'push position',
-			category: 'beetleblocks'
+			category: 'motion'
 	};
 	this.blocks.popPosition =
 	{
 			only: SpriteMorph,
 			type:'command',
 			spec: 'pop position',
-			category: 'beetleblocks'
+			category: 'motion'
 	};
 
+	// shapes
+	this.blocks.clear =
+	{
+			only: SpriteMorph,
+			type:'command',
+			spec: 'clear',
+			category: 'shapes'
+	};
 	this.blocks.cube =
 	{
 			only: SpriteMorph,
 			type:'command',
 			spec: 'cube size %n',
-			category: 'beetleblocks',
+			category: 'shapes',
 			defaults: [0.5]
 	};
 	this.blocks.cuboid =
@@ -216,7 +245,7 @@ SpriteMorph.prototype.initBlocks = function() {
 			only: SpriteMorph,
 			type:'command',
 			spec: 'cuboid l: %n w: %n h: %n',
-			category: 'beetleblocks',
+			category: 'shapes',
 			defaults: [1, 0.5, 0.3]
 	};
 	this.blocks.sphere =
@@ -224,7 +253,7 @@ SpriteMorph.prototype.initBlocks = function() {
 			only: SpriteMorph,
 			type:'command',
 			spec: 'sphere diameter %n',
-			category: 'beetleblocks',
+			category: 'shapes',
 			defaults: [0.5]		
 	};
 	this.blocks.tube =
@@ -232,7 +261,7 @@ SpriteMorph.prototype.initBlocks = function() {
 			only: SpriteMorph,
 			type:'command',
 			spec: 'tube l: %n outer: %n inner: %n',
-			category: 'beetleblocks',
+			category: 'shapes',
 			defaults: [2, 1, 0.5]
 	};
 	this.blocks.text =
@@ -240,7 +269,7 @@ SpriteMorph.prototype.initBlocks = function() {
 			only: SpriteMorph,
 			type:'command', 
 			spec: 'text %s height %n depth %n',
-			category: 'beetleblocks',
+			category: 'shapes',
 			defaults: ['hello world', 1, 0.5]
 	};
 	this.blocks.startDrawing =
@@ -248,14 +277,14 @@ SpriteMorph.prototype.initBlocks = function() {
 			only: SpriteMorph,
 			type:'command',
 			spec: 'start drawing',
-			category: 'beetleblocks'
+			category: 'shapes'
 	};		 
 	this.blocks.stopDrawing =
 	{
 			only: SpriteMorph,
 			type:'command',
 			spec: 'stop drawing',
-			category: 'beetleblocks'
+			category: 'shapes'
 	};
 
 	this.blocks.startExtrusion =
@@ -263,21 +292,21 @@ SpriteMorph.prototype.initBlocks = function() {
 			only: SpriteMorph,
 			type:'command',
 			spec: 'start extruding',
-			category: 'beetleblocks'
+			category: 'shapes'
 	};
 	this.blocks.stopExtrusion =
 	{
 			only: SpriteMorph,
 			type:'command',
 			spec: 'stop extruding',
-			category: 'beetleblocks'
+			category: 'shapes'
 	};
 	this.blocks.setExtrusionRadius =
 	{
 			only: SpriteMorph,
 			type:'command',
 			spec: 'set extrusion radius to %n',
-			category: 'beetleblocks',
+			category: 'shapes',
 			defaults: [1]
 	};
 	this.blocks.changeExtrusionRadius =
@@ -285,16 +314,17 @@ SpriteMorph.prototype.initBlocks = function() {
 			only: SpriteMorph,
 			type:'command',
 			spec: 'change extrusion radius by %n',
-			category: 'beetleblocks',
+			category: 'shapes',
 			defaults: [1]
 	};
 
+	// color
 	this.blocks.setHSL =
 	{
 			only: SpriteMorph,
 			type:'command', 
 			spec: 'set %hsl to %n',	
-			category: 'beetleblocks',
+			category: 'colors',
 			defaults: ['hue', 50]
 	};
 	this.blocks.changeHSL =
@@ -302,7 +332,7 @@ SpriteMorph.prototype.initBlocks = function() {
 			only: SpriteMorph,
 			type:'command', 
 			spec: 'change %hsl by %n',
-			category: 'beetleblocks',
+			category: 'colors',
 			defaults: ['hue', 10]
 	};
 	this.blocks.getHSL =
@@ -310,66 +340,421 @@ SpriteMorph.prototype.initBlocks = function() {
 			only: SpriteMorph,
 			type:'reporter',
 			spec: 'color %hsl',
-			category: 'beetleblocks'
+			category: 'colors'
 	};
+
+	// sensing
+	this.blocks.doAsk = 
+	{
+            type: 'command',
+            category: 'sensing',
+            spec: 'request user input',
+			category: 'sensing'
+    };
 
 }
 
 SpriteMorph.prototype.initBlocks();
 
-// blockTemplates proxy
-
-SpriteMorph.prototype.originalBlockTemplates = SpriteMorph.prototype.blockTemplates;
-
-// Definition of our new primitive blocks
+// We do not proxy blockTemplates anymore, as we've changed practically everything
 
 SpriteMorph.prototype.blockTemplates = function(category) {
-	var myself = this;
+	var blocks = [], myself = this, varNames, button,
+        cat = category || 'motion', txt;
 
-	var blocks = myself.originalBlockTemplates(category); 
-
-	function blockBySelector(selector) {
+    function block(selector) {
+        if (StageMorph.prototype.hiddenPrimitives[selector]) {
+            return null;
+        }
         var newBlock = SpriteMorph.prototype.blockForSelector(selector, true);
         newBlock.isTemplate = true;
         return newBlock;
-    };
+    }
 
-	if (category === 'beetleblocks') {
-		blocks.push(blockBySelector('clear'));
-		blocks.push(blockBySelector('goHome'));
+    function variableBlock(varName) {
+        var newBlock = SpriteMorph.prototype.variableBlock(varName);
+        newBlock.isDraggable = false;
+        newBlock.isTemplate = true;
+        return newBlock;
+    }
+
+    function watcherToggle(selector) {
+        if (StageMorph.prototype.hiddenPrimitives[selector]) {
+            return null;
+        }
+        var info = SpriteMorph.prototype.blocks[selector];
+        return new ToggleMorph(
+            'checkbox',
+            this,
+            function () {
+                myself.toggleWatcher(
+                    selector,
+                    localize(info.spec),
+                    myself.blockColor[info.category]
+                );
+            },
+            null,
+            function () {
+                return myself.showingWatcher(selector);
+            },
+            null
+        );
+    }
+
+    function variableWatcherToggle(varName) {
+        return new ToggleMorph(
+            'checkbox',
+            this,
+            function () {
+                myself.toggleVariableWatcher(varName);
+            },
+            null,
+            function () {
+                return myself.showingVariableWatcher(varName);
+            },
+            null
+        );
+    }
+
+    function helpMenu() {
+        var menu = new MenuMorph(this);
+        menu.addItem('help...', 'showHelp');
+        return menu;
+    }
+
+    function addVar(pair) {
+        if (pair) {
+            if (myself.variables.silentFind(pair[0])) {
+                myself.inform('that name is already in use');
+            } else {
+                myself.addVariable(pair[0], pair[1]);
+                myself.toggleVariableWatcher(pair[0], pair[1]);
+                myself.blocksCache[cat] = null;
+                myself.paletteCache[cat] = null;
+                myself.parentThatIsA(IDE_Morph).refreshPalette();
+            }
+        }
+    }
+
+	if (cat === 'motion') {
+		blocks.push(block('goHome'));
 		blocks.push('-');
-		blocks.push(blockBySelector('showBeetle'));
-		blocks.push(blockBySelector('hideBeetle'));
+		blocks.push(block('showBeetle'));
+		blocks.push(block('hideBeetle'));
 		blocks.push('-');
-		blocks.push(blockBySelector('move'));
-		blocks.push(blockBySelector('rotate'));
+		blocks.push(block('move'));
+		blocks.push(block('rotate'));
 		blocks.push('-');
-		blocks.push(blockBySelector('setPosition'));
-		blocks.push(blockBySelector('setPositionOnAxis'));
-		blocks.push(blockBySelector('changePositionBy'));
-		blocks.push(blockBySelector('setRotationOnAxis'));
-		blocks.push(blockBySelector('pointTowards'));
-		blocks.push(blockBySelector('getPosition'));
-		blocks.push(blockBySelector('getRotation'));
-		blocks.push(blockBySelector('pushPosition'));
-		blocks.push(blockBySelector('popPosition'));
+		blocks.push(block('setPosition'));
+		blocks.push(block('setPositionOnAxis'));
+		blocks.push(block('changePositionBy'));
+		blocks.push(block('setRotationOnAxis'));
+		blocks.push(block('pointTowards'));
+		blocks.push(block('getPosition'));
+		blocks.push(block('getRotation'));
+		blocks.push(block('pushPosition'));
+		blocks.push(block('popPosition'));
+
+	} else if (cat === 'shapes') {
+		blocks.push(block('clear'));
 		blocks.push('-');
-		blocks.push(blockBySelector('cube'));
-		blocks.push(blockBySelector('cuboid'));
-		blocks.push(blockBySelector('sphere'));
-		blocks.push(blockBySelector('tube'));
-		blocks.push(blockBySelector('text'));
-		blocks.push(blockBySelector('startDrawing'));
-		blocks.push(blockBySelector('stopDrawing'));
-		blocks.push(blockBySelector('startExtrusion'));
-		blocks.push(blockBySelector('stopExtrusion'));
-		blocks.push(blockBySelector('setExtrusionRadius'));
-		blocks.push(blockBySelector('changeExtrusionRadius'));
-		blocks.push('-');
-		blocks.push(blockBySelector('setHSL'));
-		blocks.push(blockBySelector('changeHSL'));
-		blocks.push(blockBySelector('getHSL'));
-	};
+		blocks.push(block('cube'));
+		blocks.push(block('cuboid'));
+		blocks.push(block('sphere'));
+		blocks.push(block('tube'));
+		blocks.push(block('text'));
+		blocks.push(block('startDrawing'));
+		blocks.push(block('stopDrawing'));
+		blocks.push(block('startExtrusion'));
+		blocks.push(block('stopExtrusion'));
+		blocks.push(block('setExtrusionRadius'));
+		blocks.push(block('changeExtrusionRadius'));
+
+	} else if (cat === 'colors') {
+		blocks.push(block('setHSL'));
+		blocks.push(block('changeHSL'));
+		blocks.push(block('getHSL'));
+
+	} else if (cat === 'control') {
+
+        blocks.push(block('receiveGo'));
+        blocks.push(block('receiveKey'));
+        blocks.push(block('receiveClick'));
+        blocks.push(block('receiveMessage'));
+        blocks.push('-');
+        blocks.push(block('doBroadcast'));
+        blocks.push(block('doBroadcastAndWait'));
+        blocks.push(watcherToggle('getLastMessage'));
+        blocks.push(block('getLastMessage'));
+        blocks.push('-');
+        blocks.push(block('doWarp'));
+        blocks.push('-');
+        blocks.push(block('doWait'));
+        blocks.push(block('doWaitUntil'));
+        blocks.push('-');
+        blocks.push(block('doForever'));
+        blocks.push(block('doRepeat'));
+        blocks.push(block('doUntil'));
+        blocks.push('-');
+        blocks.push(block('doIf'));
+        blocks.push(block('doIfElse'));
+        blocks.push('-');
+        blocks.push(block('doReport'));
+        blocks.push('-');
+        blocks.push(block('doStopThis'));
+        blocks.push(block('doStopOthers'));
+        blocks.push('-');
+        blocks.push(block('doRun'));
+        blocks.push(block('fork'));
+        blocks.push(block('evaluate'));
+        blocks.push('-');
+        blocks.push(block('doCallCC'));
+        blocks.push(block('reportCallCC'));
+        /*blocks.push('-');
+        blocks.push(block('receiveOnClone'));
+        blocks.push(block('createClone'));
+        blocks.push(block('removeClone'));*/
+        blocks.push('-');
+        blocks.push(block('doPauseAll'));
+
+	} else if (cat === 'sensing') {
+        blocks.push(block('doAsk'));
+        blocks.push(watcherToggle('getLastAnswer'));
+        blocks.push(block('getLastAnswer'));
+        blocks.push('-');
+        blocks.push(watcherToggle('reportMouseX'));
+        blocks.push(block('reportMouseX'));
+        blocks.push(watcherToggle('reportMouseY'));
+        blocks.push(block('reportMouseY'));
+        blocks.push(block('reportMouseDown'));
+        blocks.push('-');
+        blocks.push(block('reportKeyPressed'));
+        blocks.push('-');
+		blocks.push(block('doResetTimer'));
+        blocks.push(watcherToggle('getTimer'));
+        blocks.push(block('getTimer'));
+        blocks.push('-');
+        blocks.push(block('reportURL'));
+        blocks.push('-');
+        blocks.push(block('reportIsFastTracking'));
+        blocks.push(block('doSetFastTracking'));
+        blocks.push('-');
+        blocks.push(block('reportDate'));
+
+    // for debugging: ///////////////
+
+        if (this.world().isDevMode) {
+
+            blocks.push('-');
+            txt = new TextMorph(localize(
+                'development mode \ndebugging primitives:'
+            ));
+            txt.fontSize = 9;
+            txt.setColor(this.paletteTextColor);
+            blocks.push(txt);
+            blocks.push('-');
+            blocks.push(block('reportStackSize'));
+            blocks.push(block('reportFrameCount'));
+        }
+
+    } else if (cat === 'operators') {
+
+        blocks.push(block('reifyScript'));
+        blocks.push(block('reifyReporter'));
+        blocks.push(block('reifyPredicate'));
+        blocks.push('#');
+        blocks.push('-');
+        blocks.push(block('reportSum'));
+        blocks.push(block('reportDifference'));
+        blocks.push(block('reportProduct'));
+        blocks.push(block('reportQuotient'));
+        blocks.push('-');
+        blocks.push(block('reportModulus'));
+        blocks.push(block('reportRound'));
+        blocks.push(block('reportMonadic'));
+        blocks.push(block('reportRandom'));
+        blocks.push('-');
+        blocks.push(block('reportLessThan'));
+        blocks.push(block('reportEquals'));
+        blocks.push(block('reportGreaterThan'));
+        blocks.push('-');
+        blocks.push(block('reportAnd'));
+        blocks.push(block('reportOr'));
+        blocks.push(block('reportNot'));
+        blocks.push('-');
+        blocks.push(block('reportTrue'));
+        blocks.push(block('reportFalse'));
+        blocks.push('-');
+        blocks.push(block('reportJoinWords'));
+        blocks.push(block('reportTextSplit'));
+        blocks.push(block('reportLetter'));
+        blocks.push(block('reportStringSize'));
+        blocks.push('-');
+        blocks.push(block('reportUnicode'));
+        blocks.push(block('reportUnicodeAsLetter'));
+        blocks.push('-');
+        blocks.push(block('reportIsA'));
+        blocks.push(block('reportIsIdentical'));
+        blocks.push('-');
+        blocks.push(block('reportJSFunction'));
+
+    // for debugging: ///////////////
+
+        if (this.world().isDevMode) {
+            blocks.push('-');
+            txt = new TextMorph(
+                'development mode \ndebugging primitives:'
+            );
+            txt.fontSize = 9;
+            txt.setColor(this.paletteTextColor);
+            blocks.push(txt);
+            blocks.push('-');
+            blocks.push(block('reportTypeOf'));
+            blocks.push(block('reportTextFunction'));
+        }
+
+    /////////////////////////////////
+
+    } else if (cat === 'variables') {
+
+        button = new PushButtonMorph(
+            null,
+            function () {
+                new VariableDialogMorph(
+                    null,
+                    addVar,
+                    myself
+                ).prompt(
+                    'Variable name',
+                    null,
+                    myself.world()
+                );
+            },
+            'Make a variable'
+        );
+        button.userMenu = helpMenu;
+        button.selector = 'addVariable';
+        button.showHelp = BlockMorph.prototype.showHelp;
+        blocks.push(button);
+
+        if (this.variables.allNames().length > 0) {
+            button = new PushButtonMorph(
+                null,
+                function () {
+                    var menu = new MenuMorph(
+                        myself.deleteVariable,
+                        null,
+                        myself
+                    );
+                    myself.variables.allNames().forEach(function (name) {
+                        menu.addItem(name, name);
+                    });
+                    menu.popUpAtHand(myself.world());
+                },
+                'Delete a variable'
+            );
+            button.userMenu = helpMenu;
+            button.selector = 'deleteVariable';
+            button.showHelp = BlockMorph.prototype.showHelp;
+            blocks.push(button);
+        }
+
+        blocks.push('-');
+
+        varNames = this.variables.allNames();
+        if (varNames.length > 0) {
+            varNames.forEach(function (name) {
+                blocks.push(variableWatcherToggle(name));
+                blocks.push(variableBlock(name));
+            });
+            blocks.push('-');
+        }
+
+        blocks.push(block('doSetVar'));
+        blocks.push(block('doChangeVar'));
+        blocks.push(block('doShowVar'));
+        blocks.push(block('doHideVar'));
+        blocks.push(block('doDeclareVariables'));
+
+        blocks.push('=');
+
+        blocks.push(block('reportNewList'));
+        blocks.push('-');
+        blocks.push(block('reportCONS'));
+        blocks.push(block('reportListItem'));
+        blocks.push(block('reportCDR'));
+        blocks.push('-');
+        blocks.push(block('reportListLength'));
+        blocks.push(block('reportListContainsItem'));
+        blocks.push('-');
+        blocks.push(block('doAddToList'));
+        blocks.push(block('doDeleteFromList'));
+        blocks.push(block('doInsertInList'));
+        blocks.push(block('doReplaceInList'));
+
+    // for debugging: ///////////////
+
+        if (this.world().isDevMode) {
+            blocks.push('-');
+            txt = new TextMorph(localize(
+                'development mode \ndebugging primitives:'
+            ));
+            txt.fontSize = 9;
+            txt.setColor(this.paletteTextColor);
+            blocks.push(txt);
+            blocks.push('-');
+            blocks.push(block('reportMap'));
+            blocks.push('-');
+            blocks.push(block('doForEach'));
+        }
+
+    /////////////////////////////////
+
+        blocks.push('=');
+
+        if (StageMorph.prototype.enableCodeMapping) {
+            blocks.push(block('doMapCodeOrHeader'));
+            blocks.push(block('doMapStringCode'));
+            blocks.push(block('doMapListCode'));
+            blocks.push('-');
+            blocks.push(block('reportMappedCode'));
+            blocks.push('=');
+        }
+
+	} else if (cat === 'my blocks') {
+		button = new PushButtonMorph(
+            null,
+            function () {
+                var ide = myself.parentThatIsA(IDE_Morph),
+                    stage = myself.parentThatIsA(StageMorph);
+                new BlockDialogMorph(
+                    null,
+                    function (definition) {
+                        if (definition.spec !== '') {
+                            if (definition.isGlobal) {
+                                stage.globalBlocks.push(definition);
+                            } else {
+                                myself.customBlocks.push(definition);
+                            }
+                            ide.flushPaletteCache();
+                            ide.refreshPalette();
+                            new BlockEditorMorph(definition, myself).popUp();
+                        }
+                    },
+                    myself
+                ).prompt(
+                    'Make a block',
+                    null,
+                    myself.world()
+                );
+            },
+            'Make a block'
+        );
+        button.userMenu = helpMenu;
+        button.selector = 'addCustomBlock';
+        button.showHelp = BlockMorph.prototype.showHelp;
+        blocks.push(button);
+	}
 
 	return blocks;
 }
