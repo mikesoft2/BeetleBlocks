@@ -4,7 +4,8 @@ BeetleBlocks is a visual, blocks-based programming environment for
 its path as a tube, and generate geometry in other ways. The
 resulting 3D geometry can be exported as a 3D-printable file.
 
-BeetleBlocks is a project by Eric Rosenbaum and Duks Koschitz, with software development by Bernat Ramagosa and Jens Moenig.
+BeetleBlocks is a project by Eric Rosenbaum and Duks Koschitz, 
+with software development by Bernat Romagosa and Jens Moenig.
 
 Try it here:
 http://ericrosenbaum.github.io/BeetleBlocks/beetleblocks.html
