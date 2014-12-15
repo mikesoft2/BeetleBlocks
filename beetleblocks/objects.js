@@ -854,7 +854,7 @@ StageMorph.prototype.initRenderer = function() {
 	this.renderer.changed = false;
 	this.renderer.isWireframeMode = false;
 	this.renderer.showingAxes = true;
-	this.renderer.isParallelProjection = true;
+	this.renderer.isParallelProjection = false;
 
 	this.renderer.toggleWireframe = function() {
 		var myInnerSelf = this;
