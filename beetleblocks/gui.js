@@ -806,3 +806,11 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
     }
     this.setExtent(this.world().extent()); // resume trackChanges
 };
+
+// Addressing #54: Stage occasionally goes blank
+IDE_Morph.prototype.originalRefreshPalette = IDE_Morph.prototype.refreshPalette;
+IDE_Morph.prototype.refreshPalette = function (shouldIgnorePosition) {
+	this.originalRefreshPalette(shouldIgnorePosition);
+	this.stage.reRender();
+};
+
