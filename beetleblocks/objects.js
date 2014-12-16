@@ -956,12 +956,13 @@ StageMorph.prototype.initCamera = function() {
 						this.position.x = 0;
 						this.position.y = 10;
 						this.position.z = 0;
+						this.setRotationFromEuler(new THREE.Euler(-Math.PI/2, 0, -Math.PI/2));
 					} else {
 						this.position.x = -5;
 						this.position.y = 7;
 						this.position.z = 5;
+						this.lookAt(new THREE.Vector3());
 					}
-					this.lookAt(new THREE.Vector3());
 					myself.reRender();
 			}
 	}
