@@ -904,11 +904,14 @@ StageMorph.prototype.reRender = function() {
 }
 
 StageMorph.prototype.initCamera = function() {
-	var myself = this;
+	var myself = this,
+		threeLayer;
 
 	if (this.scene.camera) { this.scene.remove(this.camera) };
 
 	var createCamera = function() {
+			threeLayer = document.createElement('div');
+
 			if (myself.renderer.isParallelProjection) { 
 					var zoom = myself.camera ? myself.camera.zoomFactor : 82,
 						width = Math.max(myself.width(), 480),
@@ -921,12 +924,9 @@ StageMorph.prototype.initCamera = function() {
 									0.1, 
 									1000);
 			} else {
-					myself.camera = new THREE.PerspectiveCamera(60, 480/360, 1, 1000)
-			};
-			var threeLayer = document.createElement('div');
+					myself.camera = new THREE.PerspectiveCamera(60, 480/360, 1, 1000);
+			}
 
-			myself.controls = new THREE.OrbitControls(myself.camera, threeLayer);
-			myself.controls.addEventListener('change', function(event) { myself.render });
 			// We need to implement zooming ourselves for parallel projection
 
 			myself.camera.zoomIn = function() {
@@ -950,19 +950,21 @@ StageMorph.prototype.initCamera = function() {
 			}
 
 			myself.camera.reset = function() {
+
+					myself.controls = new THREE.OrbitControls(this, threeLayer);
+					myself.controls.addEventListener('change', function(event) { myself.render });
+
 					if (myself.renderer.isParallelProjection) {
 						this.zoomFactor = 82;
 						this.applyZoom();
-						this.position.x = 0;
-						this.position.y = 10;
-						this.position.z = 0;
-						this.setRotationFromEuler(new THREE.Euler(-Math.PI/2, 0, -Math.PI/2));
+						this.position.set(0,10,0);
+						myself.controls.rotateLeft(radians(90));
 					} else {
-						this.position.x = -5;
-						this.position.y = 7;
-						this.position.z = 5;
+						this.position.set (-5, 7, 5);
 						this.lookAt(new THREE.Vector3());
 					}
+
+					myself.controls.update();
 					myself.reRender();
 			}
 	}
