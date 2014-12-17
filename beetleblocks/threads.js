@@ -9,7 +9,7 @@ Process.prototype.clear = function() {
 	beetle.extruding = false; 
 
 	beetle.reset();
-	beetle.resetColor();
+	beetle.color.reset();
 	beetle.posAndRotStack = new Array();
 	stage.reRender();
 };

@@ -40,14 +40,15 @@ SpriteMorph.prototype.initBeetle = function() {
 	// drawing
 	this.beetle.drawing = false;
 
+	// reset
 	this.beetle.reset = function() {	
 		this.position.set(0,0,0);
 		this.rotation.set(0,0,0);
 	}
 
-	this.beetle.resetColor = function() {	
-		myself.beetle.color.setHSL(0.05,0.5,0.5);
-		myself.beetle.getObjectByName('beetleShape').material.color = myself.beetle.color;
+	this.beetle.color.reset = function() {	
+		this.setHSL(0.05,0.5,0.5);
+		myself.beetle.getObjectByName('beetleShape').material.color = this;
 	}
 
 	// visibility
@@ -59,7 +60,7 @@ SpriteMorph.prototype.initBeetle = function() {
 	this.beetle.add(this.beetle.shape);
 
 	this.beetle.reset();
-	this.beetle.resetColor()
+	this.beetle.color.reset()
 
 	this.beetle.axes = [];
 	// beetle's local axis lines
