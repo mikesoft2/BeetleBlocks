@@ -1,6 +1,7 @@
 Process.prototype.clear = function() {
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+
 	stage.scene.remove(stage.myObjects);
 	stage.myObjects = new THREE.Object3D();
 	stage.scene.add(stage.myObjects);
@@ -17,12 +18,25 @@ Process.prototype.clear = function() {
 Process.prototype.goHome = function() {
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+
 	beetle.reset();
+
 	if (beetle.extruding) {
 		this.addPointToExtrusion();
 	}
+
 	stage.reRender();
 };
+
+Process.prototype.setScale = function(scale) {
+	var beetle = this.homeContext.receiver.beetle;
+	beetle.multiplierScale = Number(scale);
+}
+
+Process.prototype.changeScale = function(delta) {
+	var beetle = this.homeContext.receiver.beetle;
+	beetle.multiplierScale += Number(delta);
+}
 
 Process.prototype.setPosition = function(x, y, z) {	
 	var beetle = this.homeContext.receiver.beetle,
@@ -32,9 +46,10 @@ Process.prototype.setPosition = function(x, y, z) {
 		var p = new THREE.Vector3();
 		var startPoint =  p.copy(beetle.position);
 	}
-	x = Number(x);
-	y = Number(y);
-	z = Number(z);
+
+	x = Number(x) * beetle.multiplierScale;
+	y = Number(y) * beetle.multiplierScale;
+	z = Number(z) * beetle.multiplierScale;
 	beetle.position = new THREE.Vector3(y, z, x); 	
 
 	if (beetle.extruding) {
@@ -45,7 +60,8 @@ Process.prototype.setPosition = function(x, y, z) {
 		var p = new THREE.Vector3();
 		var endPoint = p.copy(beetle.position);
 		this.addLineGeom(startPoint, endPoint);
-	}	
+	}
+
 	stage.reRender();
 };
 
@@ -60,13 +76,13 @@ Process.prototype.setPositionOnAxis = function(axis, pos) {
 
 	pos = Number(pos);
 	if (axis == 'x') {
-		beetle.position.z = pos;
+		beetle.position.z = pos * beetle.multiplierScale;
 	}
 	if (axis == 'y') {
-		beetle.position.x = pos;
+		beetle.position.x = pos * beetle.multiplierScale;
 	}
 	if (axis == 'z') {
-		beetle.position.y = pos;
+		beetle.position.y = pos * beetle.multiplierScale;
 	}		
 	if (beetle.extruding) {
 		this.addPointToExtrusion();
@@ -75,7 +91,8 @@ Process.prototype.setPositionOnAxis = function(axis, pos) {
 		var p = new THREE.Vector3();
 		var endPoint = p.copy(beetle.position);
 		this.addLineGeom(startPoint, endPoint);
-	}	
+	}
+
 	stage.reRender();
 };
 
@@ -90,13 +107,13 @@ Process.prototype.changePositionBy = function(axis, dist) {
 
 	dist = Number(dist);
 	if (axis == 'x') {
-		beetle.position.z += dist;
+		beetle.position.z += dist * beetle.multiplierScale;
 	}
 	if (axis == 'y') {
-		beetle.position.x += dist;
+		beetle.position.x += dist * beetle.multiplierScale;
 	}
 	if (axis == 'z') {
-		beetle.position.y += dist;
+		beetle.position.y += dist * beetle.multiplierScale;
 	}	
 	if (beetle.extruding) {
 		this.addPointToExtrusion();
@@ -149,8 +166,10 @@ Process.prototype.addLineGeom = function(startPoint, endPoint) {
 
 	geometry.vertices.push(startPoint);
 	geometry.vertices.push(endPoint);
-	var lineMaterial = new THREE.LineBasicMaterial({ color: beetle.color });
-	var line = new THREE.Line(geometry, lineMaterial);
+
+	var lineMaterial = new THREE.LineBasicMaterial({ color: beetle.color }),
+		line = new THREE.Line(geometry, lineMaterial);
+
 	stage.myObjects.add(line);		
 	stage.reRender();
 }
@@ -158,11 +177,13 @@ Process.prototype.addLineGeom = function(startPoint, endPoint) {
 Process.prototype.move = function(dist) {
 	var beetle = this.homeContext.receiver.beetle;
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+
 	if (beetle.drawing) {
 		var p = new THREE.Vector3();
 		var startPoint =  p.copy(beetle.position);
 	}
-	dist = Number(dist);		
+
+	dist = Number(dist) * beetle.multiplierScale;
 	beetle.translateZ(dist);
 
 	if (beetle.extruding) {
@@ -173,6 +194,7 @@ Process.prototype.move = function(dist) {
 		var endPoint = p.copy(beetle.position);
 		this.addLineGeom(startPoint, endPoint);
 	}
+
 	stage.reRender();
 };
 
@@ -197,18 +219,24 @@ Process.prototype.rotate = function(axis, angle) {
 
 
 Process.prototype.cube = function(size) {
-	var stage = this.homeContext.receiver.parentThatIsA(StageMorph);
-	size = Number(size);
+	var beetle = this.homeContext.receiver.beetle;
+		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+
+	size = Number(size) * beetle.multiplierScale;
 	this.addBoxGeom(size, size, size);
+
 	stage.reRender();
 };
 
 Process.prototype.cuboid = function(length, width, height) {
-	var stage = this.homeContext.receiver.parentThatIsA(StageMorph);
-	length = Number(length);
-	width = Number(width);
-	height = Number(height);
+	var beetle = this.homeContext.receiver.beetle;
+		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+
+	length = Number(length) * beetle.multiplierScale;
+	width = Number(width) * beetle.multiplierScale;
+	height = Number(height) * beetle.multiplierScale;
 	this.addBoxGeom(width, height, length); 
+
 	stage.reRender();
 };
 
@@ -228,9 +256,12 @@ Process.prototype.addBoxGeom = function(length, width, height) {
 }
 
 Process.prototype.sphere = function(diam) {
-	var stage = this.homeContext.receiver.parentThatIsA(StageMorph);
-	diam = Number(diam);
+	var beetle = this.homeContext.receiver.beetle;
+		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+
+	diam = Number(diam) * beetle.multiplierScale;
 	this.addSphereGeom(diam);
+
 	stage.reRender();
 };
 
@@ -248,11 +279,14 @@ Process.prototype.addSphereGeom = function(diam) {
 }
 
 Process.prototype.tube = function(length, outer, inner) {
-	var stage = this.homeContext.receiver.parentThatIsA(StageMorph);
-	length = Number(length);
-	outer = Number(outer);
-	inner = Number(inner);
+	var beetle = this.homeContext.receiver.beetle;
+		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+
+	length = Number(length) * beetle.multiplierScale;
+	outer = Number(outer) * beetle.multiplierScale;
+	inner = Number(inner) * beetle.multiplierScale;
 	this.addTubeGeom(length, outer, inner);
+
 	stage.reRender();
 };
 
@@ -263,21 +297,24 @@ Process.prototype.addTubeGeom = function(length, outer, inner) {
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph),
 		pts = [],
 		numPoints = 24,
-		radius = outer/2;
+		radius = outer/2 
 
 	for (i = 0; i < numPoints; i ++) {
 		var a = 2 * Math.PI * i / numPoints;
 		pts.push(new THREE.Vector2(Math.cos(a) * radius, Math.sin(a) * radius));
 	}
-	var shape = new THREE.Shape( pts );
+
+	var shape = new THREE.Shape(pts);
 
 	pts = [];
 	radius = inner/2;
+
 	for (i = 0; i < numPoints; i ++) {
 		var a = 2 * Math.PI * i / numPoints;
 		pts.push(new THREE.Vector2(Math.cos(a) * radius, Math.sin(a) * radius));
 	}
-	var hole = new THREE.Shape(pts);		
+
+	var hole = new THREE.Shape(pts);
 	shape.holes.push(hole);
 
 	var options = { 
@@ -285,9 +322,11 @@ Process.prototype.addTubeGeom = function(length, outer, inner) {
 		bevelEnabled: false
 	};
 
-	var tubeGeom = new THREE.ExtrudeGeometry(shape, options);
-	var material = new THREE.MeshLambertMaterial({ color: beetle.color });
+	var tubeGeom = new THREE.ExtrudeGeometry(shape, options),
+		material = new THREE.MeshLambertMaterial({ color: beetle.color });
+
 	material.wireframe = stage.renderer.isWireframeMode;
+
 	var tube = new THREE.Mesh(tubeGeom, material);
 
 	tube.position.copy(beetle.position);
@@ -299,8 +338,9 @@ Process.prototype.addTubeGeom = function(length, outer, inner) {
 Process.prototype.text = function(textString, height, depth) {
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
-	height = Number(height);
-	depth = Number(depth);
+
+	height = Number(height) * beetle.multiplierScale;
+	depth = Number(depth) * beetle.multiplierScale;
 
 	var textGeometry = new THREE.TextGeometry(textString, {
 		font: 'helvetiker',
@@ -309,11 +349,15 @@ Process.prototype.text = function(textString, height, depth) {
 	});
 
 	var material = new THREE.MeshLambertMaterial({ color: beetle.color });
+
 	material.wireframe = stage.renderer.isWireframeMode;
+
 	var t = new THREE.Mesh(textGeometry, material);
+
 	t.position.copy(beetle.position);
 	t.rotation.copy(beetle.rotation);	
 	stage.myObjects.add(t);
+
 	stage.reRender();
 };
 
@@ -325,28 +369,41 @@ Process.prototype.text = function(textString, height, depth) {
 Process.prototype.startExtrusion = function() {
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+
 	beetle.extruding = true;
 	beetle.extrusionPoints = new Array();
 	this.addPointToExtrusion();
-	this.addSphereGeom(beetle.extrusionRadius); // start cap
+	this.addSphereGeom(beetle.extrusionRadius * beetle.multiplierScale); // start cap
+
 	stage.reRender();
 };
 
 Process.prototype.stopExtrusion = function() {
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+
 	if (beetle.extruding) {
 		beetle.extruding = false;
-		//addPointToExtrusion();
 
-		var extrudeBend = new THREE.SplineCurve3(beetle.extrusionPoints);
-		var path = new THREE.TubeGeometry(extrudeBend, beetle.extrusionPoints.length, beetle.extrusionRadius/2, 8, false);
-		var material = new THREE.MeshLambertMaterial({ color: beetle.color, });
-		material.wireframe = stage.renderer.isWireframeMode;
+		var extrudeBend = new THREE.SplineCurve3(beetle.extrusionPoints),
+			path = new THREE.TubeGeometry(
+						extrudeBend, 
+						beetle.extrusionPoints.length * beetle.multiplierScale, 
+						beetle.extrusionRadius/2 * beetle.multiplierScale, 
+						8, 
+						false
+					),
+			material = new THREE.MeshLambertMaterial({
+						color: beetle.color, 
+						wireframe: stage.renderer.isWireframeMode
+					});
+
 		var mesh = new THREE.Mesh(path, material);
+
 		stage.myObjects.add(mesh);
-		this.addSphereGeom(beetle.extrusionRadius); // end cap
+		this.addSphereGeom(beetle.extrusionRadius * beetle.multiplierScale); // end cap
 	}
+
 	stage.reRender();
 };
 
@@ -359,8 +416,9 @@ Process.prototype.changeExtrusionRadius = function(delta) {
 }
 
 Process.prototype.addPointToExtrusion = function() {
-	var beetle = this.homeContext.receiver.beetle;
-	var p = new THREE.Vector3();
+	var beetle = this.homeContext.receiver.beetle,
+		p = new THREE.Vector3();
+
 	beetle.extrusionPoints.push(p.copy(beetle.position));
 }
 
@@ -377,8 +435,9 @@ Process.prototype.stopDrawing = function() {
 Process.prototype.setHSL = function(channel, value) {
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-		value = Number(value);
-	var hsl = beetle.color.getHSL();
+		value = Number(value),
+		hsl = beetle.color.getHSL();
+
 	if (channel == 'hue') {
 		value %= 360; // wrap
 		value /= 360; // scale from 0-360 to 0-1
@@ -392,8 +451,10 @@ Process.prototype.setHSL = function(channel, value) {
 			hsl.l = value;
 		}
 	}
+
 	beetle.color.setHSL(hsl.h, hsl.s, hsl.l);
-	beetle.shape.material.color = beetle.color;		
+	beetle.shape.material.color = beetle.color;
+
 	stage.reRender();
 };
 
@@ -401,6 +462,7 @@ Process.prototype.changeHSL = function(channel, value) {
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph),
 		value = Number(value);
+
 	if (channel == 'hue') {
 		value %= 360; // wrap
 		value /= 360; // scale from 0-360 to 0-1
@@ -414,13 +476,16 @@ Process.prototype.changeHSL = function(channel, value) {
 			beetle.color.offsetHSL(0,0,value);
 		}
 	}
+
 	beetle.shape.material.color = beetle.color;	
+
 	stage.reRender();
 };
 
 Process.prototype.getHSL = function(channel) {
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+
 	if (channel == 'hue') {
 		return(beetle.color.getHSL().h * 360);
 	}
@@ -430,6 +495,7 @@ Process.prototype.getHSL = function(channel) {
 	if (channel == 'lightness') {
 		return(beetle.color.getHSL().l * 100);
 	}
+
 	stage.reRender();
 };
 
@@ -446,6 +512,7 @@ Process.prototype.getPosition = function(axis) {
 	if (axis == 'z') {
 		pos = beetle.position.y;
 	}
+
 	return pos;
 };
 
@@ -462,6 +529,7 @@ Process.prototype.getRotation = function(axis) {
 	if (axis == 'z') {
 		rot = beetle.rotation.y;
 	}
+
 	return degrees(rot);
 };
 
@@ -476,10 +544,13 @@ Process.prototype.popPosition = function() {
 
 	if (beetle.posAndRotStack.length) {
 		var posAndRot = beetle.posAndRotStack.pop();	
+
 		beetle.position.set(posAndRot.position.x, posAndRot.position.y, posAndRot.position.z);
 		beetle.rotation.set(posAndRot.rotation.x, posAndRot.rotation.y, posAndRot.rotation.z);
-		stage.reRender();
+
 		if (beetle.extruding) { this.addPointToExtrusion() }
+
+		stage.reRender();
 	}
 };
 

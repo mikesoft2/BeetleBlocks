@@ -32,6 +32,8 @@ SpriteMorph.prototype.initBeetle = function() {
 
 	this.beetle.posAndRotStack = new Array();
 
+	this.beetle.multiplierScale = 1;
+
 	// extrusion
 	this.beetle.extruding = false;
 	this.beetle.currentExtrusion = null;
@@ -115,197 +117,181 @@ SpriteMorph.prototype.initBlocks = function() {
 
 	var myself = this;
 	this.originalInitBlocks();
-/*
-	Object.keys(this.blocks).forEach(function(eachKey) {
-		if (myself.blocks[eachKey].category === 'other') {
-			myself.blocks[eachKey].category = 'my blocks'
-		}
-	});
-*/
+	
 	// motion
 	this.blocks.goHome =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'go home',
 			category: 'motion'
 	};		
 	this.blocks.move =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'move %n',
 			category: 'motion',
 			defaults: [1]
 	};
 	this.blocks.rotate =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'rotate %axes by %n',
 			category: 'motion',
 			defaults: ['z',15]
 	};
 	this.blocks.setPosition =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'go to x: %n y: %n z: %n',
 			category: 'motion',
 			defaults: [0, 0, 0]
 	};
 	this.blocks.setPositionOnAxis =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'set %axes to %n',
 			category: 'motion',
 			defaults: ['x', 0]
 	};
 	this.blocks.changePositionBy =
 	{
-			only: SpriteMorph,
-			type:'command', 
+			type: 'command', 
 			spec: 'change %axes by %n',
 			category: 'motion',
 			defaults: ['x', 1]
 	};
 	this.blocks.setRotationOnAxis =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'set %axes rotation to %n',	
 			category: 'motion',
 			defaults: ['z', 0]
 	};
 	this.blocks.pointTowards =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'point towards x: %n y: %n z: %n',
 			category: 'motion',
 			defaults: [0, 0, 0]
 	};
 	this.blocks.getPosition =
 	{
-			only: SpriteMorph,
-			type:'reporter',
+			type: 'reporter',
 			spec: '%axes position',
 			category: 'motion',
 			defaults: ['x']
 	};
 	this.blocks.getRotation =
 	{
-			only: SpriteMorph,
-			type:'reporter',
+			type: 'reporter',
 			spec: '%axes rotation',
 			category: 'motion',
 			defaults: ['z']
 	};
 	this.blocks.pushPosition =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'push position',
 			category: 'motion'
 	};
 	this.blocks.popPosition =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'pop position',
 			category: 'motion'
+	};
+	this.blocks.setScale =
+	{
+			type: 'command',
+			spec: 'set scale to %n',
+			category: 'motion',
+			defaults: [1]
+	};
+	this.blocks.changeScale =
+	{
+			type: 'command',
+			spec: 'change scale by %n',
+			category: 'motion',
+			defaults: [0.5]
 	};
 
 	// shapes
 	this.blocks.clear =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'clear',
 			category: 'shapes'
 	};
 	this.blocks.cube =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'cube size %n',
 			category: 'shapes',
 			defaults: [0.5]
 	};
 	this.blocks.cuboid =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'cuboid l: %n w: %n h: %n',
 			category: 'shapes',
 			defaults: [1, 0.5, 0.3]
 	};
 	this.blocks.sphere =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'sphere diameter %n',
 			category: 'shapes',
 			defaults: [0.5]		
 	};
 	this.blocks.tube =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'tube l: %n outer: %n inner: %n',
 			category: 'shapes',
 			defaults: [2, 1, 0.5]
 	};
 	this.blocks.text =
 	{
-			only: SpriteMorph,
-			type:'command', 
+			type: 'command', 
 			spec: 'text %s height %n depth %n',
 			category: 'shapes',
 			defaults: ['hello', 1, 0.5]
 	};
 	this.blocks.startDrawing =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'start drawing',
 			category: 'shapes'
 	};		 
 	this.blocks.stopDrawing =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'stop drawing',
 			category: 'shapes'
 	};
 
 	this.blocks.startExtrusion =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'start extruding',
 			category: 'shapes'
 	};
 	this.blocks.stopExtrusion =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'stop extruding',
 			category: 'shapes'
 	};
 	this.blocks.setExtrusionRadius =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'set extrusion radius to %n',
 			category: 'shapes',
 			defaults: [1]
 	};
 	this.blocks.changeExtrusionRadius =
 	{
-			only: SpriteMorph,
-			type:'command',
+			type: 'command',
 			spec: 'change extrusion radius by %n',
 			category: 'shapes',
 			defaults: [1]
@@ -314,24 +300,21 @@ SpriteMorph.prototype.initBlocks = function() {
 	// color
 	this.blocks.setHSL =
 	{
-			only: SpriteMorph,
-			type:'command', 
+			type: 'command', 
 			spec: 'set %hsl to %n',	
 			category: 'colors',
 			defaults: ['hue', 50]
 	};
 	this.blocks.changeHSL =
 	{
-			only: SpriteMorph,
-			type:'command', 
+			type: 'command', 
 			spec: 'change %hsl by %n',
 			category: 'colors',
 			defaults: ['hue', 10]
 	};
 	this.blocks.getHSL =
 	{
-			only: SpriteMorph,
-			type:'reporter',
+			type: 'reporter',
 			spec: 'color %hsl',
 			category: 'colors'
 	};
@@ -444,6 +427,9 @@ SpriteMorph.prototype.blockTemplates = function(category) {
 		blocks.push(block('getRotation'));
 		blocks.push(block('pushPosition'));
 		blocks.push(block('popPosition'));
+		blocks.push('-');
+		blocks.push(block('setScale'));
+		blocks.push(block('changeScale'));
 
 	} else if (cat === 'shapes') {
 		blocks.push(block('clear'));
@@ -756,7 +742,6 @@ SpriteMorph.prototype.drawNew = function () { this.hide() }
 // StageMorph
 
 StageMorph.prototype.originalDestroy = StageMorph.prototype.destroy;
-
 StageMorph.prototype.destroy = function() {
 	var myself = this;
 	this.scene.remove(this.myObjects);
@@ -893,7 +878,7 @@ StageMorph.prototype.render = function() {
 };
 
 StageMorph.prototype.renderCycle = function() {
-   	if (this.renderer.changed){
+   	if (this.renderer.changed) {
 		this.render();
 		this.changed();
 		this.renderer.changed = false;
