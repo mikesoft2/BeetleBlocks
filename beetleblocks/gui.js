@@ -403,9 +403,9 @@ IDE_Morph.prototype.createControlBar = function () {
 		this.updateLabel();
 	};
 
-    	this.controlBar.originalUpdateLabel = this.controlBar.updateLabel;
+	this.controlBar.originalUpdateLabel = this.controlBar.updateLabel;
 
-    	this.controlBar.updateLabel = function() {
+	this.controlBar.updateLabel = function() {
 		this.originalUpdateLabel();
 		this.label.setLeft(cameraButton.right() + 5);
 	}
@@ -726,6 +726,8 @@ IDE_Morph.prototype.fixLayout = function (situation) {
                 this.bottom()
             ));
         }
+
+        this.statusDisplay.fixLayout();
     }
 
     Morph.prototype.trackChanges = true;
@@ -745,7 +747,126 @@ IDE_Morph.prototype.buildPanes = function () {
 			tabTo: nop
 		}
 	};
+	this.createStatusDisplay();
 };
+
+IDE_Morph.prototype.createStatusDisplay = function () {
+    var frame,
+		padding = 5,
+		myself = this,
+		elements = [],
+		beetle = this.currentSprite.beetle;
+
+    if (this.statusDisplay) {
+        this.statusDisplay.destroy();
+    }
+
+    this.statusDisplay = new Morph();
+    this.statusDisplay.color = this.groupColor;
+    this.add(this.statusDisplay);
+
+    frame = new ScrollFrameMorph(null, null, this.sliderColor);
+    frame.acceptsDrops = false;
+    frame.contents.acceptsDrops = false;
+
+    frame.alpha = 0;
+
+    this.statusDisplay.frame = frame;
+    this.statusDisplay.add(frame);
+
+    this.statusDisplay.fixLayout = function () {
+        this.setLeft(myself.stage.left());
+        this.setTop(myself.stage.bottom() + padding);
+		this.setWidth(myself.stage.width());
+		this.setHeight(myself.height() - myself.stage.height() - myself.controlBar.height() - padding);
+		this.frame.setExtent(this.extent());
+        this.arrangeContents()
+        this.refresh();
+    };
+
+    this.statusDisplay.arrangeContents = function () {
+        var x = this.left() + padding,
+            y = this.top() + padding,
+            max = this.right(),
+            start = this.left() + padding;
+
+        this.frame.contents.children.forEach(function (element) {
+			if (element.newLine) {
+				y += 14;
+				x = start;
+			} else if (element.newColumn) {
+				x = (max - start) / 2 + padding;
+				console.log(x);
+			} else {
+				element.setPosition(new Point(x, y));
+            	x += element.width();
+			}
+        });
+        this.frame.contents.adjustBounds();
+    };
+
+    this.statusDisplay.addElement = function (element) {
+
+		// This is getting too "creative"...
+		if (element == '--') {
+			// this is a new line
+			element = new Morph();
+			element.newLine = true;
+		} else if (element == '|') {
+			// this is a column separator
+			element = new Morph();
+			element.newColumn = true;
+		} else if (typeof element == 'string') {
+			// this is a label
+			element = new StringMorph(element, 12, null, true);
+		};
+
+		this.frame.contents.add(element);
+        this.fixLayout();
+    };
+
+    this.statusDisplay.refresh = function () {
+        this.frame.contents.children.forEach(function (element) {
+            if (element.hasOwnProperty('update')) {
+				element.update();
+		   		element.changed();
+		   		element.drawNew();
+		   		element.changed();
+			};
+        });
+    };
+
+    this.statusDisplay.acceptsDrops = function () {
+        return false;
+    };
+
+	// Add all contents
+
+	elements.push('Beetle position:');
+	element = new StringMorph();
+	element.update = function() {
+		this.text = 
+			' (' + beetle.position.x.toString().slice(0,5) + ', ' 
+			+ beetle.position.y.toString().slice(0,5) + ', ' 
+			+ beetle.position.z.toString().slice(0,5) + ')' };
+	elements.push(element);
+
+	elements.push('|');
+
+	elements.push('Beetle rotation:');
+	element = new StringMorph();
+	element.update = function() {
+		this.text = 
+			' (' + degrees(beetle.rotation.x).toString().slice(0,5) + ', ' 
+			+ degrees(beetle.rotation.y).toString().slice(0,5) + ', ' 
+			+ degrees(beetle.rotation.z).toString().slice(0,5) + ')' };
+	elements.push(element);
+
+	elements.push('--');
+
+	elements.forEach(function(each) { myself.statusDisplay.addElement(each) });
+};
+
 
 IDE_Morph.prototype.selectSprite = function (sprite) {
     this.currentSprite = sprite;
@@ -766,6 +887,7 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
             this.controlBar.stageSizeButton,
             this.spriteEditor,
             this.palette,
+			this.statusDisplay,
             this.categories
         ];
 

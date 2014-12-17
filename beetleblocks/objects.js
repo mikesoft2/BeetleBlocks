@@ -881,6 +881,7 @@ StageMorph.prototype.renderCycle = function() {
    	if (this.renderer.changed) {
 		this.render();
 		this.changed();
+		this.parentThatIsA(IDE_Morph).statusDisplay.refresh();
 		this.renderer.changed = false;
 	}
 }
