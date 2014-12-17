@@ -1048,3 +1048,68 @@ StageMorph.prototype.clearPenTrails = function() {
     // We'll never need to clear the pen trails in BeetleBlocks, it only causes the renderer to disappear
 	nop(); 
 };
+
+// StageMorph drawing
+StageMorph.prototype.originalDrawOn = StageMorph.prototype.drawOn;
+StageMorph.prototype.drawOn = function (aCanvas, aRect) {
+	// If the scale is lower than 1, we reuse the original method, 
+	// otherwise we need to modify the renderer dimensions
+	// we do not need to render the original canvas anymore because 
+	// we have removed sprites and backgrounds
+
+    var rectangle, area, delta, src, context, w, h, sl, st;
+    if (!this.isVisible) {
+        return null;
+    }
+	if (this.scale < 1) {
+		return this.originalDrawOn(aCanvas, aRect);
+	}
+
+    rectangle = aRect || this.bounds;
+    area = rectangle.intersect(this.bounds).round();
+    if (area.extent().gt(new Point(0, 0))) {
+        delta = this.position().neg();
+        src = area.copy().translateBy(delta).round();
+        context = aCanvas.getContext('2d');
+        context.globalAlpha = this.alpha;
+
+        sl = src.left();
+        st = src.top();
+        w = Math.min(src.width(), this.image.width - sl);
+        h = Math.min(src.height(), this.image.height - st);
+
+        if (w < 1 || h < 1) {
+            return null;
+        }
+
+		context.save();
+		if (this.scaleChanged) {
+			w = this.width();
+			h = this.height();
+			var dpr = window.devicePixelRatio;
+			this.scaleChanged = false;
+			this.renderer.setSize(w / dpr, h / dpr);
+			this.reRender();
+		}
+
+		context.drawImage(
+			this.penTrails(),
+			src.left() / this.scale,
+			src.top() / this.scale,
+			w,
+			h,
+			area.left() / this.scale,
+			area.top() / this.scale,
+			w,
+			h
+		);
+        context.restore();
+    }
+};
+
+StageMorph.prototype.originalSetScale = StageMorph.prototype.setScale;
+StageMorph.prototype.setScale = function (number) {
+	this.scaleChanged = true;
+	this.originalSetScale(number);
+}
+
