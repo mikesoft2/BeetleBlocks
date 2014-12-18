@@ -214,6 +214,12 @@ SpriteMorph.prototype.initBlocks = function() {
 			category: 'motion',
 			defaults: [0.5]
 	};
+	this.blocks.reportScale = 
+	{
+			type: 'reporter',
+			spec: 'scale',
+			category: 'motion'
+	}
 
 	// shapes
 	this.blocks.clear =
@@ -430,6 +436,7 @@ SpriteMorph.prototype.blockTemplates = function(category) {
 		blocks.push('-');
 		blocks.push(block('setScale'));
 		blocks.push(block('changeScale'));
+		blocks.push(block('reportScale'));
 
 	} else if (cat === 'shapes') {
 		blocks.push(block('clear'));

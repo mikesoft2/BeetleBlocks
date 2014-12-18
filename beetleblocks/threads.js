@@ -30,13 +30,26 @@ Process.prototype.goHome = function() {
 };
 
 Process.prototype.setScale = function(scale) {
-	var beetle = this.homeContext.receiver.beetle;
+	var sprite = this.homeContext.receiver,
+		beetle = sprite.beetle,
+		ide = sprite.parentThatIsA(IDE_Morph);
+
 	beetle.multiplierScale = Number(scale);
+	ide.statusDisplay.refresh();
 }
 
 Process.prototype.changeScale = function(delta) {
-	var beetle = this.homeContext.receiver.beetle;
+	var sprite = this.homeContext.receiver,
+		beetle = sprite.beetle,
+		ide = sprite.parentThatIsA(IDE_Morph);
+
 	beetle.multiplierScale += Number(delta);
+	ide.statusDisplay.refresh();
+}
+
+Process.prototype.reportScale = function() {
+	var beetle = this.homeContext.receiver.beetle;
+	return beetle.multiplierScale;
 }
 
 Process.prototype.setPosition = function(x, y, z) {	
@@ -48,9 +61,9 @@ Process.prototype.setPosition = function(x, y, z) {
 		var startPoint =  p.copy(beetle.position);
 	}
 
-	x = Number(x) * beetle.multiplierScale;
-	y = Number(y) * beetle.multiplierScale;
-	z = Number(z) * beetle.multiplierScale;
+	x = Number(x);
+	y = Number(y);
+	z = Number(z);
 	beetle.position = new THREE.Vector3(y, z, x); 	
 
 	if (beetle.extruding) {
@@ -77,13 +90,13 @@ Process.prototype.setPositionOnAxis = function(axis, pos) {
 
 	pos = Number(pos);
 	if (axis == 'x') {
-		beetle.position.z = pos * beetle.multiplierScale;
+		beetle.position.z = pos;
 	}
 	if (axis == 'y') {
-		beetle.position.x = pos * beetle.multiplierScale;
+		beetle.position.x = pos;
 	}
 	if (axis == 'z') {
-		beetle.position.y = pos * beetle.multiplierScale;
+		beetle.position.y = pos;
 	}		
 	if (beetle.extruding) {
 		this.addPointToExtrusion();
@@ -106,15 +119,15 @@ Process.prototype.changePositionBy = function(axis, dist) {
 		var startPoint =  p.copy(beetle.position);
 	}
 
-	dist = Number(dist);
+	dist = Number(dist) * beetle.multiplierScale;
 	if (axis == 'x') {
-		beetle.position.z += dist * beetle.multiplierScale;
+		beetle.position.z += dist;
 	}
 	if (axis == 'y') {
-		beetle.position.x += dist * beetle.multiplierScale;
+		beetle.position.x += dist;
 	}
 	if (axis == 'z') {
-		beetle.position.y += dist * beetle.multiplierScale;
+		beetle.position.y += dist;
 	}	
 	if (beetle.extruding) {
 		this.addPointToExtrusion();
