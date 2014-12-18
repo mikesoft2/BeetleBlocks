@@ -22,6 +22,15 @@ SpriteMorph.prototype.initBeetle = function() {
 	this.beetle.name = 'beetle';
 	this.beetle.color = new THREE.Color();
 
+	// To avoid precision loss, we keep state here and perform transformations on 
+	// the beetle's actual properties by using these values
+	this.beetle.state = {
+		reset: function() {
+			this.color = { h: 30, s: 50, l: 50, set: function(h, s, l) { this.h = h, this.s = s, this.l = l }};
+			this.rotation = { x: 0, y: 0, z: 0, set: function(x, y, z) { this.x = x, this.y = y, this.z = z }};
+		}
+	};
+
 	var material = new THREE.MeshLambertMaterial( { color: this.beetle.color } );
 	var geometry = new THREE.CylinderGeometry( 0, 0.25, 0.7, 32);
 
@@ -31,6 +40,11 @@ SpriteMorph.prototype.initBeetle = function() {
 	this.beetle.shape.name = 'beetleShape';
 
 	this.beetle.posAndRotStack = new Array();
+
+	this.beetle.rotation.update = function() {
+		var rot = myself.beetle.state.rotation;
+		this.set(radians(rot.y * -1), radians(rot.z), radians(rot.x * -1));
+	}
 
 	this.beetle.multiplierScale = 1;
 
@@ -44,13 +58,21 @@ SpriteMorph.prototype.initBeetle = function() {
 
 	// reset
 	this.beetle.reset = function() {	
-		this.position.set(0,0,0);
-		this.rotation.set(0,0,0);
+		this.position.set(0, 0, 0);
+		this.state.reset();
+		this.rotation.update();
+		this.color.update();
 	}
 
 	this.beetle.color.reset = function() {	
-		this.setHSL(0.05,0.5,0.5);
-		myself.beetle.getObjectByName('beetleShape').material.color = this;
+		myself.beetle.state.color.set(30, 50, 50);
+		this.update();
+	}
+
+	this.beetle.color.update = function() {
+		hsl = myself.beetle.state.color;
+		this.setHSL(hsl.h/360, hsl.s/100, hsl.l/100);
+		myself.beetle.shape.material.color = this;
 	}
 
 	// visibility
@@ -62,7 +84,7 @@ SpriteMorph.prototype.initBeetle = function() {
 	this.beetle.add(this.beetle.shape);
 
 	this.beetle.reset();
-	this.beetle.color.reset()
+	this.beetle.color.reset();
 
 	this.beetle.axes = [];
 	// beetle's local axis lines
@@ -75,11 +97,9 @@ SpriteMorph.prototype.initBeetle = function() {
 }
 
 SpriteMorph.prototype.originalInit = SpriteMorph.prototype.init;
-
 SpriteMorph.prototype.init = function(globals) {
 	this.initBeetle();
 	this.originalInit(globals);
-
 }
 
 // Definition of new BeetleBlocks categories

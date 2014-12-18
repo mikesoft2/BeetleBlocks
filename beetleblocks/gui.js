@@ -852,9 +852,9 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	elements.push('Beetle rotation: ');
 	element = new StringMorph();
 	element.update = function() {
-		this.text = degrees(beetle.rotation.x).toString().slice(0,5) + ', ' 
-					+ degrees(beetle.rotation.y).toString().slice(0,5) + ', ' 
-					+ degrees(beetle.rotation.z).toString().slice(0,5)
+		this.text = beetle.state.rotation.x.toString().slice(0,5) + ', ' 
+					+ beetle.state.rotation.y.toString().slice(0,5) + ', ' 
+					+ beetle.state.rotation.z.toString().slice(0,5)
 	};
 	element.newLines = 2;
 	elements.push(element);
@@ -881,10 +881,9 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	elements.push('HSL: ');
 	element = new StringMorph();
 	element.update = function() {
-		var hsl = beetle.color.getHSL();
-		this.text = (hsl.h * 360).toString().slice(0,5) + ', ' 
-					+ (hsl.s * 100).toString().slice(0,5) + ', ' 
-					+ (hsl.l * 100).toString().slice(0,5)
+		this.text = beetle.state.color.h.toString().slice(0,5) + ', ' 
+					+ beetle.state.color.s.toString().slice(0,5) + ', ' 
+					+ beetle.state.color.l.toString().slice(0,5)
    	};
 	element.newLines = 3;
 	elements.push(element);
@@ -912,7 +911,6 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 
 	elements.forEach(function(each) { myself.statusDisplay.addElement(each) });
 };
-
 
 IDE_Morph.prototype.selectSprite = function (sprite) {
     this.currentSprite = sprite;

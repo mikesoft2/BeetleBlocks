@@ -147,14 +147,16 @@ Process.prototype.setRotationOnAxis = function(axis, angle) {
 
 	angle = Number(angle);
 	if (axis == 'x') {
-		beetle.rotation.z = radians(angle * -1);
+		beetle.state.rotation.x = angle % 360;
 	}
 	if (axis == 'y') {
-		beetle.rotation.x = radians(angle * -1);
+		beetle.state.rotation.y = angle % 360;
 	}
 	if (axis == 'z') {
-		beetle.rotation.y = radians(angle);
+		beetle.state.rotation.z = angle % 360;
 	}
+
+	beetle.rotation.update();
 
 	if (beetle.extruding) {
 		this.addPointToExtrusion();
@@ -164,12 +166,14 @@ Process.prototype.setRotationOnAxis = function(axis, angle) {
 };
 
 Process.prototype.pointTowards = function(x, y, z) {
+	// We're losing precision here
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph),
 	x = Number(x);
 	y = Number(y);
 	z = Number(z);
 	beetle.lookAt(new THREE.Vector3(y, z, x));
+	beetle.state.rotation.set(degrees(beetle.rotation.x), degrees(beetle.rotation.y), degrees(beetle.rotation.z));
 	stage.reRender();
 };
 
@@ -213,7 +217,7 @@ Process.prototype.move = function(dist) {
 };
 
 Process.prototype.rotate = function(axis, angle) {
-	var beetle = this.homeContext.receiver.beetle;
+	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
 
 	angle = Number(angle);
@@ -226,8 +230,9 @@ Process.prototype.rotate = function(axis, angle) {
 	}
 	if (axis == 'z') {
 		beetle.rotateY(radians(angle));
-	}	
+	}
 
+	beetle.state.rotation.set(degrees(beetle.rotation.x), degrees(beetle.rotation.y), degrees(beetle.rotation.z));
 	stage.reRender();
 };
 
@@ -453,22 +458,16 @@ Process.prototype.setHSL = function(channel, value) {
 		hsl = beetle.color.getHSL();
 
 	if (channel == 'hue') {
-		value %= 360; // wrap
-		value /= 360; // scale from 0-360 to 0-1
-		hsl.h = value;
+		beetle.state.color.h = value % 360;
 	} else {
-		value %= 100; // wrap
-		value /= 100; // scale from 0-100 to 0-1
 		if (channel == 'saturation') {
-			hsl.s = value;
+			beetle.state.color.s = value % 100;
 		} else if (channel == 'lightness') {
-			hsl.l = value;
+			beetle.state.color.l = value % 100;
 		}
 	}
 
-	beetle.color.setHSL(hsl.h, hsl.s, hsl.l);
-	beetle.shape.material.color = beetle.color;
-
+	beetle.color.update();
 	stage.reRender();
 };
 
@@ -478,21 +477,16 @@ Process.prototype.changeHSL = function(channel, value) {
 		value = Number(value);
 
 	if (channel == 'hue') {
-		value %= 360; // wrap
-		value /= 360; // scale from 0-360 to 0-1
-		beetle.color.offsetHSL(value,0,0);
+		beetle.state.color.h = (beetle.state.color.h + value) % 360;
 	} else {
-		value %= 100; // wrap
-		value /= 100; // scale from 0-100 to 0-1
 		if (channel == 'saturation') {
-			beetle.color.offsetHSL(0,value,0);
+			beetle.state.color.s = (beetle.state.color.s + value) % 100;
 		} else if (channel == 'lightness') {
-			beetle.color.offsetHSL(0,0,value);
+			beetle.state.color.l = (beetle.state.color.l + value) % 100;
 		}
 	}
 
-	beetle.shape.material.color = beetle.color;	
-
+	beetle.color.update();
 	stage.reRender();
 };
 
@@ -501,13 +495,13 @@ Process.prototype.getHSL = function(channel) {
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
 
 	if (channel == 'hue') {
-		return(beetle.color.getHSL().h * 360);
+		return(beetle.state.color.h);
 	}
 	if (channel == 'saturation') {
-		return(beetle.color.getHSL().s * 100);
+		return(beetle.state.color.s);
 	}
 	if (channel == 'lightness') {
-		return(beetle.color.getHSL().l * 100);
+		return(beetle.state.color.l);
 	}
 
 	stage.reRender();
@@ -535,21 +529,21 @@ Process.prototype.getRotation = function(axis) {
 		rot = 0;
 
 	if (axis == 'x') {
-		rot = beetle.rotation.z;
+		rot = beetle.state.rotation.x;
 	}
 	if (axis == 'y') {
-		rot = beetle.rotation.x;
+		rot = beetle.state.rotation.y;
 	}
 	if (axis == 'z') {
-		rot = beetle.rotation.y;
+		rot = beetle.state.rotation.z;
 	}
 
-	return degrees(rot);
+	return rot;
 };
 
 Process.prototype.pushPosition = function() {
 	var beetle = this.homeContext.receiver.beetle;
-	beetle.posAndRotStack.push({position: beetle.position.clone(), rotation: beetle.rotation.clone()});
+	beetle.posAndRotStack.push({position: beetle.position.clone(), rotation: beetle.state.rotation.clone()});
 };
 
 Process.prototype.popPosition = function() {
@@ -560,7 +554,8 @@ Process.prototype.popPosition = function() {
 		var posAndRot = beetle.posAndRotStack.pop();	
 
 		beetle.position.set(posAndRot.position.x, posAndRot.position.y, posAndRot.position.z);
-		beetle.rotation.set(posAndRot.rotation.x, posAndRot.rotation.y, posAndRot.rotation.z);
+		beetle.state.rotation.set(posAndRot.rotation.x, posAndRot.rotation.y, posAndRot.rotation.z);
+		beetle.rotation.update();
 
 		if (beetle.extruding) { this.addPointToExtrusion() }
 
