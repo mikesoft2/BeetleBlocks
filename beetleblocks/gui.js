@@ -463,6 +463,9 @@ IDE_Morph.prototype.cameraMenu = function () {
 			'check to show x/y/z axes',
 			false
 			);
+// I'm taking this one out until I figure out why the button label rendering glitch happens
+// and until we address #61: Add a "beetle" menu and split the camera menu
+/*
 	addPreference(
 			'Show beetle',
 			function(){ myself.currentSprite.beetle.toggleVisibility() },
@@ -471,6 +474,7 @@ IDE_Morph.prototype.cameraMenu = function () {
 			'check to show the beetle',
 			false
 			);
+*/
 	addPreference(
 			'Toggle parallel projection',
 			function(){ stage.renderer.toggleParallelProjection() },
@@ -787,37 +791,30 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     this.statusDisplay.arrangeContents = function () {
         var x = this.left() + padding,
             y = this.top() + padding,
-            max = this.right(),
-            start = this.left() + padding;
+            max = this.right() - padding,
+            start = x,
+			middle = (max - start) / 2 + start;
 
         this.frame.contents.children.forEach(function (element) {
-			if (element.newLine) {
-				y += 14;
+			element.setPosition(new Point(x, y));
+			x += element.width();
+
+			if (element.newLines) {
+				y += 14 * element.newLines;
 				x = start;
-			} else if (element.newColumn) {
-				x = (max - start) / 2 + padding;
-				console.log(x);
-			} else {
-				element.setPosition(new Point(x, y));
-            	x += element.width();
-			}
+			};
+
+			if (element.newColumn) {
+				x = middle;
+			};
         });
+
         this.frame.contents.adjustBounds();
     };
 
     this.statusDisplay.addElement = function (element) {
 
-		// This is getting too "creative"...
-		if (element == '--') {
-			// this is a new line
-			element = new Morph();
-			element.newLine = true;
-		} else if (element == '|') {
-			// this is a column separator
-			element = new Morph();
-			element.newColumn = true;
-		} else if (typeof element == 'string') {
-			// this is a label
+		if (typeof element == 'string') {
 			element = new StringMorph(element, 12, null, true);
 		};
 
@@ -842,27 +839,76 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 
 	// Add all contents
 
-	elements.push('Beetle position:');
+	elements.push('Beetle position: ');
 	element = new StringMorph();
 	element.update = function() {
-		this.text = 
-			' (' + beetle.position.x.toString().slice(0,5) + ', ' 
-			+ beetle.position.y.toString().slice(0,5) + ', ' 
-			+ beetle.position.z.toString().slice(0,5) + ')' };
+		this.text = beetle.position.x.toString().slice(0,5) + ', ' 
+					+ beetle.position.y.toString().slice(0,5) + ', ' 
+					+ beetle.position.z.toString().slice(0,5)
+	};
+	element.newColumn = true;
 	elements.push(element);
 
-	elements.push('|');
-
-	elements.push('Beetle rotation:');
+	elements.push('Beetle rotation: ');
 	element = new StringMorph();
 	element.update = function() {
-		this.text = 
-			' (' + degrees(beetle.rotation.x).toString().slice(0,5) + ', ' 
-			+ degrees(beetle.rotation.y).toString().slice(0,5) + ', ' 
-			+ degrees(beetle.rotation.z).toString().slice(0,5) + ')' };
+		this.text = degrees(beetle.rotation.x).toString().slice(0,5) + ', ' 
+					+ degrees(beetle.rotation.y).toString().slice(0,5) + ', ' 
+					+ degrees(beetle.rotation.z).toString().slice(0,5)
+	};
+	element.newLines = 2;
 	elements.push(element);
 
-	elements.push('--');
+	elements.push('Scale: ');
+	element = new StringMorph();
+	element.update = function() {
+		this.text = beetle.multiplierScale.toString().slice(0,5) 
+					+ ' (' + (beetle.multiplierScale * 100).toString().slice(0,5) + '%)'
+	}
+	element.newLines = 2;
+	elements.push(element);
+
+	elements.push('Color: ');
+	element = new Morph();
+	element.update = function() {
+		this.setColor(new Color(beetle.color.r * 255, beetle.color.g * 255, beetle.color.b * 255));
+	}
+	element.setWidth(30);
+	element.setHeight(12);
+	element.newColumn = true;
+	elements.push(element);
+
+	elements.push('HSL: ');
+	element = new StringMorph();
+	element.update = function() {
+		var hsl = beetle.color.getHSL();
+		this.text = (hsl.h * 360).toString().slice(0,5) + ', ' 
+					+ (hsl.s * 100).toString().slice(0,5) + ', ' 
+					+ (hsl.l * 100).toString().slice(0,5)
+   	};
+	element.newLines = 3;
+	elements.push(element);
+
+	element = new PushButtonMorph(
+		null,
+		function () {
+			beetle.toggleVisibility();
+			element.labelString = (beetle.shape.visible ? 'Hide' : 'Show') + ' beetle';
+			element.drawNew();
+		},
+            'Hide beetle'
+        );
+
+	// It should be done like this, so it also updates if we toggle visibility from somewhere else...
+	// For some reason this doesn't work
+
+	/*
+	element.update = function() {
+		this.labelString = (beetle.shape.visible ? 'Hide' : 'Show') + ' beetle';
+	};
+	*/
+
+	elements.push(element);
 
 	elements.forEach(function(each) { myself.statusDisplay.addElement(each) });
 };

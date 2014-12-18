@@ -8,6 +8,7 @@ Process.prototype.clear = function() {
 
 	beetle.drawing = false;
 	beetle.extruding = false; 
+	beetle.multiplierScale = 1;
 
 	beetle.reset();
 	beetle.color.reset();
