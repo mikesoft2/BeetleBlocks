@@ -32,13 +32,14 @@ SpriteMorph.prototype.initBeetle = function() {
 			this.h = h;
 			this.s = s;
 			this.l = l;
-		}
+		};
+
 		this.rotation = { x: 0, y: 0, z: 0 };
 		this.rotation.set = function (x, y, z) { 
 			this.x = x;
 		   	this.y = y;
 			this.z = z;
-		}
+		};
 	}
 
 	var material = new THREE.MeshLambertMaterial( { color: this.beetle.color } );

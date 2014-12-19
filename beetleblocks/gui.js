@@ -852,9 +852,9 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	elements.push('Position: ');
 	element = new StringMorph();
 	element.update = function() {
-		this.text = beetle.position.x.toString().slice(0,5) + ', ' 
-					+ beetle.position.y.toString().slice(0,5) + ', ' 
-					+ beetle.position.z.toString().slice(0,5)
+		this.text = beetle.position.x.toFixed(2).toString().replace('.00','') + ', ' 
+					+ beetle.position.y.toFixed(2).toString().replace('.00','') + ', ' 
+					+ beetle.position.z.toFixed(2).toString().replace('.00','')
 	};
 	element.newColumn = true;
 	elements.push(element);
@@ -862,9 +862,9 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	elements.push('Rotation: ');
 	element = new StringMorph();
 	element.update = function() {
-		this.text = beetle.state.rotation.x.toString().slice(0,5) + ', ' 
-					+ beetle.state.rotation.y.toString().slice(0,5) + ', ' 
-					+ beetle.state.rotation.z.toString().slice(0,5)
+		this.text = beetle.state.rotation.x.toFixed(2).toString().replace('.00','') + ', ' 
+					+ beetle.state.rotation.y.toFixed(2).toString().replace('.00','') + ', ' 
+					+ beetle.state.rotation.z.toFixed(2).toString().replace('.00','')
 	};
 	element.newLines = 2;
 	elements.push(element);
@@ -872,8 +872,8 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	elements.push('Scale: ');
 	element = new StringMorph();
 	element.update = function() {
-		this.text = beetle.multiplierScale.toString().slice(0,5) 
-					+ ' (' + (beetle.multiplierScale * 100).toString().slice(0,5) + '%)'
+		this.text = beetle.multiplierScale.toString() 
+					+ ' (' + (beetle.multiplierScale * 100).toString() + '%)'
 	}
 	element.newLines = 2;
 	elements.push(element);
@@ -891,9 +891,9 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	elements.push('HSL: ');
 	element = new StringMorph();
 	element.update = function() {
-		this.text = beetle.state.color.h.toString().slice(0,5) + ', ' 
-					+ beetle.state.color.s.toString().slice(0,5) + ', ' 
-					+ beetle.state.color.l.toString().slice(0,5)
+		this.text = beetle.state.color.h.toFixed(2).toString().replace('.00','') + ', ' 
+					+ beetle.state.color.s.toFixed(2).toString().replace('.00','') + ', ' 
+					+ beetle.state.color.l.toFixed(2).toString().replace('.00','')
    	};
 	element.newLines = 3;
 	elements.push(element);
