@@ -24,12 +24,22 @@ SpriteMorph.prototype.initBeetle = function() {
 
 	// To avoid precision loss, we keep state here and perform transformations on 
 	// the beetle's actual properties by using these values
-	this.beetle.state = {
-		reset: function() {
-			this.color = { h: 30, s: 50, l: 50, set: function(h, s, l) { this.h = h, this.s = s, this.l = l }};
-			this.rotation = { x: 0, y: 0, z: 0, set: function(x, y, z) { this.x = x, this.y = y, this.z = z }};
+	this.beetle.state = {}
+
+	this.beetle.state.reset = function () {
+		this.color = { h: 30, s: 50, l: 50 };
+		this.color.set = function(h, s, l) { 
+			this.h = h;
+			this.s = s;
+			this.l = l;
 		}
-	};
+		this.rotation = { x: 0, y: 0, z: 0 };
+		this.rotation.set = function (x, y, z) { 
+			this.x = x;
+		   	this.y = y;
+			this.z = z;
+		}
+	}
 
 	var material = new THREE.MeshLambertMaterial( { color: this.beetle.color } );
 	var geometry = new THREE.CylinderGeometry( 0, 0.25, 0.7, 32);

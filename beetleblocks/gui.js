@@ -1,3 +1,9 @@
+IDE_Morph.prototype.originalNewProject = IDE_Morph.prototype.newProject;
+IDE_Morph.prototype.newProject = function () {
+	this.originalNewProject();
+	this.createStatusDisplay();
+}
+
 IDE_Morph.prototype.originalRemoveSprite = IDE_Morph.prototype.removeSprite;
 IDE_Morph.prototype.removeSprite = function (sprite) {
 	var stage = sprite.parentThatIsA(StageMorph);
@@ -677,6 +683,11 @@ ProjectDialogMorph.prototype.openProject = function () {
     }
 };
 
+IDE_Morph.prototype.originalRawOpenProjectString = IDE_Morph.prototype.rawOpenProjectString;
+IDE_Morph.prototype.rawOpenProjectString = function (str) {
+	this.originalRawOpenProjectString(str);
+	this.createStatusDisplay();
+}
 
 // Single Morph mode, no corral and no tabs in the scripting area
 
@@ -838,8 +849,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     };
 
 	// Add all contents
-
-	elements.push('Beetle position: ');
+	elements.push('Position: ');
 	element = new StringMorph();
 	element.update = function() {
 		this.text = beetle.position.x.toString().slice(0,5) + ', ' 
@@ -849,7 +859,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	element.newColumn = true;
 	elements.push(element);
 
-	elements.push('Beetle rotation: ');
+	elements.push('Rotation: ');
 	element = new StringMorph();
 	element.update = function() {
 		this.text = beetle.state.rotation.x.toString().slice(0,5) + ', ' 
