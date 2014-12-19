@@ -403,42 +403,55 @@ Process.prototype.stopExtrusion = function() {
 
 	if (beetle.extruding) {
 		beetle.extruding = false;
+		beetle.extrusionMesh.name = '';
 
-		var extrudeBend = new THREE.SplineCurve3(beetle.extrusionPoints),
-			path = new THREE.TubeGeometry(
-						extrudeBend, 
-						beetle.extrusionPoints.length * beetle.multiplierScale, 
-						beetle.extrusionRadius/2 * beetle.multiplierScale, 
-						8, 
-						false
-					),
-			material = new THREE.MeshLambertMaterial({
-						color: beetle.color, 
-						wireframe: stage.renderer.isWireframeMode
-					});
-
-		var mesh = new THREE.Mesh(path, material);
-
-		stage.myObjects.add(mesh);
 		this.addSphereGeom(beetle.extrusionRadius * beetle.multiplierScale); // end cap
 	}
 
 	stage.reRender();
 };
 
-Process.prototype.setExtrusionRadius = function(radius) {
-	this.homeContext.receiver.beetle.extrusionRadius = radius;
-}
-
-Process.prototype.changeExtrusionRadius = function(delta) {
-	this.homeContext.receiver.beetle.extrusionRadius += delta;
-}
-
 Process.prototype.addPointToExtrusion = function() {
 	var beetle = this.homeContext.receiver.beetle,
+		stage = this.homeContext.receiver.parentThatIsA(StageMorph),
 		p = new THREE.Vector3();
 
 	beetle.extrusionPoints.push(p.copy(beetle.position));
+
+	var extrudeBend = new THREE.SplineCurve3(beetle.extrusionPoints),
+		path = new THREE.TubeGeometry(
+				extrudeBend, 
+				beetle.extrusionPoints.length * beetle.multiplierScale, 
+				beetle.extrusionRadius/2 * beetle.multiplierScale, 
+				8, 
+			false
+			),
+		material = new THREE.MeshLambertMaterial({
+				color: beetle.color, 
+				wireframe: stage.renderer.isWireframeMode
+		});
+
+	beetle.extrusionMesh = new THREE.Mesh(path, material);
+	beetle.extrusionMesh.name = 'in progress';
+
+	stage.myObjects.remove(stage.myObjects.getObjectByName('in progress'));
+	stage.myObjects.add(beetle.extrusionMesh);
+
+	stage.reRender();
+}
+
+Process.prototype.setExtrusionRadius = function(radius) {
+	if (!beetle.extruding) {
+		this.homeContext.receiver.beetle.extrusionRadius = radius;
+	}
+	// should we fire an error otherwise?
+}
+
+Process.prototype.changeExtrusionRadius = function(delta) {
+	if (!beetle.extruding) {
+		this.homeContext.receiver.beetle.extrusionRadius += delta;
+	}
+	// should we fire an error otherwise?
 }
 
 Process.prototype.startDrawing = function() {
