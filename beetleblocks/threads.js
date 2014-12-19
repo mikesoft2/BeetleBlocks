@@ -556,7 +556,7 @@ Process.prototype.getRotation = function(axis) {
 
 Process.prototype.pushPosition = function() {
 	var beetle = this.homeContext.receiver.beetle;
-	beetle.posAndRotStack.push({position: beetle.position.clone(), rotation: beetle.state.rotation.clone()});
+	beetle.posAndRotStack.push({position: beetle.position.clone(), rotation: beetle.state.rotation});
 };
 
 Process.prototype.popPosition = function() {
