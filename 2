@@ -1,5 +1,19 @@
+SyntaxElementMorph.prototype.originalSetScale = SyntaxElementMorph.prototype.setScale;
+SyntaxElementMorph.prototype.setScale = function (num) {
+	var myself = this;
+	this.originalSetScale(num);
+    this.children.forEach(function (morph) {
+        if (morph instanceof StringMorph) {
+            morph.fontSize = myself.fontSize;
+			morph.changed();
+			morph.drawNew();
+        }
+	})
+}
+
 // labelPart() proxy
 SyntaxElementMorph.prototype.originalLabelPart = SyntaxElementMorph.prototype.labelPart;
+
 SyntaxElementMorph.prototype.labelPart = function(spec) {
 	var part;
 	switch (spec) {
@@ -50,8 +64,7 @@ SyntaxElementMorph.prototype.labelPart = function(spec) {
 					);
 			break;
 		default:
-			part = this.originalLabelPart(spec);
-			//part.fontSize = this.fontSize;
+			part = SyntaxElementMorph.prototype.originalLabelPart(spec);
 			break;
 	}
 	return part;
