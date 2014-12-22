@@ -131,6 +131,7 @@ SpriteMorph.prototype.blockColor = {
     motion : new Color(74, 108, 212),
     shapes : new Color(143, 86, 227),
 	colors : new Color(207, 74, 217),
+	sound : new Color(207, 74, 217), // we need to keep this color for the zoom blocks dialog
     control : new Color(230, 168, 34),
     sensing : new Color(4, 148, 220),
     operators : new Color(98, 194, 19),
