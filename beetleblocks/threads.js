@@ -441,6 +441,7 @@ Process.prototype.addPointToExtrusion = function() {
 }
 
 Process.prototype.setExtrusionRadius = function(radius) {
+	var beetle = this.homeContext.receiver.beetle;
 	if (!beetle.extruding) {
 		this.homeContext.receiver.beetle.extrusionRadius = radius;
 	}
@@ -448,6 +449,7 @@ Process.prototype.setExtrusionRadius = function(radius) {
 }
 
 Process.prototype.changeExtrusionRadius = function(delta) {
+	var beetle = this.homeContext.receiver.beetle;
 	if (!beetle.extruding) {
 		this.homeContext.receiver.beetle.extrusionRadius += delta;
 	}
