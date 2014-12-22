@@ -472,13 +472,15 @@ Process.prototype.setHSL = function(channel, value) {
 		value = Number(value),
 		hsl = beetle.color.getHSL();
 
+	// Hue is cyclic, while saturation and lightness are clipped between 0 and 100
+
 	if (channel == 'hue') {
-		beetle.state.color.h = value % 360;
+		beetle.state.color.h = Math.abs(value + 360) % 360;
 	} else {
 		if (channel == 'saturation') {
-			beetle.state.color.s = value % 100;
+			beetle.state.color.s = Math.max(Math.min(value, 100), 0);
 		} else if (channel == 'lightness') {
-			beetle.state.color.l = value % 100;
+			beetle.state.color.l = Math.max(Math.min(value, 100), 0);
 		}
 	}
 
@@ -491,13 +493,15 @@ Process.prototype.changeHSL = function(channel, value) {
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph),
 		value = Number(value);
 
+	// Hue is cyclic, while saturation and lightness are clipped between 0 and 100
+
 	if (channel == 'hue') {
-		beetle.state.color.h = (beetle.state.color.h + value) % 360;
+		beetle.state.color.h = Math.abs(beetle.state.color.h + value + 360) % 360;
 	} else {
 		if (channel == 'saturation') {
-			beetle.state.color.s = (beetle.state.color.s + value) % 100;
+			beetle.state.color.s = Math.max(Math.min((beetle.state.color.s + value), 100), 0);
 		} else if (channel == 'lightness') {
-			beetle.state.color.l = (beetle.state.color.l + value) % 100;
+			beetle.state.color.l = Math.max(Math.min((beetle.state.color.l + value), 100), 0);
 		}
 	}
 
