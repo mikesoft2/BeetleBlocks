@@ -24,22 +24,26 @@ SpriteMorph.prototype.initBeetle = function() {
 
 	// To avoid precision loss, we keep state here and perform transformations on 
 	// the beetle's actual properties by using these values
-	this.beetle.state = {}
-
-	this.beetle.state.reset = function () {
-		this.color = { h: 30, s: 50, l: 50 };
-		this.color.set = function(h, s, l) { 
+	this.beetle.color.state = {
+		h: 30,
+		s: 50,
+		l: 50,
+		set: function(h, s, l) {
 			this.h = h;
 			this.s = s;
 			this.l = l;
-		};
+		}
+	}
 
-		this.rotation = { x: 0, y: 0, z: 0 };
-		this.rotation.set = function (x, y, z) { 
-			this.x = x;
-		   	this.y = y;
-			this.z = z;
-		};
+	this.beetle.color.reset = function () {
+		this.state.set(30, 50, 50);
+		this.update();
+	}
+
+	this.beetle.color.update = function() {
+		hsl = myself.beetle.color.state;
+		this.setHSL(hsl.h/360, hsl.s/100, hsl.l/100);
+		myself.beetle.shape.material.color = this;
 	}
 
 	var material = new THREE.MeshLambertMaterial( { color: this.beetle.color } );
@@ -51,11 +55,6 @@ SpriteMorph.prototype.initBeetle = function() {
 	this.beetle.shape.name = 'beetleShape';
 
 	this.beetle.posAndRotStack = new Array();
-
-	this.beetle.rotation.update = function() {
-		var rot = myself.beetle.state.rotation;
-		this.set(radians(rot.y * -1), radians(rot.z), radians(rot.x * -1));
-	}
 
 	this.beetle.multiplierScale = 1;
 
@@ -70,20 +69,8 @@ SpriteMorph.prototype.initBeetle = function() {
 	// reset
 	this.beetle.reset = function() {	
 		this.position.set(0, 0, 0);
-		this.state.reset();
-		this.rotation.update();
-		this.color.update();
-	}
-
-	this.beetle.color.reset = function() {	
-		myself.beetle.state.color.set(30, 50, 50);
-		this.update();
-	}
-
-	this.beetle.color.update = function() {
-		hsl = myself.beetle.state.color;
-		this.setHSL(hsl.h/360, hsl.s/100, hsl.l/100);
-		myself.beetle.shape.material.color = this;
+		this.rotation.set(0,0,0);
+		this.color.reset();
 	}
 
 	// visibility

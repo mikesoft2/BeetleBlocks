@@ -881,9 +881,9 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	elements.push('Rotation: ');
 	element = new StringMorph();
 	element.update = function() {
-		this.text = beetle.state.rotation.x.toFixed(2).toString().replace('.00','') + ', ' 
-					+ beetle.state.rotation.y.toFixed(2).toString().replace('.00','') + ', ' 
-					+ beetle.state.rotation.z.toFixed(2).toString().replace('.00','')
+		this.text = degrees(beetle.rotation.z * -1).toFixed(2).toString().replace('.00','') + ', ' 
+					+ degrees(beetle.rotation.x * -1).toFixed(2).toString().replace('.00','') + ', ' 
+					+ degrees(beetle.rotation.y).toFixed(2).toString().replace('.00','')
 	};
 	element.newLines = 2;
 	elements.push(element);
@@ -910,9 +910,9 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	elements.push('HSL: ');
 	element = new StringMorph();
 	element.update = function() {
-		this.text = beetle.state.color.h.toFixed(2).toString().replace('.00','') + ', ' 
-					+ beetle.state.color.s.toFixed(2).toString().replace('.00','') + ', ' 
-					+ beetle.state.color.l.toFixed(2).toString().replace('.00','')
+		this.text = beetle.color.state.h.toFixed(2).toString().replace('.00','') + ', ' 
+					+ beetle.color.state.s.toFixed(2).toString().replace('.00','') + ', ' 
+					+ beetle.color.state.l.toFixed(2).toString().replace('.00','')
    	};
 	elements.push(element);
 
