@@ -878,25 +878,6 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	element.newColumn = true;
 	elements.push(element);
 
-	elements.push('Rotation: ');
-	element = new StringMorph();
-	element.update = function() {
-		this.text = degrees(beetle.rotation.z * -1).toFixed(2).toString().replace('.00','') + ', ' 
-					+ degrees(beetle.rotation.x * -1).toFixed(2).toString().replace('.00','') + ', ' 
-					+ degrees(beetle.rotation.y).toFixed(2).toString().replace('.00','')
-	};
-	element.newLines = 2;
-	elements.push(element);
-
-	elements.push('Scale: ');
-	element = new StringMorph();
-	element.update = function() {
-		this.text = beetle.multiplierScale.toString() 
-					+ ' (' + (beetle.multiplierScale * 100).toString() + '%)'
-	}
-	element.newLines = 2;
-	elements.push(element);
-
 	elements.push('Color: ');
 	element = new Morph();
 	element.update = function() {
@@ -904,6 +885,16 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	}
 	element.setWidth(30);
 	element.setHeight(12);
+	element.newLines = 1.5;
+	elements.push(element);
+
+	elements.push('Rotation: ');
+	element = new StringMorph();
+	element.update = function() {
+		this.text = degrees(beetle.rotation.z * -1).toFixed(2).toString().replace('.00','') + ', ' 
+					+ degrees(beetle.rotation.x * -1).toFixed(2).toString().replace('.00','') + ', ' 
+					+ degrees(beetle.rotation.y).toFixed(2).toString().replace('.00','')
+	};
 	element.newColumn = true;
 	elements.push(element);
 
@@ -914,8 +905,28 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 					+ beetle.color.state.s.toFixed(2).toString().replace('.00','') + ', ' 
 					+ beetle.color.state.l.toFixed(2).toString().replace('.00','')
    	};
+	element.newLines = 1.5;
 	elements.push(element);
 
+	elements.push('Scale: ');
+	element = new StringMorph();
+	element.update = function() {
+		this.text = beetle.multiplierScale.toString() 
+					+ ' (' + (beetle.multiplierScale * 100).toString() + '%)'
+	}
+	element.newColumn = true;
+	elements.push(element);
+
+	elements.push('Opacity: ');
+	element = new StringMorph();
+	element.update = function() {
+		this.text = (beetle.shape.material.opacity * 100).toFixed(2).toString().replace('.00','') + '%'
+	}
+	element.newLines = 1.5;
+	elements.push(element);
+
+
+	
 	// Add all contents
 
 	elements.forEach(function(each) { myself.statusDisplay.addElement(each) });

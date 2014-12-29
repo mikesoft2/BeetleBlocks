@@ -46,7 +46,7 @@ SpriteMorph.prototype.initBeetle = function() {
 		myself.beetle.shape.material.color = this;
 	}
 
-	var material = new THREE.MeshLambertMaterial( { color: this.beetle.color } );
+	var material = new THREE.MeshLambertMaterial( { color: this.beetle.color, transparent: true } );
 	var geometry = new THREE.CylinderGeometry( 0, 0.25, 0.7, 32);
 
 	this.beetle.shape = new THREE.Mesh(geometry, material);
@@ -69,7 +69,7 @@ SpriteMorph.prototype.initBeetle = function() {
 	// reset
 	this.beetle.reset = function() {	
 		this.position.set(0, 0, 0);
-		this.rotation.set(0,0,0);
+		this.rotation.set(0, 0, 0);
 		this.color.reset();
 	}
 
@@ -323,24 +323,24 @@ SpriteMorph.prototype.initBlocks = function() {
 	};
 
 	// color
-	this.blocks.setHSL =
+	this.blocks.setHSLA =
 	{
 			type: 'command', 
-			spec: 'set %hsl to %n',	
+			spec: 'set %hsla to %n',	
 			category: 'colors',
 			defaults: ['hue', 50]
 	};
-	this.blocks.changeHSL =
+	this.blocks.changeHSLA =
 	{
 			type: 'command', 
-			spec: 'change %hsl by %n',
+			spec: 'change %hsla by %n',
 			category: 'colors',
 			defaults: ['hue', 10]
 	};
-	this.blocks.getHSL =
+	this.blocks.getHSLA =
 	{
 			type: 'reporter',
-			spec: 'color %hsl',
+			spec: 'color %hsla',
 			category: 'colors'
 	};
 
@@ -473,9 +473,9 @@ SpriteMorph.prototype.blockTemplates = function(category) {
 		blocks.push(block('changeExtrusionRadius'));
 
 	} else if (cat === 'colors') {
-		blocks.push(block('setHSL'));
-		blocks.push(block('changeHSL'));
-		blocks.push(block('getHSL'));
+		blocks.push(block('setHSLA'));
+		blocks.push(block('changeHSLA'));
+		blocks.push(block('getHSLA'));
 
 	} else if (cat === 'control') {
 

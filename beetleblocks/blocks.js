@@ -26,14 +26,15 @@ SyntaxElementMorph.prototype.labelPart = function(spec) {
 					true
 					);
 			break;
-		case '%hsl':
+		case '%hsla':
 			part = new InputSlotMorph(
 					null,
 					false,
 					{
 					'hue' : ['hue'],
 					'saturation' : ['saturation'],
-					'lightness' : ['lightness']
+					'lightness' : ['lightness'],
+					'opacity' : ['opacity']
 					},
 					true
 					);

@@ -258,7 +258,11 @@ Process.prototype.addBoxGeom = function(length, width, height) {
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph),
 		boxGeometry = new THREE.BoxGeometry(length, width, height),
-		material = new THREE.MeshLambertMaterial( { color: beetle.color } );
+		material = new THREE.MeshLambertMaterial({
+				color: beetle.color,
+				transparent: true,
+				opacity: beetle.shape.material.opacity 
+		});
 
 	material.wireframe = stage.renderer.isWireframeMode;
 	var box = new THREE.Mesh(boxGeometry, material);
@@ -283,7 +287,11 @@ Process.prototype.addSphereGeom = function(diam) {
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph),
 		sphereGeometry = new THREE.SphereGeometry(diam/2),
-		material = new THREE.MeshLambertMaterial( { color: beetle.color } );
+		material = new THREE.MeshLambertMaterial({
+				color: beetle.color,
+				transparent: true,
+				opacity: beetle.shape.material.opacity 
+		});
 
 	material.wireframe = stage.renderer.isWireframeMode;
 	var sphere = new THREE.Mesh(sphereGeometry, material);
@@ -337,7 +345,11 @@ Process.prototype.addTubeGeom = function(length, outer, inner) {
 	};
 
 	var tubeGeom = new THREE.ExtrudeGeometry(shape, options),
-		material = new THREE.MeshLambertMaterial({ color: beetle.color });
+		material = new THREE.MeshLambertMaterial({
+				color: beetle.color,
+				transparent: true,
+				opacity: beetle.shape.material.opacity 
+		});
 
 	material.wireframe = stage.renderer.isWireframeMode;
 
@@ -362,7 +374,11 @@ Process.prototype.text = function(textString, height, depth) {
 		height: depth
 	});
 
-	var material = new THREE.MeshLambertMaterial({ color: beetle.color });
+	var material = new THREE.MeshLambertMaterial({
+				color: beetle.color,
+				transparent: true,
+				opacity: beetle.shape.material.opacity 
+		});
 
 	material.wireframe = stage.renderer.isWireframeMode;
 
@@ -423,7 +439,9 @@ Process.prototype.addPointToExtrusion = function() {
 			),
 		material = new THREE.MeshLambertMaterial({
 				color: beetle.color, 
-				wireframe: stage.renderer.isWireframeMode
+				wireframe: stage.renderer.isWireframeMode,
+				transparent: true,
+				opacity: beetle.shape.material.opacity
 		});
 
 	beetle.extrusionMesh = new THREE.Mesh(path, material);
@@ -461,50 +479,50 @@ Process.prototype.stopDrawing = function() {
 	beetle.drawing = false;
 };
 
-Process.prototype.setHSL = function(channel, value) {
+Process.prototype.setHSLA = function(channel, value) {
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph),
 		value = Number(value),
 		hsl = beetle.color.getHSL();
 
-	// Hue is cyclic, while saturation and lightness are clipped between 0 and 100
+	// Hue is cyclic, while saturation, lightness and opacity are clipped between 0 and 100
 
 	if (channel == 'hue') {
 		beetle.color.state.h = Math.abs(value + 360) % 360;
-	} else {
-		if (channel == 'saturation') {
-			beetle.color.state.s = Math.max(Math.min(value, 100), 0);
-		} else if (channel == 'lightness') {
-			beetle.color.state.l = Math.max(Math.min(value, 100), 0);
-		}
+	} else if (channel == 'saturation') {
+		beetle.color.state.s = Math.max(Math.min(value, 100), 0);
+	} else if (channel == 'lightness') {
+		beetle.color.state.l = Math.max(Math.min(value, 100), 0);
+	} else if (channel == 'opacity') {
+		beetle.shape.material.opacity = Math.max(Math.min(value / 100, 1), 0);
 	}
 
 	beetle.color.update();
 	stage.reRender();
 };
 
-Process.prototype.changeHSL = function(channel, value) {	
+Process.prototype.changeHSLA = function(channel, value) {	
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph),
 		value = Number(value);
 
-	// Hue is cyclic, while saturation and lightness are clipped between 0 and 100
+	// Hue is cyclic, while saturation, lightness and opacity are clipped between 0 and 100
 
 	if (channel == 'hue') {
 		beetle.color.state.h = Math.abs(beetle.color.state.h + value + 360) % 360;
-	} else {
-		if (channel == 'saturation') {
-			beetle.color.state.s = Math.max(Math.min((beetle.color.state.s + value), 100), 0);
-		} else if (channel == 'lightness') {
-			beetle.color.state.l = Math.max(Math.min((beetle.color.state.l + value), 100), 0);
-		}
+	} else if (channel == 'saturation') {
+		beetle.color.state.s = Math.max(Math.min((beetle.color.state.s + value), 100), 0);
+	} else if (channel == 'lightness') {
+		beetle.color.state.l = Math.max(Math.min((beetle.color.state.l + value), 100), 0);
+	} else if (channel == 'opacity') {
+		beetle.shape.material.opacity = Math.max(Math.min(beetle.shape.material.opacity + value / 100, 1), 0);
 	}
 
 	beetle.color.update();
 	stage.reRender();
 };
 
-Process.prototype.getHSL = function(channel) {
+Process.prototype.getHSLA = function(channel) {
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
 
@@ -516,6 +534,9 @@ Process.prototype.getHSL = function(channel) {
 	}
 	if (channel == 'lightness') {
 		return(beetle.color.state.l);
+	}
+	if (channel == 'opacity') {
+		return(beetle.shape.material.opacity * 100);
 	}
 
 	stage.reRender();
