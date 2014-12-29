@@ -319,21 +319,22 @@ Process.prototype.addTubeGeom = function(length, outer, inner) {
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph),
 		pts = [],
 		numPoints = 24,
-		radius = outer/2 
+		innerRadius = inner/2,
+		outerRadius = outer/2
 
 	for (i = 0; i < numPoints; i ++) {
 		var a = 2 * Math.PI * i / numPoints;
-		pts.push(new THREE.Vector2(Math.cos(a) * radius, Math.sin(a) * radius));
+		pts.push(new THREE.Vector2(Math.cos(a) * outerRadius, Math.sin(a) * outerRadius));
 	}
 
 	var shape = new THREE.Shape(pts);
 
 	pts = [];
-	radius = inner/2;
+	innerRadius = inner/2;
 
 	for (i = 0; i < numPoints; i ++) {
 		var a = 2 * Math.PI * i / numPoints;
-		pts.push(new THREE.Vector2(Math.cos(a) * radius, Math.sin(a) * radius));
+		pts.push(new THREE.Vector2(Math.cos(a) * innerRadius, Math.sin(a) * innerRadius));
 	}
 
 	var hole = new THREE.Shape(pts);
@@ -403,7 +404,7 @@ Process.prototype.startExtrusion = function() {
 	beetle.extruding = true;
 	beetle.extrusionPoints = new Array();
 	this.addPointToExtrusion();
-	this.addSphereGeom(beetle.extrusionRadius * beetle.multiplierScale); // start cap
+	this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale); // start cap
 
 	stage.reRender();
 };
@@ -416,7 +417,7 @@ Process.prototype.stopExtrusion = function() {
 		beetle.extruding = false;
 		beetle.extrusionMesh.name = '';
 
-		this.addSphereGeom(beetle.extrusionRadius * beetle.multiplierScale); // end cap
+		this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale); // end cap
 	}
 
 	stage.reRender();
@@ -433,7 +434,7 @@ Process.prototype.addPointToExtrusion = function() {
 		path = new THREE.TubeGeometry(
 				extrudeBend, 
 				beetle.extrusionPoints.length * beetle.multiplierScale, 
-				beetle.extrusionRadius/2 * beetle.multiplierScale, 
+				beetle.extrusionDiameter/2 * beetle.multiplierScale, 
 				8, 
 			false
 			),
@@ -453,18 +454,18 @@ Process.prototype.addPointToExtrusion = function() {
 	stage.reRender();
 }
 
-Process.prototype.setExtrusionRadius = function(radius) {
+Process.prototype.setExtrusionDiameter = function(diameter) {
 	var beetle = this.homeContext.receiver.beetle;
 	if (!beetle.extruding) {
-		this.homeContext.receiver.beetle.extrusionRadius = radius;
+		this.homeContext.receiver.beetle.extrusionDiameter = diameter;
 	}
 	// should we fire an error otherwise?
 }
 
-Process.prototype.changeExtrusionRadius = function(delta) {
+Process.prototype.changeExtrusionDiameter = function(delta) {
 	var beetle = this.homeContext.receiver.beetle;
 	if (!beetle.extruding) {
-		this.homeContext.receiver.beetle.extrusionRadius += delta;
+		this.homeContext.receiver.beetle.extrusionDiameter += delta;
 	}
 	// should we fire an error otherwise?
 }
