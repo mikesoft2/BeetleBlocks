@@ -3,7 +3,7 @@ SyntaxElementMorph.prototype.originalLabelPart = SyntaxElementMorph.prototype.la
 SyntaxElementMorph.prototype.labelPart = function(spec) {
 	var part;
 	switch (spec) {
-		case '%axes':
+		case '%localAxes':
 			part = new InputSlotMorph(
 					null,
 					false,
@@ -11,6 +11,18 @@ SyntaxElementMorph.prototype.labelPart = function(spec) {
 					'x' : ['x'],
 					'y' : ['y'], 
 					'z' : ['z']
+					},
+					true
+					);
+			break;
+		case '%globalAxes':
+			part = new InputSlotMorph(
+					null,
+					false,
+					{
+					'X' : ['X'],
+					'Y' : ['Y'], 
+					'Z' : ['Z']
 					},
 					true
 					);
@@ -58,6 +70,49 @@ SyntaxElementMorph.prototype.labelPart = function(spec) {
 	return part;
 }
 
+// Increase inter-block space
+
+SyntaxElementMorph.prototype.originalFixLayout = SyntaxElementMorph.prototype.fixLayout;
+SyntaxElementMorph.prototype.fixLayout = function () {
+	this.originalFixLayout();
+	if (this.nextBlock)	{
+		var nb = this.nextBlock();
+		if (nb) { nb.moveBy(new Point(0,1)) }
+	}
+}
+
+// On C-slots, we also need to fix the position of dents
+CSlotMorph.prototype.originalInit = CSlotMorph.prototype.init;
+CSlotMorph.prototype.init = function() {
+	this.originalInit();
+	this.dent = 7;
+	this.inset = 7;
+}
+
+CSlotMorph.prototype.fixLayout = function () {
+    var nb = this.nestedBlock();
+    if (nb) {
+        nb.setPosition(
+            new Point(
+                this.left() + this.inset + 1, // inner left 
+                this.top() + this.corner + 1 // inner top
+            )
+        );
+        this.setHeight(nb.fullBounds().height() + this.corner + 2); // inner bottom
+        this.setWidth(nb.fullBounds().width() + (this.cSlotPadding * 2));
+    } else {
+        this.setHeight(this.corner * 4  + this.cSlotPadding); // default
+        this.setWidth(
+            this.corner * 4
+                + (this.inset * 2)
+                + this.dent
+                + (this.cSlotPadding * 2)
+        ); // default
+    }
+    if (this.parent.fixLayout) {
+        this.parent.fixLayout();
+    }
+};
 
 // Camera SymbolMorph
 
