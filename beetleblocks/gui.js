@@ -871,9 +871,9 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	elements.push('Position: ');
 	element = new StringMorph();
 	element.update = function() {
-		this.text = beetle.position.x.toFixed(2).toString().replace('.00','') + ', ' 
-					+ beetle.position.y.toFixed(2).toString().replace('.00','') + ', ' 
-					+ beetle.position.z.toFixed(2).toString().replace('.00','')
+		this.text = beetle.position.z.toFixed(2).toString().replace('.00','') + ', ' 
+					+ beetle.position.x.toFixed(2).toString().replace('.00','') + ', ' 
+					+ beetle.position.y.toFixed(2).toString().replace('.00','')
 	};
 	element.newColumn = true;
 	elements.push(element);
