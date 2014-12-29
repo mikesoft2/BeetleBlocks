@@ -453,52 +453,6 @@ IDE_Morph.prototype.cameraMenu = function () {
 			})
 		});
 	menu.addLine();
-	addPreference(
-			'Wireframe mode',
-			function() { stage.renderer.toggleWireframe() },
-			stage.renderer.isWireframeMode,
-			'uncheck to disable wireframe mode',
-			'check to enable wireframe mode',
-			false
-		     );
-	addPreference(
-			'Show axes',
-			function(){ stage.renderer.toggleAxes() },
-			stage.renderer.showingAxes,
-			'uncheck to hide x/y/z axes',
-			'check to show x/y/z axes',
-			false
-			);
-// I'm taking this one out until I figure out why the button label rendering glitch happens
-// and until we address #61: Add a "beetle" menu and split the camera menu
-/*
-	addPreference(
-			'Show beetle',
-			function(){ myself.currentSprite.beetle.toggleVisibility() },
-			myself.currentSprite.beetle.shape.visible,
-			'uncheck to hide the beetle',
-			'check to show the beetle',
-			false
-			);
-*/
-	addPreference(
-			'Toggle parallel projection',
-			function(){ stage.renderer.toggleParallelProjection() },
-			stage.renderer.isParallelProjection,
-			'check to render in parallel projection',
-			'uncheck to render in perspective projection',
-			false
-			);
-
-	menu.addLine();
-	addPreference(
-			'Show grid',
-			function(){ stage.scene.grid.toggle() },
-			stage.scene.grid.visible,
-			'uncheck to hide x/y grid',
-			'check to show x/y grid',
-			false
-		     );
 	menu.addItem(
 		'Set grid interval',
 		function(){
@@ -770,7 +724,8 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 		padding = 5,
 		myself = this,
 		elements = [],
-		beetle = this.currentSprite.beetle;
+		beetle = this.currentSprite.beetle,
+		stage = this.stage;
 
     if (this.statusDisplay) {
         this.statusDisplay.destroy();
@@ -848,7 +803,71 @@ IDE_Morph.prototype.createStatusDisplay = function () {
         return false;
     };
 
-	// Add all contents
+	// Buttons
+	
+	var toggleBeetleButton = new PushButtonMorph(
+		null,
+		function () {
+			beetle.toggleVisibility();
+			toggleBeetleButton.labelString = (beetle.shape.visible ? 'Hide' : 'Show') + ' beetle';
+			toggleBeetleButton.drawNew();
+		},
+		'Hide beetle'
+	);
+	elements.push(toggleBeetleButton);
+
+	var toggleAxesButton = new PushButtonMorph(
+		null,
+		function () {
+			stage.renderer.toggleAxes();
+			toggleAxesButton.labelString = (stage.renderer.showingAxes ? 'Hide' : 'Show') + ' axes';
+			toggleAxesButton.drawNew();
+		},
+		'Hide axes');
+	elements.push(toggleAxesButton);
+
+	var toggleWireframeButton = new PushButtonMorph(
+		null,
+		function () {
+			stage.renderer.toggleWireframe();
+			toggleWireframeButton.labelString = (stage.renderer.isWireframeMode ? 'Shaded' : 'Wireframe') + ' mode';
+			toggleWireframeButton.drawNew();
+		},
+		'Wireframe mode');
+	elements.push(toggleWireframeButton);
+
+	var toggleParallelProjectionButton = new PushButtonMorph(
+		null,
+		function () {
+			stage.renderer.toggleParallelProjection();
+			toggleParallelProjectionButton.labelString = (stage.renderer.isParallelProjection ? 'Perspective' : 'Parallel') + ' projection';
+			toggleParallelProjectionButton.drawNew();
+		},
+		'  Parallel projection  ');
+	elements.push(toggleParallelProjectionButton);
+
+	var toggleGridButton = new PushButtonMorph(
+		null,
+		function () {
+			stage.scene.grid.toggle();
+			toggleGridButton.labelString = (stage.scene.grid.visible ? 'Hide' : 'Show') + ' grid';
+			toggleGridButton.drawNew();
+		},
+		'Show grid');
+	toggleGridButton.newLines = 3;
+	elements.push(toggleGridButton);
+
+	// It should be done like this, so it also updates if we toggle visibility from somewhere else...
+	// For some reason this doesn't work
+
+	/*
+	element.update = function() {
+		this.labelString = (beetle.shape.visible ? 'Hide' : 'Show') + ' beetle';
+	};
+	*/
+
+	// Status watchers
+
 	elements.push('Position: ');
 	element = new StringMorph();
 	element.update = function() {
@@ -895,29 +914,9 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 					+ beetle.state.color.s.toFixed(2).toString().replace('.00','') + ', ' 
 					+ beetle.state.color.l.toFixed(2).toString().replace('.00','')
    	};
-	element.newLines = 3;
 	elements.push(element);
 
-	element = new PushButtonMorph(
-		null,
-		function () {
-			beetle.toggleVisibility();
-			element.labelString = (beetle.shape.visible ? 'Hide' : 'Show') + ' beetle';
-			element.drawNew();
-		},
-            'Hide beetle'
-        );
-
-	// It should be done like this, so it also updates if we toggle visibility from somewhere else...
-	// For some reason this doesn't work
-
-	/*
-	element.update = function() {
-		this.labelString = (beetle.shape.visible ? 'Hide' : 'Show') + ' beetle';
-	};
-	*/
-
-	elements.push(element);
+	// Add all contents
 
 	elements.forEach(function(each) { myself.statusDisplay.addElement(each) });
 };
