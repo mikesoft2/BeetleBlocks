@@ -70,6 +70,7 @@ SpriteMorph.prototype.initBeetle = function() {
 	this.beetle.reset = function() {	
 		this.position.set(0, 0, 0);
 		this.rotation.set(0, 0, 0);
+		this.shape.material.opacity = 1;
 		this.color.reset();
 	}
 
