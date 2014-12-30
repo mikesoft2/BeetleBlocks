@@ -107,13 +107,13 @@ IDE_Morph.prototype.projectMenu = function () {
 			    );
 	}
 
+	menu.addLine();
 	menu.addItem(
 			'Export 3D model as STL',
 			function() { myself.downloadSTL() },
 			'download the currently rendered 3D model\ninto an STL file ready to be printed'
-		    )
-
-		menu.addLine();
+		    );
+	menu.addLine();
 	menu.addItem(
 			'Import tools',
 			function () {
@@ -289,28 +289,6 @@ IDE_Morph.prototype.settingsMenu = function () {
         this.stage.isFastTracked,
         'uncheck to run scripts\nat normal speed',
         'check to prioritize\nscript execution'
-    );
-    addPreference(
-        'Rasterize SVGs',
-        function () {
-            MorphicPreferences.rasterizeSVGs =
-                !MorphicPreferences.rasterizeSVGs;
-        },
-        MorphicPreferences.rasterizeSVGs,
-        'uncheck for smooth\nscaling of vector costumes',
-        'check to rasterize\nSVGs on import',
-        true
-    );
-    addPreference(
-        'Sprite Nesting',
-        function () {
-            SpriteMorph.prototype.enableNesting =
-                !SpriteMorph.prototype.enableNesting;
-        },
-        SpriteMorph.prototype.enableNesting,
-        'uncheck to disable\nsprite composition',
-        'check to enable\nsprite composition',
-        true
     );
     menu.addLine(); // everything below this line is stored in the project
     addPreference(
