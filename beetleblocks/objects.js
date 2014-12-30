@@ -1153,3 +1153,34 @@ StageMorph.prototype.setScale = function (number) {
 	this.originalSetScale(number);
 }
 
+// Contextual menu
+StageMorph.prototype.userMenu = function () {
+	StageMorph.prototype.userMenu = function () {
+    var ide = this.parentThatIsA(IDE_Morph),
+        menu = new MenuMorph(this),
+        shiftClicked = this.world().currentKey === 16,
+        myself = this;
+
+    if (ide && ide.isAppMode) {
+        return menu;
+    }
+    menu.addItem(
+        'pic...',
+        function () {
+            window.open(myself.fullImageClassic().toDataURL());
+        },
+        'open a new window\nwith a picture of the scene'
+    );
+	menu.addLine();
+	menu.addItem(
+		'export as STL',
+		function () {
+			ide.downloadSTL()
+		},
+		'export scene as an STL\nfile ready to be printed'
+	);
+	return menu;
+};
+
+}
+
