@@ -824,28 +824,33 @@ StageMorph.prototype.initScene = function() {
 
 	// Grid
 	this.scene.grid.draw = function() {
-		var color = this.lines? this.lines[0].material.color : this.defaultColor;
+
+		var color = this.lines ? this.lines[0].material.color : this.defaultColor;
+
 		if (this.lines) {
 			this.lines.forEach(function(eachLine){
 				myself.scene.remove(eachLine)
 			});
-			this.lines = [];
 		}
+
 		this.lines = [];
-		for (x = -10; x <= 10 / this.interval.x; x++) {
+
+		for (x = -10 / this.interval.x; x <= 10 / this.interval.x; x++) {
 			p1 = new THREE.Vector3(x * this.interval.x, 0, -10);
 			p2 = new THREE.Vector3(x * this.interval.x, 0, 10);
 			l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color);
 			l.visible = this.visible;
 			this.lines.push(l);
 		}
-		for (y = -10; y <= 10 / this.interval.y; y++) {
+
+		for (y = -10 / this.interval.y; y <= 10 / this.interval.y; y++) {
 			p1 = new THREE.Vector3(-10, 0, y * this.interval.y);
 			p2 = new THREE.Vector3(10, 0, y * this.interval.y);
 			l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color);
 			l.visible = this.visible;
 			this.lines.push(l);
 		}
+
 		myself.reRender();
 	}
 
