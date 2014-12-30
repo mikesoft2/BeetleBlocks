@@ -38,6 +38,7 @@ SpriteMorph.prototype.initBeetle = function() {
 	this.beetle.color.reset = function () {
 		this.state.set(30, 50, 50);
 		this.update();
+		myself.beetle.shape.material.opacity = 1;
 	}
 
 	this.beetle.color.update = function() {
@@ -70,7 +71,6 @@ SpriteMorph.prototype.initBeetle = function() {
 	this.beetle.reset = function() {	
 		this.position.set(0, 0, 0);
 		this.rotation.set(0, 0, 0);
-		this.color.reset();
 	}
 
 	// visibility
@@ -137,6 +137,26 @@ SpriteMorph.prototype.initBlocks = function() {
 	var myself = this;
 	this.originalInitBlocks();
 	
+	// Uncomment this to get backwards compatibility with previously saved projects.
+	// After fixing these projects, save them and comment this code again:
+
+	/*
+
+		this.blocks.setExtrusionRadius = this.blocks.setExtrusionDiameter;
+		this.blocks.changeExtrusionRadius = this.blocks.changeExtrusionDiameter;
+
+		// Projects using the old HSL blocks will fail to run, you'll need to replace
+		// all color related blocks.
+
+		this.blocks.setHSL = this.blocks.setHSLA;
+		this.blocks.changeHSL = this.blocks.changeHSLA;
+		this.blocks.getHSL = this.blocks.getHSLA;
+
+		// Additionally, you'll need to re-select global coordinates, as they are
+		// now uppercase.
+
+	*/
+
 	// motion
 	this.blocks.goHome =
 	{
@@ -156,7 +176,7 @@ SpriteMorph.prototype.initBlocks = function() {
 			type: 'command',
 			spec: 'rotate %localAxes by %n',
 			category: 'motion',
-			defaults: ['z',15]
+			defaults: ['z', 15]
 	};
 	this.blocks.setPosition =
 	{
@@ -812,15 +832,15 @@ StageMorph.prototype.initScene = function() {
 			this.lines = [];
 		}
 		this.lines = [];
-		for (x = 0; x <= 10 / this.interval.x; x++) {
-			p1 = new THREE.Vector3(x * this.interval.x, 0, 0);
+		for (x = -10; x <= 10 / this.interval.x; x++) {
+			p1 = new THREE.Vector3(x * this.interval.x, 0, -10);
 			p2 = new THREE.Vector3(x * this.interval.x, 0, 10);
 			l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color);
 			l.visible = this.visible;
 			this.lines.push(l);
 		}
-		for (y = 0; y <= 10 / this.interval.y; y++) {
-			p1 = new THREE.Vector3(0, 0, y * this.interval.y);
+		for (y = -10; y <= 10 / this.interval.y; y++) {
+			p1 = new THREE.Vector3(-10, 0, y * this.interval.y);
 			p2 = new THREE.Vector3(10, 0, y * this.interval.y);
 			l = myself.scene.addLineFromPointToPointWithColor(p1, p2, color);
 			l.visible = this.visible;

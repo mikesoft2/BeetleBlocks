@@ -89,13 +89,13 @@ Process.prototype.setPositionOnAxis = function(axis, pos) {
 	}
 
 	pos = Number(pos);
-	if (axis == 'x') {
+	if (axis == 'X') {
 		beetle.position.z = pos;
 	}
-	if (axis == 'y') {
+	if (axis == 'Y') {
 		beetle.position.x = pos;
 	}
-	if (axis == 'z') {
+	if (axis == 'Z') {
 		beetle.position.y = pos;
 	}		
 	if (beetle.extruding) {
@@ -120,13 +120,13 @@ Process.prototype.changePositionBy = function(axis, dist) {
 	}
 
 	dist = Number(dist) * beetle.multiplierScale;
-	if (axis == 'x') {
+	if (axis == 'X') {
 		beetle.position.z += dist;
 	}
-	if (axis == 'y') {
+	if (axis == 'Y') {
 		beetle.position.x += dist;
 	}
-	if (axis == 'z') {
+	if (axis == 'Z') {
 		beetle.position.y += dist;
 	}	
 	if (beetle.extruding) {
@@ -146,13 +146,13 @@ Process.prototype.setRotationOnAxis = function(axis, angle) {
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
 
 	angle = Number(angle);
-	if (axis == 'x') {
+	if (axis == 'X') {
 		beetle.rotation.z = radians(angle * -1);
 	}
-	if (axis == 'y') {
+	if (axis == 'Y') {
 		beetle.rotation.x = radians(angle * -1);
 	}
-	if (axis == 'z') {
+	if (axis == 'Z') {
 		beetle.rotation.y = radians(angle);
 	}
 
@@ -392,11 +392,6 @@ Process.prototype.text = function(textString, height, depth) {
 	stage.reRender();
 };
 
-// plan for extrusions appearing as you move:
-// tubegeometry needs to have a pre-allocated size, so
-// create a tubegeometry with 100 segments, and update the geometry as you go
-// keep track of segments and create a new tubegeometry as needed
-
 Process.prototype.startExtrusion = function() {
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
@@ -547,13 +542,13 @@ Process.prototype.getPosition = function(axis) {
 	var beetle = this.homeContext.receiver.beetle,
 		pos = 0;
 
-	if (axis == 'x') {
+	if (axis == 'X') {
 		pos = beetle.position.z;
 	}
-	if (axis == 'y') {
+	if (axis == 'Y') {
 		pos = beetle.position.x;
 	}
-	if (axis == 'z') {
+	if (axis == 'Z') {
 		pos = beetle.position.y;
 	}
 
@@ -564,13 +559,13 @@ Process.prototype.getRotation = function(axis) {
 	var beetle = this.homeContext.receiver.beetle,
 		rot = 0;
 
-	if (axis == 'x') {
+	if (axis == 'X') {
 		rot = beetle.rotation.z;
 	}
-	if (axis == 'y') {
+	if (axis == 'Y') {
 		rot = beetle.rotation.x;
 	}
-	if (axis == 'z') {
+	if (axis == 'Z') {
 		rot = beetle.rotation.y;
 	}
 
