@@ -8,7 +8,7 @@ BlockDialogMorph.prototype.init = function (target, action, environment) {
 	});
 	if (this.types) {
 		this.types.children.forEach(function (each) {
-			each.setColor(myself.environment.owner.blockColor['my blocks']);
+			each.setColor(SpriteMorph.prototype.blockColor['my blocks']);
 		});
 	}
 	this.edit();
