@@ -283,10 +283,10 @@ Process.prototype.sphere = function(diam) {
 	stage.reRender();
 };
 
-Process.prototype.addSphereGeom = function(diam) {
+Process.prototype.addSphereGeom = function(diam, isExtrusionCap) {
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-		sphereGeometry = new THREE.SphereGeometry(diam/2),
+		sphereGeometry = new THREE.SphereGeometry(diam/2, isExtrusionCap ? 6 : 16, isExtrusionCap ? 6 : 12),
 		material = new THREE.MeshLambertMaterial({
 				color: beetle.color,
 				transparent: true,
@@ -399,7 +399,7 @@ Process.prototype.startExtrusion = function() {
 	beetle.extruding = true;
 	beetle.extrusionPoints = new Array();
 	this.addPointToExtrusion();
-	this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale); // start cap
+	this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true); // start cap
 
 	stage.reRender();
 };
@@ -412,7 +412,7 @@ Process.prototype.stopExtrusion = function() {
 		beetle.extruding = false;
 		beetle.extrusionMesh.name = '';
 
-		this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale); // end cap
+		this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true); // end cap
 	}
 
 	stage.reRender();
