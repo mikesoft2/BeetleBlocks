@@ -1,3 +1,10 @@
+IDE_Morph.prototype.originalCreateLogo = IDE_Morph.prototype.createLogo;
+IDE_Morph.prototype.createLogo = function () {
+	this.originalCreateLogo();
+	this.logo.texture = 'beetleblocks/logo.png';
+	this.logo.drawNew();
+}
+
 IDE_Morph.prototype.originalNewProject = IDE_Morph.prototype.newProject;
 IDE_Morph.prototype.newProject = function () {
 	this.originalNewProject();
