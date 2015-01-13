@@ -69,7 +69,7 @@ SpeechBubbleMorph*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.gui = '2015-January-12';
+modules.gui = '2015-January-13';
 
 // Declarations
 
@@ -352,6 +352,7 @@ IDE_Morph.prototype.openIn = function (world) {
                         function () {
                             msg = myself.showMessage('Opening project...');
                         },
+                        function () {nop(); }, // yield (bug in Chrome)
                         function () {
                             if (projectData.indexOf('<snapdata') === 0) {
                                 myself.rawOpenCloudDataString(projectData);
@@ -2045,6 +2046,7 @@ IDE_Morph.prototype.cloudMenu = function () {
                                             'Opening project...'
                                         );
                                     },
+                                    function () {nop(); }, // yield (Chrome)
                                     function () {
                                         myself.rawOpenCloudDataString(
                                             projectData
@@ -2924,6 +2926,7 @@ IDE_Morph.prototype.openProjectString = function (str) {
         function () {
             msg = myself.showMessage('Opening project...');
         },
+        function () {nop(); }, // yield (bug in Chrome)
         function () {
             myself.rawOpenProjectString(str);
         },
@@ -2965,6 +2968,7 @@ IDE_Morph.prototype.openCloudDataString = function (str) {
         function () {
             msg = myself.showMessage('Opening project...');
         },
+        function () {nop(); }, // yield (bug in Chrome)
         function () {
             myself.rawOpenCloudDataString(str);
         },
@@ -3015,6 +3019,7 @@ IDE_Morph.prototype.openBlocksString = function (str, name, silently) {
         function () {
             msg = myself.showMessage('Opening blocks...');
         },
+        function () {nop(); }, // yield (bug in Chrome)
         function () {
             myself.rawOpenBlocksString(str, name, silently);
         },
@@ -3061,6 +3066,7 @@ IDE_Morph.prototype.openSpritesString = function (str) {
         function () {
             msg = myself.showMessage('Opening sprite...');
         },
+        function () {nop(); }, // yield (bug in Chrome)
         function () {
             myself.rawOpenSpritesString(str);
         },
@@ -3337,6 +3343,15 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
         }).forEach(function (s) {
             s.adjustScrollBars();
         });
+        // prevent rotation and draggability controls from
+        // showing for the stage
+        if (this.currentSprite === this.stage) {
+            this.spriteBar.children.forEach(function (child) {
+                if (child instanceof PushButtonMorph) {
+                    child.hide();
+                }
+            });
+        }
     }
     this.setExtent(this.world().extent()); // resume trackChanges
 };
