@@ -3,7 +3,7 @@ SyntaxElementMorph.prototype.originalLabelPart = SyntaxElementMorph.prototype.la
 SyntaxElementMorph.prototype.labelPart = function(spec) {
 	var part;
 	switch (spec) {
-		case '%localAxes':
+		case '%axes':
 			part = new InputSlotMorph(
 					null,
 					false,
@@ -11,18 +11,6 @@ SyntaxElementMorph.prototype.labelPart = function(spec) {
 					'x' : ['x'],
 					'y' : ['y'], 
 					'z' : ['z']
-					},
-					true
-					);
-			break;
-		case '%globalAxes':
-			part = new InputSlotMorph(
-					null,
-					false,
-					{
-					'X' : ['X'],
-					'Y' : ['Y'], 
-					'Z' : ['Z']
 					},
 					true
 					);

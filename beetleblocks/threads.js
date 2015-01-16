@@ -89,13 +89,13 @@ Process.prototype.setPositionOnAxis = function(axis, pos) {
 	}
 
 	pos = Number(pos);
-	if (axis == 'X') {
+	if (axis == 'x') {
 		beetle.position.z = pos;
 	}
-	if (axis == 'Y') {
+	if (axis == 'y') {
 		beetle.position.x = pos;
 	}
-	if (axis == 'Z') {
+	if (axis == 'z') {
 		beetle.position.y = pos;
 	}		
 	if (beetle.extruding) {
@@ -120,13 +120,13 @@ Process.prototype.changePositionBy = function(axis, dist) {
 	}
 
 	dist = Number(dist) * beetle.multiplierScale;
-	if (axis == 'X') {
+	if (axis == 'x') {
 		beetle.position.z += dist;
 	}
-	if (axis == 'Y') {
+	if (axis == 'y') {
 		beetle.position.x += dist;
 	}
-	if (axis == 'Z') {
+	if (axis == 'z') {
 		beetle.position.y += dist;
 	}	
 	if (beetle.extruding) {
@@ -146,13 +146,13 @@ Process.prototype.setRotationOnAxis = function(axis, angle) {
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
 
 	angle = Number(angle);
-	if (axis == 'X') {
+	if (axis == 'x') {
 		beetle.rotation.z = radians(angle * -1);
 	}
-	if (axis == 'Y') {
+	if (axis == 'y') {
 		beetle.rotation.x = radians(angle * -1);
 	}
-	if (axis == 'Z') {
+	if (axis == 'z') {
 		beetle.rotation.y = radians(angle);
 	}
 
@@ -542,13 +542,13 @@ Process.prototype.getPosition = function(axis) {
 	var beetle = this.homeContext.receiver.beetle,
 		pos = 0;
 
-	if (axis == 'X') {
+	if (axis == 'x') {
 		pos = beetle.position.z;
 	}
-	if (axis == 'Y') {
+	if (axis == 'y') {
 		pos = beetle.position.x;
 	}
-	if (axis == 'Z') {
+	if (axis == 'z') {
 		pos = beetle.position.y;
 	}
 
@@ -559,13 +559,13 @@ Process.prototype.getRotation = function(axis) {
 	var beetle = this.homeContext.receiver.beetle,
 		rot = 0;
 
-	if (axis == 'X') {
+	if (axis == 'x') {
 		rot = beetle.rotation.z;
 	}
-	if (axis == 'Y') {
+	if (axis == 'y') {
 		rot = beetle.rotation.x;
 	}
-	if (axis == 'Z') {
+	if (axis == 'z') {
 		rot = beetle.rotation.y;
 	}
 

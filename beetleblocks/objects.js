@@ -174,58 +174,58 @@ SpriteMorph.prototype.initBlocks = function() {
 	this.blocks.rotate =
 	{
 			type: 'command',
-			spec: 'rotate %localAxes by %n',
+			spec: 'rotate %axes by %n',
 			category: 'motion',
 			defaults: ['z', 15]
 	};
 	this.blocks.setPosition =
 	{
 			type: 'command',
-			spec: 'go to X: %n Y: %n Z: %n',
+			spec: 'go to x: %n y: %n z: %n',
 			category: 'motion',
 			defaults: [0, 0, 0]
 	};
 	this.blocks.setPositionOnAxis =
 	{
 			type: 'command',
-			spec: 'set %globalAxes to %n',
+			spec: 'set %axes to %n',
 			category: 'motion',
-			defaults: ['X', 0]
+			defaults: ['x', 0]
 	};
 	this.blocks.changePositionBy =
 	{
 			type: 'command', 
-			spec: 'change %globalAxes by %n',
+			spec: 'change %axes by %n',
 			category: 'motion',
-			defaults: ['X', 1]
+			defaults: ['x', 1]
 	};
 	this.blocks.setRotationOnAxis =
 	{
 			type: 'command',
-			spec: 'set %globalAxes rotation to %n',	
+			spec: 'set %axes rotation to %n',	
 			category: 'motion',
-			defaults: ['Z', 0]
+			defaults: ['z', 0]
 	};
 	this.blocks.pointTowards =
 	{
 			type: 'command',
-			spec: 'point towards X: %n Y: %n Z: %n',
+			spec: 'point towards x: %n y: %n z: %n',
 			category: 'motion',
 			defaults: [0, 0, 0]
 	};
 	this.blocks.getPosition =
 	{
 			type: 'reporter',
-			spec: '%globalAxes position',
+			spec: '%axes position',
 			category: 'motion',
-			defaults: ['X']
+			defaults: ['x']
 	};
 	this.blocks.getRotation =
 	{
 			type: 'reporter',
-			spec: '%globalAxes rotation',
+			spec: '%axes rotation',
 			category: 'motion',
-			defaults: ['Z']
+			defaults: ['z']
 	};
 	this.blocks.pushPosition =
 	{
