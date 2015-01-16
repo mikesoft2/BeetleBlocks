@@ -157,6 +157,17 @@ SpriteMorph.prototype.initBlocks = function() {
 
 	*/
 
+	// control
+	
+	// Although this selector should naturally be "reset", I've kept "clear"
+	// so we don't need to fix all example projects again.
+	this.blocks.clear =
+	{
+			type: 'command',
+			spec: 'reset',
+			category: 'control'
+	};
+
 	// motion
 	this.blocks.goHome =
 	{
@@ -261,12 +272,6 @@ SpriteMorph.prototype.initBlocks = function() {
 	}
 
 	// shapes
-	this.blocks.clear =
-	{
-			type: 'command',
-			spec: 'clear',
-			category: 'shapes'
-	};
 	this.blocks.cube =
 	{
 			type: 'command',
@@ -499,6 +504,10 @@ SpriteMorph.prototype.blockTemplates = function(category) {
 
 	} else if (cat === 'control') {
 
+		// This is the reset block, the selector has been kept
+		// for backwards compatibility
+        blocks.push(block('clear'));
+        blocks.push('-');
         blocks.push(block('receiveGo'));
         blocks.push(block('receiveKey'));
         blocks.push(block('receiveClick'));
