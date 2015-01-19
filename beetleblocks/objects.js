@@ -275,7 +275,7 @@ SpriteMorph.prototype.initBlocks = function() {
 	this.blocks.cube =
 	{
 			type: 'command',
-			spec: 'cube size %n',
+			spec: 'cube Dim. %n',
 			category: 'shapes',
 			defaults: [0.5]
 	};
@@ -289,7 +289,7 @@ SpriteMorph.prototype.initBlocks = function() {
 	this.blocks.sphere =
 	{
 			type: 'command',
-			spec: 'sphere diameter %n',
+			spec: 'sphere Dia. %n',
 			category: 'shapes',
 			defaults: [0.5]		
 	};
@@ -303,7 +303,7 @@ SpriteMorph.prototype.initBlocks = function() {
 	this.blocks.text =
 	{
 			type: 'command', 
-			spec: 'text %s height %n depth %n',
+			spec: 'text %s H: %n W: %n',
 			category: 'shapes',
 			defaults: ['hello', 1, 0.5]
 	};
@@ -335,14 +335,14 @@ SpriteMorph.prototype.initBlocks = function() {
 	this.blocks.setExtrusionDiameter =
 	{
 			type: 'command',
-			spec: 'set extrusion diameter to %n',
+			spec: 'set extrusion Dia. to %n',
 			category: 'shapes',
 			defaults: [1]
 	};
 	this.blocks.changeExtrusionDiameter =
 	{
 			type: 'command',
-			spec: 'change extrusion diameter by %n',
+			spec: 'change extrusion Dia. by %n',
 			category: 'shapes',
 			defaults: [1]
 	};
