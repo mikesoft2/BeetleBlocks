@@ -377,7 +377,7 @@ IDE_Morph.prototype.createControlBar = function () {
 	button.labelColor = this.buttonLabelColor;
 	button.contrast = this.buttonContrast;
 	button.drawNew();
-	// button.hint = 'edit settings';
+	button.hint = '3D world settings';
 	button.fixLayout();
 	cameraButton = button;
 	this.controlBar.add(cameraButton);
@@ -666,7 +666,6 @@ IDE_Morph.prototype.fixLayout = function (situation) {
             ) * 10) / 10);
             this.stage.setCenter(this.center());
         } else {
-//            this.stage.setScale(this.isSmallStage ? 0.5 : 1);
             this.stage.setScale(this.isSmallStage ? this.stageRatio : 1);
             this.stage.setTop(this.logo.bottom() + padding);
             this.stage.setRight(this.right());
@@ -787,6 +786,40 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     this.statusDisplay.acceptsDrops = function () {
         return false;
     };
+
+	this.statusDisplay.watchers = function (leftPos) {
+	/*
+	    answer an array of all currently visible watchers.
+	    If leftPos is specified, filter the list for all
+	    shown or hidden watchers whose left side equals
+	    the given border (for automatic positioning)
+	*/
+		return this.children.filter(function (morph) {
+			if (morph instanceof WatcherMorph) {
+				if (leftPos) {
+					return morph.left() === leftPos;
+				}
+				return morph.isVisible;
+			}
+			return false;
+		});
+	};
+
+	this.statusDisplay.step = function() {
+		// update watchers
+    	current = Date.now();
+    	elapsed = current - this.lastWatcherUpdate;
+    	leftover = (1000 / this.watcherUpdateFrequency) - elapsed;
+    	if (leftover < 1) {
+    	    this.watchers().forEach(function (w) {
+    	        w.update();
+    	    });
+    	this.lastWatcherUpdate = Date.now();
+    	}
+	}
+
+	this.statusDisplay.lastWatcherUpdate = Date.now();
+	this.statusDisplay.watcherUpdateFrequency = 250;
 
 	// Buttons
 	
@@ -909,8 +942,6 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	}
 	element.newLines = 1.5;
 	elements.push(element);
-
-
 	
 	// Add all contents
 

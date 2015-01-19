@@ -1164,7 +1164,6 @@ StageMorph.prototype.setScale = function (number) {
 
 // Contextual menu
 StageMorph.prototype.userMenu = function () {
-	StageMorph.prototype.userMenu = function () {
     var ide = this.parentThatIsA(IDE_Morph),
         menu = new MenuMorph(this),
         shiftClicked = this.world().currentKey === 16,
@@ -1191,5 +1190,67 @@ StageMorph.prototype.userMenu = function () {
 	return menu;
 };
 
-}
+// Watchers are placed into the status display by default
+SpriteMorph.prototype.toggleVariableWatcher = function (varName, isGlobal) {
+    var statusDisplay = this.parentThatIsA(IDE_Morph).statusDisplay,
+    	//stage = this.parentThatIsA(StageMorph),
+        watcher,
+        others;
+    if (statusDisplay === null) {
+        return null;
+    }
+    watcher = this.findVariableWatcher(varName);
+    if (watcher !== null) {
+        if (watcher.isVisible) {
+            watcher.hide();
+        } else {
+            watcher.show();
+            watcher.fixLayout(); // re-hide hidden parts
+            watcher.keepWithin(statusDisplay);
+        }
+        return;
+    }
 
+    // if no watcher exists, create a new one
+    if (isNil(isGlobal)) {
+        isGlobal = contains(this.variables.parentFrame.names(), varName);
+    }
+    watcher = new WatcherMorph(
+        varName,
+        this.blockColor.variables,
+        isGlobal ? this.variables.parentFrame : this.variables,
+        varName
+    );
+    watcher.setPosition(statusDisplay.position().add(new Point(10, 110)));
+    others = statusDisplay.watchers(watcher.left());
+    if (others.length > 0) {
+        watcher.setTop(others[others.length - 1].bottom() + 2);
+    }
+    statusDisplay.add(watcher);
+    watcher.fixLayout();
+};
+
+SpriteMorph.prototype.originalFindVariableWatcher = SpriteMorph.prototype.findVariableWatcher;
+SpriteMorph.prototype.findVariableWatcher = function (varName) {
+    var statusDisplay = this.parentThatIsA(IDE_Morph).statusDisplay,
+        myself = this,
+		watcherInStage;
+
+	watcherInStage = this.originalFindVariableWatcher(varName);
+	if (watcherInStage) { 
+		return watcherInStage 
+	};
+
+    if (statusDisplay === null) {
+        return null;
+    }
+    return detect(
+        statusDisplay.children,
+        function (morph) {
+            return morph instanceof WatcherMorph
+                    && (morph.target === myself.variables
+                            || morph.target === myself.variables.parentFrame)
+                    && morph.getter === varName;
+        }
+    );
+};
