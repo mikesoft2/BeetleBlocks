@@ -483,8 +483,6 @@ SpriteMorph.prototype.blockTemplates = function(category) {
 		blocks.push(block('reportScale'));
 
 	} else if (cat === 'shapes') {
-		blocks.push(block('clear'));
-		blocks.push('-');
 		blocks.push(block('cube'));
 		blocks.push(block('cuboid'));
 		blocks.push(block('sphere'));
