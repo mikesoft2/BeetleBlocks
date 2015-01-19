@@ -592,3 +592,44 @@ Process.prototype.popPosition = function() {
 		stage.reRender();
 	}
 };
+
+Process.prototype.doAsk = function (data) {
+    var stage = this.homeContext.receiver.parentThatIsA(StageMorph),
+        isStage = true,
+        activePrompter;
+
+    if (!this.prompter) {
+        activePrompter = detect(
+            stage.children,
+            function (morph) {return morph instanceof StagePrompterMorph; }
+        );
+        if (!activePrompter) {
+            if (!isStage) {
+                this.blockReceiver().bubble(data, false, true);
+            }
+            this.prompter = new StagePrompterMorph(isStage ? data : null);
+            if (stage.scale < 1) {
+                this.prompter.setWidth(stage.width() - 10);
+            } else {
+                this.prompter.setWidth(stage.dimensions.x - 20);
+            }
+            this.prompter.fixLayout();
+            this.prompter.setCenter(stage.center());
+            this.prompter.setBottom(stage.bottom() - this.prompter.border);
+            stage.add(this.prompter);
+            this.prompter.inputField.edit();
+            stage.changed();
+        }
+    } else {
+        if (this.prompter.isDone) {
+            stage.lastAnswer = this.prompter.inputField.getValue();
+            this.prompter.destroy();
+            this.prompter = null;
+            if (!isStage) {this.blockReceiver().stopTalking(); }
+            return null;
+        }
+    }
+    this.pushContext('doYield');
+    this.pushContext();
+};
+

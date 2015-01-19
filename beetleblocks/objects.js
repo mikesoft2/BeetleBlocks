@@ -374,7 +374,7 @@ SpriteMorph.prototype.initBlocks = function() {
 	{
             type: 'command',
             category: 'sensing',
-            spec: 'request user input',
+            spec: 'request user input %s',
 			category: 'sensing'
     };
 
