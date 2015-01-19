@@ -220,7 +220,7 @@ SpriteMorph.prototype.initBlocks = function() {
 	this.blocks.pointTowards =
 	{
 			type: 'command',
-			spec: 'point towards x: %n y: %n z: %n',
+			spec: 'point to x: %n y: %n z: %n',
 			category: 'motion',
 			defaults: [0, 0, 0]
 	};
