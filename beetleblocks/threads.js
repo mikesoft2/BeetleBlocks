@@ -387,6 +387,8 @@ Process.prototype.text = function(textString, height, depth) {
 
 	t.position.copy(beetle.position);
 	t.rotation.copy(beetle.rotation);	
+	THREE.GeometryUtils.center(t.geometry);
+	t.rotateY(-Math.PI/2);
 	stage.myObjects.add(t);
 
 	stage.reRender();
