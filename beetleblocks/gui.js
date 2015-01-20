@@ -340,12 +340,26 @@ IDE_Morph.prototype.settingsMenu = function () {
 };
 
 // STL export
-
 IDE_Morph.prototype.downloadSTL = function() {
-	var exporter = new THREE.STLExporter();
-	var stlString = exporter.exportScene(this.stage.scene);
-	var blob = new Blob([stlString], {type: 'text/plain;charset=utf-8'});
+	var exporter = new THREE.STLExporter(),
+		stlString = exporter.exportScene(this.stage.scene);
+		blob = new Blob([stlString], {type: 'text/plain;charset=utf-8'});
+
 	saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_export') + '.stl'); 
+}
+
+// OBJ export
+IDE_Morph.prototype.downloadOBJ = function() {
+	var exporter = new THREE.OBJExporter(),
+		scene = copy(this.stage.scene),
+		objString, 
+		blob;
+
+	scene.children = scene.children.filter(function(each) { return each.name != 'beetle' });
+	objString = exporter.parse(scene);
+	blob = new Blob([objString], {type: 'text/plain;charset=utf-8'});
+
+	saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_export') + '.obj'); 
 }
 
 // IDE_Morph.prototype.createControlBar proxy
