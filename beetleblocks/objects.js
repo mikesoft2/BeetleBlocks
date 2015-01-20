@@ -206,7 +206,7 @@ SpriteMorph.prototype.initBlocks = function() {
 	this.blocks.changePositionBy =
 	{
 			type: 'command', 
-			spec: 'change %axes by %n',
+			spec: 'change absolute %axes by %n',
 			category: 'motion',
 			defaults: ['x', 1]
 	};
