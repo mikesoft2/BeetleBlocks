@@ -61,7 +61,6 @@ SpriteMorph.prototype.initBeetle = function() {
 
 	// extrusion
 	this.beetle.extruding = false;
-	this.beetle.currentExtrusion = null;
 	this.beetle.extrusionDiameter = 1;
 
 	// drawing
@@ -131,7 +130,6 @@ SpriteMorph.prototype.blockColor = {
 // Block specs
 
 SpriteMorph.prototype.originalInitBlocks = SpriteMorph.prototype.initBlocks;
-
 SpriteMorph.prototype.initBlocks = function() {
 
 	var myself = this;
@@ -539,11 +537,11 @@ SpriteMorph.prototype.blockTemplates = function(category) {
         blocks.push('-');
         blocks.push(block('doCallCC'));
         blocks.push(block('reportCallCC'));
-        /*blocks.push('-');
+/*        blocks.push('-');
         blocks.push(block('receiveOnClone'));
         blocks.push(block('createClone'));
-        blocks.push(block('removeClone'));*/
-        blocks.push('-');
+        blocks.push(block('removeClone'));
+        blocks.push('-');*/
         blocks.push(block('doPauseAll'));
 
 	} else if (cat === 'sensing') {
@@ -788,6 +786,45 @@ SpriteMorph.prototype.blockTemplates = function(category) {
 	return blocks;
 }
 
+// Enable cloning
+// Still a lot of work left to get this working
+SpriteMorph.prototype.originalFullCopy = SpriteMorph.prototype.fullCopy;
+SpriteMorph.prototype.fullCopy = function () {
+	var c = this.originalFullCopy();
+	c.beetle = this.beetle.clone();
+
+	c.beetle.color = new THREE.Color();
+	c.beetle.color.reset = this.beetle.color.reset;
+	c.beetle.color.update = this.beetle.color.update;
+	c.beetle.color.state = {};
+	c.beetle.color.state.h = this.beetle.color.state.h;
+	c.beetle.color.state.s = this.beetle.color.state.s;
+	c.beetle.color.state.l = this.beetle.color.state.l;
+	c.beetle.color.state.set = this.beetle.color.state.set;
+
+	c.beetle.posAndRotStack = this.beetle.posAndRotStack.slice();
+	c.beetle.multiplierScale = this.beetle.multiplierScale;
+
+	c.beetle.extruding = this.beetle.extruding;
+	c.beetle.extrusionDiameter = this.beetle.extrusionDiameter;
+
+	c.beetle.drawing = this.beetle.drawing;
+	c.beetle.reset = this.beetle.reset;
+	c.beetle.toggleVisibility = this.beetle.toggleVisibility;
+	c.beetle.axes = this.beetle.axes.slice();
+
+	this.parentThatIsA(StageMorph).scene.add(c.beetle);
+	return c;
+}
+
+SpriteMorph.prototype.originalDestroy = SpriteMorph.prototype.destroy;
+SpriteMorph.prototype.destroy = function() {
+	var stage = this.parentThatIsA(StageMorph);
+	stage.scene.remove(this.beetle);
+	this.originalDestroy();
+	stage.reRender();
+}
+
 // Single Sprite mode
 
 SpriteMorph.prototype.drawNew = function () { this.hide() }
@@ -799,7 +836,7 @@ StageMorph.prototype.destroy = function() {
 	var myself = this;
 	this.scene.remove(this.myObjects);
 	this.children.forEach(function(eachSprite) {
-		myself.parentThatIsA(IDE_Morph).removeSprite(eachSprite);
+		myself.removeSprite(eachSprite);
 	});
 	this.originalDestroy();
 }
