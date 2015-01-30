@@ -120,6 +120,12 @@ IDE_Morph.prototype.projectMenu = function () {
 			function() { myself.downloadSTL() },
 			'download the currently rendered 3D model\ninto an STL file ready to be printed'
 		    );
+	menu.addItem(
+			'Export 3D model as OBJ',
+			function() { myself.downloadOBJ() },
+			'download the currently rendered 3D model\ninto an OBJ file'
+		    );
+
 	menu.addLine();
 	menu.addItem(
 			'Import tools',

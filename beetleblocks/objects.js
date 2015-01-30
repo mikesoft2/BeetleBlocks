@@ -836,7 +836,7 @@ StageMorph.prototype.destroy = function() {
 	var myself = this;
 	this.scene.remove(this.myObjects);
 	this.children.forEach(function(eachSprite) {
-		myself.removeSprite(eachSprite);
+		myself.removeChild(eachSprite);
 	});
 	this.originalDestroy();
 }
@@ -1222,6 +1222,14 @@ StageMorph.prototype.userMenu = function () {
 		},
 		'export scene as an STL\nfile ready to be printed'
 	);
+	menu.addItem(
+		'export as OBJ',
+		function () {
+			ide.downloadOBJ()
+		},
+		'export scene as an OBJ\nfile'
+	);
+
 	return menu;
 };
 
