@@ -3,3 +3,4 @@ list-utilities	List utilities
 stream-tools	Streams (lazy lists)
 variadic-reporters	Variadic reporters
 word-sentence	Words, sentences
+reduce	Reduce block
