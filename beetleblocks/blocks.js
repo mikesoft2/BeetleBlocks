@@ -69,12 +69,11 @@ SyntaxElementMorph.prototype.fixLayout = function () {
 	}
 }
 
-// On C-slots, we also need to fix the position of dents
 CSlotMorph.prototype.originalInit = CSlotMorph.prototype.init;
 CSlotMorph.prototype.init = function() {
 	this.originalInit();
-	this.dent = 7;
-	this.inset = 7;
+	this.dent -= 1;
+	this.inset += 2;
 }
 
 CSlotMorph.prototype.fixLayout = function () {
