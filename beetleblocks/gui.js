@@ -647,6 +647,11 @@ IDE_Morph.prototype.rawOpenProjectString = function (str) {
 	this.createStatusDisplay();
 }
 
+IDE_Morph.prototype.originalRawOpenCloudDataString = IDE_Morph.prototype.rawOpenCloudDataString;
+IDE_Morph.prototype.rawOpenCloudDataString = function (str) {
+	this.originalRawOpenCloudDataString(str);
+	this.createStatusDisplay();
+}
 
 // Single Morph mode, no corral and no tabs in the scripting area
 
@@ -990,8 +995,6 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
 			this.statusDisplay,
             this.categories
         ];
-
-	this.createStatusDisplay();
 
     this.isAppMode = isNil(appMode) ? !this.isAppMode : appMode;
 
