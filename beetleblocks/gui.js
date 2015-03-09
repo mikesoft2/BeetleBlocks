@@ -701,7 +701,7 @@ IDE_Morph.prototype.fixLayout = function (situation) {
             this.spriteEditor.setPosition(this.categories.topRight().add(padding));
             this.spriteEditor.setExtent(new Point(
                 Math.max(0, this.stage.left() - padding - this.spriteEditor.left()),
-                this.bottom()
+                this.bottom() - this.categories.top()
             ));
         }
 
