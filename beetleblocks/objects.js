@@ -112,6 +112,28 @@ SpriteMorph.prototype.categories =
         'lists',
         'my blocks'
     ];
+    
+    
+// blocks color scheme: blue, green, grays
+    
+SpriteMorph.prototype.blockColor = {
+	motion : new Color(60, 60, 60),
+    shapes : new Color(75, 75, 75),
+    sensing : new Color(90, 90, 90),
+    variables : new Color(36, 172, 232),
+    lists : new Color(31, 134, 179),
+    control : new Color(0, 85, 122),
+	colors : new Color(105, 105, 105),
+    operators : new Color(135, 135, 135),
+    'my blocks': new Color(10, 84, 63),
+
+    other : new Color(50, 50, 50),
+	sound : new Color(50, 50, 50), // we need to keep this color for the zoom blocks dialog
+};
+    
+    
+/*    
+// USA (red, blue, gray)
 
 SpriteMorph.prototype.blockColor = {
     motion : new Color(40, 40, 40),
@@ -126,6 +148,46 @@ SpriteMorph.prototype.blockColor = {
     other : new Color(150, 150, 150),
     'my blocks': new Color(180, 180, 180),
 };
+*/
+
+/*
+
+// GOTH COLORS (all gray)
+
+SpriteMorph.prototype.blockColor = {
+    motion : new Color(60, 60, 60),
+    shapes : new Color(75, 75, 75),
+    sensing : new Color(90, 90, 90),
+    variables : new Color(135, 135, 135),
+    lists : new Color(135, 135, 135),
+    control : new Color(120, 120, 120),
+	colors : new Color(105, 105, 105),
+    operators : new Color(135, 135, 135),
+    'my blocks': new Color(150, 150, 150),
+
+    other : new Color(50, 50, 50),
+	sound : new Color(50, 50, 50), // we need to keep this color for the zoom blocks dialog
+};
+*/
+
+/*
+
+// DARK RGB
+SpriteMorph.prototype.blockColor = {
+    motion : new Color(60, 60, 60),
+    shapes : new Color(80, 80, 80),
+    sensing : new Color(90, 90, 90),
+    variables : new Color(89, 0, 8),
+    lists : new Color(89, 0, 8),
+    control : new Color(5, 27, 71),
+	colors : new Color(105, 105, 105),
+    operators : new Color(10, 84, 63),
+    'my blocks': new Color(150, 150, 150),
+
+    other : new Color(50, 50, 50),
+	sound : new Color(50, 50, 50), // we need to keep this color for the zoom blocks dialog
+};
+*/
 
 // Block specs
 
