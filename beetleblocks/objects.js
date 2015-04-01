@@ -384,6 +384,13 @@ SpriteMorph.prototype.initBlocks = function() {
 			category: 'shapes',
 			defaults: ['hello', 1, 0.5]
 	};
+	this.blocks.text2D =
+	{
+			type: 'command', 
+			spec: '2D text %s size: %n',
+			category: 'shapes',
+			defaults: ['hello', 10]
+	};
 	this.blocks.startDrawing =
 	{
 			type: 'command',
@@ -565,6 +572,7 @@ SpriteMorph.prototype.blockTemplates = function(category) {
 		blocks.push(block('sphere'));
 		blocks.push(block('tube'));
 		blocks.push(block('text'));
+		blocks.push(block('text2D'));
 		blocks.push(block('startDrawing'));
 		blocks.push(block('stopDrawing'));
 		blocks.push(block('startExtrusion'));

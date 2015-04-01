@@ -394,6 +394,30 @@ Process.prototype.text = function(textString, height, depth) {
 	stage.reRender();
 };
 
+Process.prototype.text2D = function(textString, size) {
+	var beetle = this.homeContext.receiver.beetle,
+		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+
+	scaledSize = Number(size) * beetle.multiplierScale;
+
+	var fontShapes = THREE.FontUtils.generateShapes(textString, { size: scaledSize });
+
+	var material = new THREE.MeshBasicMaterial({ color: beetle.color });
+	material.wireframe = stage.renderer.isWireframeMode;
+
+	var geometry = new THREE.ShapeGeometry(fontShapes, { curveSegments: 20 });
+
+	var t = new THREE.Mesh(geometry, material);
+
+	t.position.copy(beetle.position);
+	t.rotation.copy(beetle.rotation);	
+	THREE.GeometryUtils.center(t.geometry);
+	t.rotateY(-Math.PI/2);
+	stage.myObjects.add(t);
+
+	stage.reRender();
+};
+
 Process.prototype.startExtrusion = function() {
 	var beetle = this.homeContext.receiver.beetle,
 		stage = this.homeContext.receiver.parentThatIsA(StageMorph);
