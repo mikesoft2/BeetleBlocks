@@ -447,6 +447,10 @@ IDE_Morph.prototype.cameraMenu = function () {
 		'Reset camera',
 		function() { stage.camera.reset() }
 		);
+	menu.addItem(
+		'Fit to whole scene',
+		function() { stage.camera.fitScene() }
+		);
 	menu.addLine();
 	menu.addItem(
 		'Set background color', 

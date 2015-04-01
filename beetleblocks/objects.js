@@ -1129,258 +1129,272 @@ StageMorph.prototype.initCamera = function() {
 						this.position.set(0,10,0);
 						myself.controls.rotateLeft(radians(90));
 					} else {
-						this.position.set (-5, 7, 5);
+						this.position.set(-5, 7, 5);
 						this.lookAt(new THREE.Vector3());
 					}
 
 					myself.controls.update();
 					myself.reRender();
 			}
+
+			myself.camera.fitScene = function() {
+					this.reset();
+
+					var boundingBox = new THREE.Box3().setFromObject(myself.myObjects),
+						distance = boundingBox.size().y / (2 * Math.tan(this.fov * Math.PI / 360)),
+						center = boundingBox.center();
+
+					this.position.set(center.x, center.y, distance * 1.5);
+					this.lookAt(center);
+
+					myself.controls.update(); // ← Somehow this messes up the camera position!
+					myself.reRender();
+			}
 	}
-	
+
 	createCamera();
 	this.scene.add(this.camera);
 	this.camera.reset();
 }
 
 StageMorph.prototype.initLights = function() {
-	this.directionalLight = new THREE.DirectionalLight(0x4c4c4c, 1);
-	this.directionalLight.position.set(this.camera.position);
-	this.scene.add(this.directionalLight);
+		this.directionalLight = new THREE.DirectionalLight(0x4c4c4c, 1);
+		this.directionalLight.position.set(this.camera.position);
+		this.scene.add(this.directionalLight);
 
-	this.pointLight = new THREE.PointLight(0xffffff, 1, 200);
-	this.pointLight.position.set(this.camera.position);
-	this.scene.add(this.pointLight);
+		this.pointLight = new THREE.PointLight(0xffffff, 1, 200);
+		this.pointLight.position.set(this.camera.position);
+		this.scene.add(this.pointLight);
 }
 
 StageMorph.prototype.originalStep = StageMorph.prototype.step;
 StageMorph.prototype.step = function() {
-    this.originalStep();
+		this.originalStep();
 
-    // update Beetleblocks, if needed
-    this.renderCycle();
+		// update Beetleblocks, if needed
+		this.renderCycle();
 };
 
 StageMorph.prototype.referencePos = null;
 
 StageMorph.prototype.mouseScroll = function(y, x) {
-	if (this.renderer.isParallelProjection) {
-	    if (y > 0) {
-			this.camera.zoomOut();
-    	} else if (y < 0) {
-			this.camera.zoomIn();
-	    }
-	} else {
-	    if (y > 0) {
-	        this.controls.dollyOut();
-    	} else if (y < 0) {
-        	this.controls.dollyIn();
-	    }
-	    this.controls.update();
-	}
-    this.reRender();
+		if (this.renderer.isParallelProjection) {
+				if (y > 0) {
+						this.camera.zoomOut();
+				} else if (y < 0) {
+						this.camera.zoomIn();
+				}
+		} else {
+				if (y > 0) {
+						this.controls.dollyOut();
+				} else if (y < 0) {
+						this.controls.dollyIn();
+				}
+				this.controls.update();
+		}
+		this.reRender();
 };
 
 StageMorph.prototype.mouseDownLeft = function(pos) {
-    this.referencePos = pos;
+		this.referencePos = pos;
 };
 
 StageMorph.prototype.mouseDownRight = function(pos) {
-    this.referencePos = pos;
+		this.referencePos = pos;
 };
 
 StageMorph.prototype.mouseMove = function(pos, button) {
-    deltaX = pos.x - this.referencePos.x;
-    deltaY = pos.y - this.referencePos.y;
-    this.referencePos = pos
-    if (button === 'right' || this.world().currentKey === 16) { // shiftClicked
-        this.controls.panLeft(deltaX / this.dimensions.x / this.scale * 15);
-        this.controls.panUp(deltaY / this.dimensions.y / this.scale * 10);
-    } else {
-        horzAngle = deltaX / (this.dimensions.x * this.scale) * 360;
-        vertAngle = deltaY / (this.dimensions.y * this.scale) * 360;
-        this.controls.rotateLeft(radians(horzAngle));
-        this.controls.rotateUp(radians(vertAngle));
-    }
-    this.controls.update();
-    this.reRender();
+		deltaX = pos.x - this.referencePos.x;
+		deltaY = pos.y - this.referencePos.y;
+		this.referencePos = pos
+				if (button === 'right' || this.world().currentKey === 16) { // shiftClicked
+						this.controls.panLeft(deltaX / this.dimensions.x / this.scale * 15);
+						this.controls.panUp(deltaY / this.dimensions.y / this.scale * 10);
+				} else {
+						horzAngle = deltaX / (this.dimensions.x * this.scale) * 360;
+						vertAngle = deltaY / (this.dimensions.y * this.scale) * 360;
+						this.controls.rotateLeft(radians(horzAngle));
+						this.controls.rotateUp(radians(vertAngle));
+				}
+		this.controls.update();
+		this.reRender();
 };
 
 StageMorph.prototype.originalAdd = StageMorph.prototype.add;
 StageMorph.prototype.add = function(morph) {
-	this.originalAdd(morph);
-	if (morph instanceof SpriteMorph) {
-		this.scene.add(morph.beetle);
-		this.reRender();
-	}
+		this.originalAdd(morph);
+		if (morph instanceof SpriteMorph) {
+				this.scene.add(morph.beetle);
+				this.reRender();
+		}
 }
 
 StageMorph.prototype.clearPenTrails = function() {
-    // We'll never need to clear the pen trails in BeetleBlocks, it only causes the renderer to disappear
-	nop(); 
+		// We'll never need to clear the pen trails in BeetleBlocks, it only causes the renderer to disappear
+		nop(); 
 };
 
 // StageMorph drawing
 StageMorph.prototype.originalDrawOn = StageMorph.prototype.drawOn;
 StageMorph.prototype.drawOn = function (aCanvas, aRect) {
-	// If the scale is lower than 1, we reuse the original method, 
-	// otherwise we need to modify the renderer dimensions
-	// we do not need to render the original canvas anymore because 
-	// we have removed sprites and backgrounds
+		// If the scale is lower than 1, we reuse the original method, 
+		// otherwise we need to modify the renderer dimensions
+		// we do not need to render the original canvas anymore because 
+		// we have removed sprites and backgrounds
 
-    var rectangle, area, delta, src, context, w, h, sl, st;
-    if (!this.isVisible) {
-        return null;
-    }
-	if (this.scale < 1) {
-		return this.originalDrawOn(aCanvas, aRect);
-	}
-
-    rectangle = aRect || this.bounds;
-    area = rectangle.intersect(this.bounds).round();
-    if (area.extent().gt(new Point(0, 0))) {
-        delta = this.position().neg();
-        src = area.copy().translateBy(delta).round();
-        context = aCanvas.getContext('2d');
-        context.globalAlpha = this.alpha;
-
-        sl = src.left();
-        st = src.top();
-        w = Math.min(src.width(), this.image.width - sl);
-        h = Math.min(src.height(), this.image.height - st);
-
-        if (w < 1 || h < 1) {
-            return null;
-        }
-
-		context.save();
-		if (this.scaleChanged) {
-			w = this.width();
-			h = this.height();
-			var dpr = window.devicePixelRatio;
-			this.scaleChanged = false;
-			this.renderer.setSize(w / dpr, h / dpr);
-			this.reRender();
+		var rectangle, area, delta, src, context, w, h, sl, st;
+		if (!this.isVisible) {
+				return null;
+		}
+		if (this.scale < 1) {
+				return this.originalDrawOn(aCanvas, aRect);
 		}
 
-		context.drawImage(
-			this.penTrails(),
-			src.left() / this.scale,
-			src.top() / this.scale,
-			w,
-			h,
-			area.left() / this.scale,
-			area.top() / this.scale,
-			w,
-			h
-		);
-        context.restore();
-    }
+		rectangle = aRect || this.bounds;
+		area = rectangle.intersect(this.bounds).round();
+		if (area.extent().gt(new Point(0, 0))) {
+				delta = this.position().neg();
+				src = area.copy().translateBy(delta).round();
+				context = aCanvas.getContext('2d');
+				context.globalAlpha = this.alpha;
+
+				sl = src.left();
+				st = src.top();
+				w = Math.min(src.width(), this.image.width - sl);
+				h = Math.min(src.height(), this.image.height - st);
+
+				if (w < 1 || h < 1) {
+						return null;
+				}
+
+				context.save();
+				if (this.scaleChanged) {
+						w = this.width();
+						h = this.height();
+						var dpr = window.devicePixelRatio;
+						this.scaleChanged = false;
+						this.renderer.setSize(w / dpr, h / dpr);
+						this.reRender();
+				}
+
+				context.drawImage(
+								this.penTrails(),
+								src.left() / this.scale,
+								src.top() / this.scale,
+								w,
+								h,
+								area.left() / this.scale,
+								area.top() / this.scale,
+								w,
+								h
+								);
+				context.restore();
+		}
 };
 
 StageMorph.prototype.originalSetScale = StageMorph.prototype.setScale;
 StageMorph.prototype.setScale = function (number) {
-	this.scaleChanged = true;
-	this.originalSetScale(number);
+		this.scaleChanged = true;
+		this.originalSetScale(number);
 }
 
 // Contextual menu
 StageMorph.prototype.userMenu = function () {
-    var ide = this.parentThatIsA(IDE_Morph),
-        menu = new MenuMorph(this),
-        shiftClicked = this.world().currentKey === 16,
-        myself = this;
+		var ide = this.parentThatIsA(IDE_Morph),
+			menu = new MenuMorph(this),
+			shiftClicked = this.world().currentKey === 16,
+			myself = this;
 
-    if (ide && ide.isAppMode) {
-        return menu;
-    }
-    menu.addItem(
-        'pic...',
-        function () {
-            window.open(myself.fullImageClassic().toDataURL());
-        },
-        'open a new window\nwith a picture of the scene'
-    );
-	menu.addLine();
-	menu.addItem(
-		'export as STL',
-		function () {
-			ide.downloadSTL()
-		},
-		'export scene as an STL\nfile ready to be printed'
-	);
-	menu.addItem(
-		'export as OBJ',
-		function () {
-			ide.downloadOBJ()
-		},
-		'export scene as an OBJ\nfile'
-	);
+		if (ide && ide.isAppMode) {
+				return menu;
+		}
+		menu.addItem(
+						'pic...',
+						function () {
+						window.open(myself.fullImageClassic().toDataURL());
+						},
+						'open a new window\nwith a picture of the scene'
+					);
+		menu.addLine();
+		menu.addItem(
+						'export as STL',
+						function () {
+						ide.downloadSTL()
+						},
+						'export scene as an STL\nfile ready to be printed'
+					);
+		menu.addItem(
+						'export as OBJ',
+						function () {
+						ide.downloadOBJ()
+						},
+						'export scene as an OBJ\nfile'
+					);
 
-	return menu;
+		return menu;
 };
 
 // Watchers are placed into the status display by default
 SpriteMorph.prototype.toggleVariableWatcher = function (varName, isGlobal) {
-    var statusDisplay = this.parentThatIsA(IDE_Morph).statusDisplay,
-    	//stage = this.parentThatIsA(StageMorph),
-        watcher,
-        others;
-    if (statusDisplay === null) {
-        return null;
-    }
-    watcher = this.findVariableWatcher(varName);
-    if (watcher !== null) {
-        if (watcher.isVisible) {
-            watcher.hide();
-        } else {
-            watcher.show();
-            watcher.fixLayout(); // re-hide hidden parts
-            watcher.keepWithin(statusDisplay);
-        }
-        return;
-    }
+		var statusDisplay = this.parentThatIsA(IDE_Morph).statusDisplay,
+			//stage = this.parentThatIsA(StageMorph),
+			watcher,
+			others;
+		if (statusDisplay === null) {
+				return null;
+		}
+		watcher = this.findVariableWatcher(varName);
+		if (watcher !== null) {
+				if (watcher.isVisible) {
+						watcher.hide();
+				} else {
+						watcher.show();
+						watcher.fixLayout(); // re-hide hidden parts
+						watcher.keepWithin(statusDisplay);
+				}
+				return;
+		}
 
-    // if no watcher exists, create a new one
-    if (isNil(isGlobal)) {
-        isGlobal = contains(this.variables.parentFrame.names(), varName);
-    }
-    watcher = new WatcherMorph(
-        varName,
-        this.blockColor.variables,
-        isGlobal ? this.variables.parentFrame : this.variables,
-        varName
-    );
-    watcher.setPosition(statusDisplay.position().add(new Point(10, 110)));
-    others = statusDisplay.watchers(watcher.left());
-    if (others.length > 0) {
-        watcher.setTop(others[others.length - 1].bottom() + 2);
-    }
-    statusDisplay.add(watcher);
-    watcher.fixLayout();
+		// if no watcher exists, create a new one
+		if (isNil(isGlobal)) {
+				isGlobal = contains(this.variables.parentFrame.names(), varName);
+		}
+		watcher = new WatcherMorph(
+						varName,
+						this.blockColor.variables,
+						isGlobal ? this.variables.parentFrame : this.variables,
+						varName
+						);
+		watcher.setPosition(statusDisplay.position().add(new Point(10, 110)));
+		others = statusDisplay.watchers(watcher.left());
+		if (others.length > 0) {
+				watcher.setTop(others[others.length - 1].bottom() + 2);
+		}
+		statusDisplay.add(watcher);
+		watcher.fixLayout();
 };
 
 SpriteMorph.prototype.originalFindVariableWatcher = SpriteMorph.prototype.findVariableWatcher;
 SpriteMorph.prototype.findVariableWatcher = function (varName) {
-    var statusDisplay = this.parentThatIsA(IDE_Morph).statusDisplay,
-        myself = this,
-		watcherInStage;
+		var statusDisplay = this.parentThatIsA(IDE_Morph).statusDisplay,
+			myself = this,
+			watcherInStage;
 
-	watcherInStage = this.originalFindVariableWatcher(varName);
-	if (watcherInStage) { 
-		return watcherInStage 
-	};
+		watcherInStage = this.originalFindVariableWatcher(varName);
+		if (watcherInStage) { 
+				return watcherInStage 
+		};
 
-    if (statusDisplay === null) {
-        return null;
-    }
-    return detect(
-        statusDisplay.children,
-        function (morph) {
-            return morph instanceof WatcherMorph
-                    && (morph.target === myself.variables
-                            || morph.target === myself.variables.parentFrame)
-                    && morph.getter === varName;
-        }
-    );
+		if (statusDisplay === null) {
+				return null;
+		}
+		return detect(
+						statusDisplay.children,
+						function (morph) {
+						return morph instanceof WatcherMorph
+						&& (morph.target === myself.variables
+										|| morph.target === myself.variables.parentFrame)
+						&& morph.getter === varName;
+						}
+					 );
 };
