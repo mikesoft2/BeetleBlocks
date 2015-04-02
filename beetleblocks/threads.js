@@ -422,6 +422,11 @@ Process.prototype.startExtrusion = function() {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph);
 
+	if (beetle.negative) { 
+		throw new Error('Cannot extrude while in negative geometry mode');
+		return;
+	};
+
     beetle.extruding = true;
     beetle.extrusionPoints = new Array();
     this.addPointToExtrusion();
@@ -526,6 +531,12 @@ Process.prototype.stopDrawing = function() {
 
 Process.prototype.startNegativeGeometry = function() {
     var beetle = this.homeContext.receiver.beetle;
+
+	if (beetle.extruding) { 
+		throw new Error('Cannot switch to negative geometry mode while extruding');
+		return;
+	}
+
     beetle.negative = true;
 }
 

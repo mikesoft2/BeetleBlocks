@@ -15,22 +15,27 @@ THREE.Object3D.prototype.addLineFromPointToPointWithColor = function(originPoint
 
 THREE.Object3D.prototype.originalAdd = THREE.Object3D.prototype.add;
 THREE.Object3D.prototype.add = function(object, negative) {
-
     if (!negative) {
         this.originalAdd(object);
     }
 
     if (object instanceof THREE.Mesh) {
-        // We keep its binary space partitioning tree so we can later perform
-        // CSG operations on its shape
-        object.bsp = new ThreeBSP(object);
-        if (negative) {
-            this.children[0].bsp.subtract(object.bsp);
-            mesh = this.children[0].bsp.toMesh(this.children[0].material);
-            console.log(mesh);
-            this.remove(this.children[0]);
-            this.originalAdd(mesh);
-        }
+
+		// we keep each object's BSP tree so we don't need to compute it later
+		object.bsp = new ThreeBSP(object);
+
+		if (negative) {
+			var totalObjects = this.children.length,
+				myself = this;
+
+			this.children.forEach(function(each) {
+				result = each.bsp.subtract(object.bsp);
+       	    	mesh = result.toMesh(each.material);
+			    myself.add(mesh, false);
+			})
+
+			for (i = 0; i < totalObjects; i++) { this.remove(this.children[0]) } 
+		}
     }
 }
 
