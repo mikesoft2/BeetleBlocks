@@ -91,3 +91,10 @@ footer {
         height: 70%;
     }
 }
+
+h1.page-header {
+  padding-bottom: 9px;
+  margin: 40px 0 20px;
+  border-bottom: 0px solid #eee;
+  vertical-align: bottom;
+}
