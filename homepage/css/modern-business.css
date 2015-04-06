@@ -98,3 +98,21 @@ h1.page-header {
   border-bottom: 0px solid #eee;
   vertical-align: bottom;
 }
+
+.panel-default {
+  height: 220px;
+}
+
+i {
+    color: #777;
+}
+
+.tagline {
+	color: #777;
+	vertical-align: bottom;
+	font-size: 28px;
+}
+
+.highlight {
+	color: rgb(201,3,3);
+}
