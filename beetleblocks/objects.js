@@ -14,7 +14,7 @@ THREE.Object3D.prototype.addLineFromPointToPointWithColor = function(originPoint
 }
 
 THREE.Object3D.prototype.originalAdd = THREE.Object3D.prototype.add;
-THREE.Object3D.prototype.add = function(object, negative) {
+THREE.Object3D.prototype.add = function(object, negative, scene) {
     if (!negative) {
         this.originalAdd(object);
     }
@@ -28,17 +28,18 @@ THREE.Object3D.prototype.add = function(object, negative) {
 			var totalObjects = this.children.length,
 				myself = this;
 
-			this.children.forEach(function(each) {
-				result = each.bsp.subtract(object.bsp);
-       	    	mesh = result.toMesh(each.material);
-			    myself.add(mesh, false);
-			})
+			for (i = 0; i < totalObjects; i++) { 
+				result = this.children[i].bsp.subtract(object.bsp);
+				mesh = result.toMesh(this.children[i].material);
+				myself.add(mesh, false);
+			} 
 
-			for (i = 0; i < totalObjects; i++) { this.remove(this.children[0]) } 
+			for (i = 0; i < totalObjects; i++) { this.remove(this.children[0]) }
 		}
     }
 }
 
+			
 // SpriteMorph
 SpriteMorph.prototype.initBeetle = function() {
     var myself = this;
