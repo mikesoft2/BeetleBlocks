@@ -734,7 +734,7 @@ IDE_Morph.prototype.buildPanes = function () {
 
 IDE_Morph.prototype.createStatusDisplay = function () {
     var frame,
-		padding = 5,
+		padding = 1,
 		myself = this,
 		elements = [],
 		beetle = this.currentSprite.beetle,
@@ -900,7 +900,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 			toggleGridButton.labelString = (stage.scene.grid.visible ? 'Hide' : 'Show') + ' grid';
 			toggleGridButton.drawNew();
 		},
-		'Show grid');
+		'Hide grid');
 	toggleGridButton.newLines = 3;
 	elements.push(toggleGridButton);
 
