@@ -69,7 +69,7 @@ SpeechBubbleMorph*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.gui = '2015-March-09';
+modules.gui = '2015-March-15';
 
 // Declarations
 
@@ -308,6 +308,14 @@ IDE_Morph.prototype.openIn = function (world) {
         }
     }
 
+    // This function returns the value of a parameter given its key
+    function getParameterByName(name) {
+        var param = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]'),
+            regex = new RegExp('[\\?&]' + param + '=([^&#]*)'),
+        results = regex.exec(location.href);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+
     // dynamic notifications from non-source text files
     // has some issues, commented out for now
     /*
@@ -384,8 +392,21 @@ IDE_Morph.prototype.openIn = function (world) {
                             myself.shield.destroy();
                             myself.shield = null;
                             msg.destroy();
-                            myself.toggleAppMode(true);
-                            myself.runScripts();
+
+                            if (getParameterByName('editMode')) {
+                                myself.toggleAppMode(false); 
+                            } else {
+                                myself.toggleAppMode(true); 
+                            }
+
+                            if (!getParameterByName('noRun')) {
+                                myself.runScripts();
+                            }
+
+                            if (getParameterByName('hideControls')) {
+                                myself.controlBar.hide();
+				window.onbeforeunload = function (evt) {};
+                            }
                         }
                     ]);
                 },
@@ -2598,7 +2619,7 @@ IDE_Morph.prototype.aboutSnap = function () {
         module, btn1, btn2, btn3, btn4, licenseBtn, translatorsBtn,
         world = this.world();
 
-    aboutTxt = 'Snap! 4.0\nBuild Your Own Blocks\n\n--- beta ---\n\n'
+    aboutTxt = 'Snap! 4.0\nBuild Your Own Blocks\n\n--- rc ---\n\n'
         + 'Copyright \u24B8 2015 Jens M\u00F6nig and '
         + 'Brian Harvey\n'
         + 'jens@moenig.org, bh@cs.berkeley.edu\n\n'
