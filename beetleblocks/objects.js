@@ -20,20 +20,14 @@ THREE.Object3D.prototype.add = function(object, negative, scene) {
     }
 
     if (object instanceof THREE.Mesh) {
-
-		// we keep each object's BSP tree so we don't need to compute it later
-		object.bsp = new ThreeBSP(object);
-
 		if (negative) {
 			var totalObjects = this.children.length,
 				myself = this;
-
 			for (i = 0; i < totalObjects; i++) { 
-				result = this.children[i].bsp.subtract(object.bsp);
+				result = new ThreeBSP(this.children[i]).subtract(new ThreeBSP(object));
 				mesh = result.toMesh(this.children[i].material);
 				myself.add(mesh, false);
 			} 
-
 			for (i = 0; i < totalObjects; i++) { this.remove(this.children[0]) }
 		}
     }
