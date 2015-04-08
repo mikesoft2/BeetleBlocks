@@ -1183,11 +1183,20 @@ StageMorph.prototype.initCamera = function() {
         myself.camera.fitScene = function() {
             this.reset();
 
-            var boundingBox = new THREE.Box3().setFromObject(myself.myObjects),
-                distance = boundingBox.size().y / (2 * Math.tan(this.fov * Math.PI / 360)),
-                center = boundingBox.center();
+            var boundingBox = new THREE.Box3().setFromObject(myself.scene),
+                center = boundingBox.center(),
+				size = boundingBox.size(),
+				biggerAxis = (size.x > size.y) ? ((size.x > size.z) ? 'x' : 'z') : ((size.y > size.z) ? 'y' : 'z'),
+				distance = size[biggerAxis] / (2 * Math.tan(this.fov * Math.PI / 360));
 
-            this.position.set(center.x, center.y, distance * 1.5);
+			if (biggerAxis == 'x' ) {
+				this.position.set(center.x, center.y, distance * 1.5);
+			} else if (biggerAxis == 'y' ) {
+            	this.position.set(distance * 1.5, center.y, center.z);
+			} else {
+				this.position.set(center.x, distance * 1.5, center.z);
+			}
+
             this.lookAt(center);
 
             myself.controls.update(); // ← Somehow this messes up the camera position!

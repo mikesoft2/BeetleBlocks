@@ -448,7 +448,7 @@ IDE_Morph.prototype.cameraMenu = function () {
 		function() { stage.camera.reset() }
 		);
 	menu.addItem(
-		'Fit to whole scene',
+		'Zoom to extents',
 		function() { stage.camera.fitScene() }
 		);
 	menu.addLine();
