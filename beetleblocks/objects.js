@@ -405,14 +405,14 @@ SpriteMorph.prototype.initBlocks = function() {
         type: 'command', 
         spec: 'text %s H: %n W: %n',
         category: 'shapes',
-        defaults: ['hello', 1, 0.5]
+        defaults: [localize('hello'), 1, 0.5]
     };
     this.blocks.text2D =
     {
         type: 'command', 
         spec: '2D text %s size: %n',
         category: 'shapes',
-        defaults: ['hello', 10]
+        defaults: [localize('hello'), 10]
     };
     this.blocks.startDrawing =
     {
@@ -628,7 +628,7 @@ SpriteMorph.prototype.blockTemplates = function(category) {
         blocks.push('-');
         blocks.push(block('receiveGo'));
         blocks.push(block('receiveKey'));
-        blocks.push(block('receiveClick'));
+//        blocks.push(block('receiveClick')); // This should not be here, we have no sprites anymore!
         blocks.push(block('receiveMessage'));
         blocks.push('-');
         blocks.push(block('doBroadcast'));
@@ -997,8 +997,8 @@ StageMorph.prototype.initScene = function() {
 
         if (this.lines) {
             this.lines.forEach(function(eachLine){
-                    myself.scene.remove(eachLine)
-                    });
+                myself.scene.remove(eachLine)
+            });
         }
 
         this.lines = [];
@@ -1029,8 +1029,8 @@ StageMorph.prototype.initScene = function() {
 
     this.scene.grid.setColor = function(color) {
         this.lines.forEach(function(eachLine) {
-                eachLine.material.color.setHex(color);
-                })
+            eachLine.material.color.setHex(color);
+        })
     };
 
     this.scene.grid.toggle = function() {

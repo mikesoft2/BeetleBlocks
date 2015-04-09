@@ -15,7 +15,7 @@ SyntaxElementMorph.prototype.labelPart = function(spec) {
 					true
 					);
 			break;
-		case '%directions':
+		case '%directions': // what is this? it looks like it's never used
 			part = new InputSlotMorph(
 					null,
 					false,

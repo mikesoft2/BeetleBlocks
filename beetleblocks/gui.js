@@ -1045,3 +1045,28 @@ IDE_Morph.prototype.refreshPalette = function (shouldIgnorePosition) {
 	this.stage.reRender();
 };
 
+// Language
+
+IDE_Morph.prototype.originalSetLanguage = IDE_Morph.prototype.setLanguage;
+IDE_Morph.prototype.setLanguage = function(lang, callback) {
+		var myself = this;
+
+		myself.originalSetLanguage(lang, function() {
+				var translation = document.getElementById('bb-language'),
+				src = 'beetleblocks/lang-' + lang + '.js',
+				myInnerSelf = this;
+		if (translation) {
+				document.head.removeChild(translation);
+		}
+		if (lang === 'en') {
+				return this.reflectLanguage('en', callback);
+		}
+		translation = document.createElement('script');
+		translation.id = 'bb-language';
+		translation.onload = function () {
+				myInnerSelf.reflectLanguage(lang, callback);
+		};
+		document.head.appendChild(translation);
+		translation.src = src; 
+		});
+};
