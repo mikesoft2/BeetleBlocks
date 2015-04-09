@@ -794,7 +794,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     this.statusDisplay.addElement = function (element) {
 
 		if (typeof element == 'string') {
-			element = new StringMorph(element, 12, null, true);
+			element = new StringMorph(localize(element), 12, null, true);
 		};
 
 		this.frame.contents.add(element);

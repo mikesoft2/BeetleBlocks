@@ -42,61 +42,61 @@ tempDict = {
 
 	// UI
 	'Export 3D model as STL':
-		'Exportar model 3D a STL',
+		'Exportar modelo 3D a STL',
 	'Export 3D model as OBJ':
-		'Exportar model 3D a OBJ',
+		'Exportar modelo 3D a OBJ',
 	'Reset camera':
-		'Reinicia càmera',
+		'Reinicia cámara',
 	'Zoom to extents':
-		'Mostra escena sencera',
+		'Muestra escena completa',
 	'Set background color':
-		'Defineix el color de fons',
+		'Define el color de fondo',
 	'Set grid interval':
-		'Defineix l\'interval de la graella',
+		'Define el intervalo de la rejilla',
 	'Set grid color':
-		'Defineix el color de la graella',
+		'Define el color de rejilla',
 	'3D world settings':
-		'Configuració del món 3D',
+		'Configuración del mundo 3D',
 	'Hide beetle':
-		'Amaga beetle',
+		'Oculta beetle',
 	'Show beetle':
-		'Mostra beetle',
+		'Muestra beetle',
 	'Hide axes':
-		'Amaga eixos',
+		'Oculta ejes',
 	'Show axes':
-		'Mostra eixos',
+		'Muestra ejes',
 	'Wireframe mode':
-		'Model de filferros',
+		'Modelo de alambre',
 	'Shaded mode':
-		'Model ombrejat',
+		'Modelo sombreado',
 	'  Parallel projection  ':
-		'  Projecció paral·lela  ',
+		'  Proyección paralela  ',
 	'Parallel projection':
-		'Projecció paral·lela',
+		'Proyección paralela',
 	'Perspective projection':
-		'Projecció perspectiva',
+		'Proyección perspectiva',
 	'Hide grid':
-		'Amaga graella',
+		'Oculta rejilla',
 	'Show grid':
-		'Mostra graella',
+		'Muestra rejilla',
 	'Position: ':
-		'Posició: ',
+		'Posición: ',
 	'Rotation: ':
-		'Rotació: ',
+		'Rotación: ',
 	'Scale: ':
 		'Escala: ',
 	'Color: ':
 		'Color: ',
-	'HSL:' :
+	'HSL: ':
 		'HSL: ',
 	'Opacity: ':
-		'Opacitat: ',
+		'Opacidad: ',
 	'Grid intervals':
-		'Intervals de la graella:',
+		'Intervalos de la rejilla:',
 	'x interval':
-		'interval x',
+		'intervalo x',
 	'y interval':
-		'interval y',
+		'intervalo y',
 	'export as STL':
 		'exportar a STL',
 	'export as OBJ':
@@ -104,33 +104,33 @@ tempDict = {
 
 	// Movement
 	'go home':
-		'torna a casa',
+		'vuelve a casa',
 	'move %n':
-		'mou-te %n passos',
+		'muévete %n pasos',
 	'rotate %axes by %n':
-		'rota la %axes en %n graus',
+		'rota la %axes en %n grados',
 	'go to x: %n y: %n z: %n':
-		'ves a x: %n y: %n z: %n',
+		've a x: %n y: %n z: %n',
 	'set %axes to %n':
-		'fixa la %axes a %n',
+		'fija la %axes a %n',
 	'change absolute %axes by %n':
-		'canvia la %axes absoluta en %n',
+		'cambia la %axes absoluta en %n',
 	'set %axes rotation to %n':
-		'fixa la rotació %axes a %n',
+		'fija la rotación %axes a %n',
 	'point to x: %n y: %n z: %n':
 		'apunta a x: %n y: %n z: %n',
 	'%axes position':
-		'posició %axes',
+		'posición %axes',
 	'%axes rotation':
-		'rotació %axes',
+		'rotación %axes',
 	'push position':
-		'apila posició',
+		'apila posición',
 	'pop position':
-		'desempila posició',
+		'desapila posición',
 	'set scale to %n':
-		'fixa l\'escala a %n',
+		'fija la escala a %n',
 	'change scale by %n':
-		'canvia l\'escala en %n',
+		'cambia la escala en %n',
 	'scale':
 		'escala',
 	'origin':
@@ -142,33 +142,33 @@ tempDict = {
 
 	// Shapes
 	'Shapes':
-		'Formes',
+		'Formas',
 	'cube Dim. %n':
-		'cub Dim. %n',
+		'cubo Dim. %n',
 	'cuboid l: %n w: %n h: %n':
-		'cuboide ll. %n am. %n al. %n',
+		'cuboide l. %n an. %n al. %n',
 	'sphere Dia. %n':
 		'esfera Dia. %n',
 	'tube l: %n outer: %n inner: %n':
-		'tub ll. %n ext: %n int: %n',
+		'tubo l. %n ext: %n int: %n',
 	'text %s H: %n W: %n':
-		'text %s al. %n am. %n',
+		'texto %s al. %n an. %n',
 	'hello':
 		'hola',
 	'2D text %s size: %n':
-		'text 2D %s mida: %n',
+		'texto 2D %s tamaño: %n',
 	'start drawing':
-		'comença a dibuixar',
+		'empieza a dibujaar',
 	'stop drawing':
-		'deixa de dibuixar',
+		'deja de dibujar',
 	'start extruding':
-		'comença a extrudir',
+		'empieza a extrudir',
 	'stop extruding':
-		'deixa d\'extrudir',
+		'deja de extrudir',
 	'set extrusion Dia. to %n':
-		'fixa el Dia. d\'extrusió a %n',
+		'fija el Dia. de extrusión a %n',
 	'change extrusion Dia. by %n':
-		'canvia el Dia. d\'extrusió en %n',
+		'cambia el Dia. de extrusión en %n',
 	'start negative geometry':
 		'activa la geometria negativa',
 	'stop negative geometry':
@@ -176,64 +176,64 @@ tempDict = {
 
 	// Colors
 	'Colors':
-		'Colors',
+		'Colores',
 	'set %hsla to %n':
-		'fixa %hsla a %n',
+		'fija %hsla a %n',
 	'change %hsla by %n':
-		'canvia %hsla en %n',
+		'cambia %hsla en %n',
 	'color %hsla':
 		'%hsla del color',
 	'hue':
-		'to',
+		'tono',
 	'saturation':
-		'saturació',
+		'saturación',
 	'lightness':
-		'brillantor',
+		'brillo',
 	'opacity':
-		'opacitat',
+		'opacidad',
 
 	// Sensors
 	'request user input %s':
-		'demana %s a l\'usuari',
+		'pide %s al usuario',
 
 	// My blocks
 	'My blocks':
-		'Blocs propis',
+		'Mis bloques',
 
 	// Missing strings
 	'JavaScript function ( %mult%s ) { %code }':
-		'funció JavaScript ( %mult%s ) { %code }',
+		'función JavaScript ( %mult%s ) { %code }',
 	'Reset Password...':
-		'Restablir contrasenya...',
+		'Reestablecer contraseña...',
 	'Reset password':
-		'Restablir contrasenya',
+		'Reestablecer contraseña',
 	'User name:':
-		'Nom d\'usuari:',
+		'Nombre de usuario:',
 	'User name:':
-		'Nom d\'usuari:',
+		'Nombre de usuario:',
 	'Codification support':
-		'Suport per a codificació',
+		'Soporte para codificación',
 	'check for block\nto text mapping features':
-		'marca\'m per activar les\nfuncionalitats de conversió\nde blocs a codi',
+		'márcame para activar las\nfuncionalidades de conversión\nde bloques a código',
 	'current %dates':
 		'%dates actual',
 	'year':
-		'any',
+		'año',
 	'month':
 		'mes',
 	'date':
-		'dia',
+		'día',
 	'day of week':
-		'dia de la setmana',
+		'día de la semana',
 	'hour':
 		'hora',
 	'minute':
-		'minut',
+		'minuto',
 	'second':
-		'segon',
+		'segundo',
 	'time in milliseconds':
-		'temps en milisegons'
+		'tiempo en milisegundos'
 };
 
-// Add attributes to original SnapTranslator.dict.ca
-for (var attrname in tempDict) { SnapTranslator.dict.ca[attrname] = tempDict[attrname]; }
+// Add attributes to original SnapTranslator.dict.es
+for (var attrname in tempDict) { SnapTranslator.dict.es[attrname] = tempDict[attrname]; }
