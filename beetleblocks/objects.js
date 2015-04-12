@@ -136,6 +136,22 @@ SpriteMorph.prototype.categories =
     'my blocks'
 ];
 
+SpriteMorph.prototype.blockColor = {
+		motion : new Color(68, 95, 153),
+         shapes : new Color(48, 137, 151),
+         colors : new Color(101, 61, 122),
+         sound : new Color(207, 74, 217), // we need to keep this color for the zoom blocks dialog
+         control : new Color(80, 80, 80),
+         sensing : new Color(130, 130, 130),
+         operators : new Color(94, 144, 52),
+         variables : new Color(191, 101, 36),
+         lists : new Color(168, 66, 32),
+         other : new Color(150, 150, 150),
+         'my blocks': new Color(4, 158, 235),
+};
+
+/*
+// original 
 
 SpriteMorph.prototype.blockColor = {
 motion : new Color(74, 108, 212),
@@ -150,8 +166,6 @@ motion : new Color(74, 108, 212),
          other : new Color(150, 150, 150),
          'my blocks': new Color(150, 150, 60),
 };
-
-/*
 
 // blocks color scheme: blue, green, grays
 
