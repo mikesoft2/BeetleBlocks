@@ -1944,7 +1944,7 @@ BlockMorph.uber = SyntaxElementMorph.prototype;
 // BlockMorph preferences settings:
 
 BlockMorph.prototype.isCachingInputs = true;
-BlockMorph.prototype.zebraContrast = 40; // alternating color brightness
+BlockMorph.prototype.zebraContrast = 25; // alternating color brightness
 
 // BlockMorph sound feedback:
 
@@ -3027,7 +3027,7 @@ BlockMorph.prototype.fixLabelColor = function () {
             );
         } else {
             this.setLabelColor(
-                new Color(0, 0, 0),
+                new Color(255, 255, 255),
                 clr.lighter(this.zebraContrast)
                     .lighter(this.labelContrast * 2),
                 MorphicPreferences.isFlat ? null : new Point(1, 1)
