@@ -738,6 +738,13 @@ IDE_Morph.prototype.buildPanes = function () {
 	this.createStatusDisplay();
 };
 
+IDE_Morph.prototype.originalCreatePalette = IDE_Morph.prototype.createPalette;
+IDE_Morph.prototype.createPalette = function(){
+	this.originalCreatePalette();
+	this.palette.color = new Color(230, 230, 230);
+}
+
+
 IDE_Morph.prototype.createStatusDisplay = function () {
     var frame,
 		padding = 1,
