@@ -45,7 +45,7 @@ SpriteMorph.prototype.initBeetle = function() {
     // To avoid precision loss, we keep state here and perform transformations on 
     // the beetle's actual properties by using these values
     this.beetle.color.state = {
-        h: 30,
+        h: 180,
         s: 50,
         l: 50,
         set: function(h, s, l) {
@@ -56,7 +56,7 @@ SpriteMorph.prototype.initBeetle = function() {
     }
 
     this.beetle.color.reset = function () {
-        this.state.set(30, 50, 50);
+        this.state.set(180, 50, 50);
         this.update();
         myself.beetle.shape.material.opacity = 1;
     }
