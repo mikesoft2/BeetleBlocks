@@ -22,8 +22,14 @@ IDE_Morph.prototype.removeSprite = function (sprite) {
 // Force flat design
 IDE_Morph.prototype.setDefaultDesign = IDE_Morph.prototype.setFlatDesign; 
 
-// Overriding these functions as we cannot proxy them. They don't return a menu, they create one and pop it up
+IDE_Morph.prototype.originalInit = IDE_Morph.prototype.init;
+IDE_Morph.prototype.init = function(isAutoFill) {
+	this.originalInit();
+	this.backgroundColor = new Color(255,255,255);
+	//this.setColor(new Color(255,255,255));
+}
 
+// Overriding these functions as we cannot proxy them. They don't return a menu, they create one and pop it up
 IDE_Morph.prototype.projectMenu = function () {
 	var menu,
 	    myself = this,
