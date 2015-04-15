@@ -688,7 +688,7 @@ IDE_Morph.prototype.fixLayout = function (situation) {
 
     // palette
     this.palette.setLeft(this.logo.left());
-    this.palette.setTop(this.categories.bottom());
+    this.palette.setTop(this.categories.bottom() + 1);
     this.palette.setHeight(this.bottom() - this.palette.top());
 
     if (situation !== 'refreshPalette') {
