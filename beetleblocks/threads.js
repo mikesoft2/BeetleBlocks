@@ -430,8 +430,22 @@ Process.prototype.startExtrusion = function() {
     beetle.extruding = true;
     beetle.extrusionPoints = new Array();
     this.addPointToExtrusion();
-    this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true); // start cap
-    //	beetle.startCap = stage.myObjects.children.pop();
+//    this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true); // start cap
+//    beetle.startCap = stage.myObjects.children.pop();
+
+    material = new THREE.MeshLambertMaterial({
+            color: beetle.color, 
+            wireframe: stage.renderer.isWireframeMode,
+            transparent: true,
+            opacity: beetle.shape.material.opacity,
+            side: THREE.DoubleSide
+        });
+
+    var circleGeometry = new THREE.CircleGeometry(beetle.extrusionDiameter/2*beetle.multiplierScale, 12);
+    var t = new THREE.Mesh(circleGeometry, material);
+    t.position.copy(beetle.position);
+    t.rotation.copy(beetle.rotation);	
+    stage.myObjects.add(t);
 
     stage.reRender();
 };
