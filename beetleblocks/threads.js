@@ -328,10 +328,7 @@ Process.prototype.addTubeGeom = function(length, outer, inner) {
     var hole = new THREE.Shape(pts);
     shape.holes.push(hole);
 
-    var options = { 
-amount: length,
-        bevelEnabled: false
-    };
+    var options = { amount: length, bevelEnabled: false };
 
     var tubeGeom = new THREE.ExtrudeGeometry(shape, options);
     var tube = new THREE.Mesh(tubeGeom, beetle.newLambertMaterial());
@@ -351,7 +348,7 @@ Process.prototype.text = function(textString, height, depth) {
             font: 'helvetiker',
             size: height,
             height: depth
-        });
+            });
 
     var mesh = new THREE.Mesh(textGeometry, beetle.newLambertMaterial());
 
@@ -461,7 +458,7 @@ Process.prototype.addPointToExtrusion = function() {
         beetle.extrusionEndCap = new THREE.Mesh(circleGeometry, beetle.newLambertMaterial());
         stage.myObjects.add(beetle.extrusionEndCap);
     }
-    
+
     // Update extrusion end cap position and rotation
 
     beetle.extrusionEndCap.position.copy(beetle.position);
@@ -500,10 +497,10 @@ Process.prototype.stopDrawing = function() {
 Process.prototype.startNegativeGeometry = function() {
     var beetle = this.homeContext.receiver.beetle;
 
-	if (beetle.extruding) { 
-		throw new Error('Cannot switch to negative geometry mode while extruding');
-		return;
-	}
+    if (beetle.extruding) { 
+        throw new Error('Cannot switch to negative geometry mode while extruding');
+        return;
+    }
 
     beetle.negative = true;
 }
