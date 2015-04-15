@@ -482,7 +482,7 @@ Process.prototype.addPointToExtrusion = function() {
                 extrudeBend, 
                 beetle.extrusionPoints.length * beetle.multiplierScale, 
                 beetle.extrusionDiameter/2 * beetle.multiplierScale, 
-                8, 
+                12, 
                 false
                 ),
         material = new THREE.MeshLambertMaterial({
