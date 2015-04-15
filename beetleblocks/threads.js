@@ -257,15 +257,9 @@ Process.prototype.cuboid = function(length, width, height) {
 Process.prototype.addBoxGeom = function(length, width, height) {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-        boxGeometry = new THREE.BoxGeometry(length, width, height),
-        material = new THREE.MeshLambertMaterial({
-            color: beetle.color,
-            transparent: true,
-            opacity: beetle.shape.material.opacity 
-        });
+        boxGeometry = new THREE.BoxGeometry(length, width, height);
 
-    material.wireframe = stage.renderer.isWireframeMode;
-    var box = new THREE.Mesh(boxGeometry, material);
+    var box = new THREE.Mesh(boxGeometry, beetle.newLambertMaterial());
     box.position.copy(beetle.position);
     box.rotation.copy(beetle.rotation);	
 
@@ -286,15 +280,9 @@ Process.prototype.sphere = function(diam) {
 Process.prototype.addSphereGeom = function(diam, isExtrusionCap) {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-        sphereGeometry = new THREE.SphereGeometry(diam/2, isExtrusionCap ? 6 : 16, isExtrusionCap ? 6 : 12),
-        material = new THREE.MeshLambertMaterial({
-            color: beetle.color,
-            transparent: true,
-            opacity: beetle.shape.material.opacity 
-        });
+        sphereGeometry = new THREE.SphereGeometry(diam/2, isExtrusionCap ? 6 : 16, isExtrusionCap ? 6 : 12);
 
-    material.wireframe = stage.renderer.isWireframeMode;
-    var sphere = new THREE.Mesh(sphereGeometry, material);
+    var sphere = new THREE.Mesh(sphereGeometry, beetle.newLambertMaterial());
     sphere.position.copy(beetle.position);
     sphere.rotation.copy(beetle.rotation);	
     stage.myObjects.add(sphere, beetle.negative);
@@ -345,16 +333,8 @@ amount: length,
         bevelEnabled: false
     };
 
-    var tubeGeom = new THREE.ExtrudeGeometry(shape, options),
-        material = new THREE.MeshLambertMaterial({
-            color: beetle.color,
-            transparent: true,
-            opacity: beetle.shape.material.opacity 
-        });
-
-    material.wireframe = stage.renderer.isWireframeMode;
-
-    var tube = new THREE.Mesh(tubeGeom, material);
+    var tubeGeom = new THREE.ExtrudeGeometry(shape, options);
+    var tube = new THREE.Mesh(tubeGeom, beetle.newLambertMaterial());
 
     tube.position.copy(beetle.position);
     tube.rotation.copy(beetle.rotation);	
@@ -364,26 +344,16 @@ amount: length,
 
 Process.prototype.text = function(textString, height, depth) {
     var beetle = this.homeContext.receiver.beetle,
-        stage = this.homeContext.receiver.parentThatIsA(StageMorph);
-
-    height = Number(height) * beetle.multiplierScale;
-    depth = Number(depth) * beetle.multiplierScale;
-
-    var textGeometry = new THREE.TextGeometry(textString, {
+        stage = this.homeContext.receiver.parentThatIsA(StageMorph), 
+        height = Number(height) * beetle.multiplierScale,
+        depth = Number(depth) * beetle.multiplierScale,
+        textGeometry = new THREE.TextGeometry(textString, {
             font: 'helvetiker',
             size: height,
             height: depth
         });
 
-    var material = new THREE.MeshLambertMaterial({
-            color: beetle.color,
-            transparent: true,
-            opacity: beetle.shape.material.opacity 
-        });
-
-    material.wireframe = stage.renderer.isWireframeMode;
-
-    var t = new THREE.Mesh(textGeometry, material);
+    var t = new THREE.Mesh(textGeometry, beetle.newLambertMaterial());
 
     t.position.copy(beetle.position);
     t.rotation.copy(beetle.rotation);	
@@ -396,18 +366,12 @@ Process.prototype.text = function(textString, height, depth) {
 
 Process.prototype.text2D = function(textString, size) {
     var beetle = this.homeContext.receiver.beetle,
-        stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+        stage = this.homeContext.receiver.parentThatIsA(StageMorph),
+        scaledSize = Number(size) * beetle.multiplierScale,
+        fontShapes = THREE.FontUtils.generateShapes(textString, { size: scaledSize }),
+        geometry = new THREE.ShapeGeometry(fontShapes, { curveSegments: 20 });
 
-    scaledSize = Number(size) * beetle.multiplierScale;
-
-    var fontShapes = THREE.FontUtils.generateShapes(textString, { size: scaledSize });
-
-    var material = new THREE.MeshBasicMaterial({ color: beetle.color });
-    material.wireframe = stage.renderer.isWireframeMode;
-
-    var geometry = new THREE.ShapeGeometry(fontShapes, { curveSegments: 20 });
-
-    var t = new THREE.Mesh(geometry, material);
+    var t = new THREE.Mesh(geometry, beetle.newLambertMaterial());
 
     t.position.copy(beetle.position);
     t.rotation.copy(beetle.rotation);	
@@ -484,15 +448,9 @@ Process.prototype.addPointToExtrusion = function() {
                 beetle.extrusionDiameter/2 * beetle.multiplierScale, 
                 12, 
                 false
-                ),
-        material = new THREE.MeshLambertMaterial({
-            color: beetle.color, 
-            wireframe: stage.renderer.isWireframeMode,
-            transparent: true,
-            opacity: beetle.shape.material.opacity
-        });
+                );
 
-    beetle.extrusionMesh = new THREE.Mesh(path, material);
+    beetle.extrusionMesh = new THREE.Mesh(path, beetle.newLambertMaterial());
     beetle.extrusionMesh.name = 'in progress';
 
     stage.myObjects.remove(stage.myObjects.getObjectByName('in progress'));

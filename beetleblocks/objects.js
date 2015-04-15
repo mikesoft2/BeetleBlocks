@@ -101,6 +101,16 @@ SpriteMorph.prototype.initBeetle = function() {
         myself.parentThatIsA(StageMorph).reRender();
     }
 
+    // material "factory"
+    this.beetle.newLambertMaterial = function() {
+        return new THREE.MeshLambertMaterial({
+            color: this.color,
+            transparent: true,
+            opacity: this.shape.material.opacity,
+            wireframe: myself.parentThatIsA(StageMorph).renderer.isWireframeMode
+        });
+    }
+
     this.beetle.add(this.beetle.shape);
 
     this.beetle.reset();
