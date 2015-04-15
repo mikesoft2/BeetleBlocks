@@ -407,7 +407,8 @@ Process.prototype.stopExtrusion = function() {
 
     if (beetle.extruding) {
         beetle.extruding = false;
-        beetle.extrusionMesh.name = '';
+        beetle.extrusionMesh = null;
+        beetle.extrusionEndCap = null;
 
         // Below an attempt to merge all these shapes into one single body:
 
