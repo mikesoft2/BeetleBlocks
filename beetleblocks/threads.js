@@ -353,13 +353,13 @@ Process.prototype.text = function(textString, height, depth) {
             height: depth
         });
 
-    var t = new THREE.Mesh(textGeometry, beetle.newLambertMaterial());
+    var mesh = new THREE.Mesh(textGeometry, beetle.newLambertMaterial());
 
-    t.position.copy(beetle.position);
-    t.rotation.copy(beetle.rotation);	
-    THREE.GeometryUtils.center(t.geometry);
-    t.rotateY(-Math.PI/2);
-    stage.myObjects.add(t);
+    mesh.position.copy(beetle.position);
+    mesh.rotation.copy(beetle.rotation);	
+    THREE.GeometryUtils.center(mesh.geometry);
+    mesh.rotateY(-Math.PI/2);
+    stage.myObjects.add(mesh);
 
     stage.reRender();
 };
@@ -371,13 +371,13 @@ Process.prototype.text2D = function(textString, size) {
         fontShapes = THREE.FontUtils.generateShapes(textString, { size: scaledSize }),
         geometry = new THREE.ShapeGeometry(fontShapes, { curveSegments: 20 });
 
-    var t = new THREE.Mesh(geometry, beetle.newLambertMaterial());
+    var mesh = new THREE.Mesh(geometry, beetle.newLambertMaterial());
 
-    t.position.copy(beetle.position);
-    t.rotation.copy(beetle.rotation);	
-    THREE.GeometryUtils.center(t.geometry);
-    t.rotateY(-Math.PI/2);
-    stage.myObjects.add(t);
+    mesh.position.copy(beetle.position);
+    mesh.rotation.copy(beetle.rotation);	
+    THREE.GeometryUtils.center(mesh.geometry);
+    mesh.rotateY(-Math.PI/2);
+    stage.myObjects.add(mesh);
 
     stage.reRender();
 };
@@ -386,30 +386,17 @@ Process.prototype.startExtrusion = function() {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph);
 
-	if (beetle.negative) { 
-		throw new Error('Cannot extrude while in negative geometry mode');
-		return;
-	};
+    if (beetle.extruding) { return }
+
+    if (beetle.negative) { 
+        throw new Error('Cannot extrude while in negative geometry mode');
+        return;
+    };
 
     beetle.extruding = true;
     beetle.extrusionPoints = new Array();
     this.addPointToExtrusion();
-//    this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true); // start cap
-//    beetle.startCap = stage.myObjects.children.pop();
-
-    material = new THREE.MeshLambertMaterial({
-            color: beetle.color, 
-            wireframe: stage.renderer.isWireframeMode,
-            transparent: true,
-            opacity: beetle.shape.material.opacity,
-            side: THREE.DoubleSide
-        });
-
-    var circleGeometry = new THREE.CircleGeometry(beetle.extrusionDiameter/2*beetle.multiplierScale, 12);
-    var t = new THREE.Mesh(circleGeometry, material);
-    t.position.copy(beetle.position);
-    t.rotation.copy(beetle.rotation);	
-    stage.myObjects.add(t);
+    this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true); // start cap
 
     stage.reRender();
 };
@@ -421,8 +408,6 @@ Process.prototype.stopExtrusion = function() {
     if (beetle.extruding) {
         beetle.extruding = false;
         beetle.extrusionMesh.name = '';
-
-        this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true); // end cap
 
         // Below an attempt to merge all these shapes into one single body:
 
@@ -464,11 +449,22 @@ Process.prototype.addPointToExtrusion = function() {
                 false
                 );
 
+    // Remove the old mesh, add the updated one
+    if (beetle.extrusionMesh) { stage.myObjects.remove(beetle.extrusionMesh) };
     beetle.extrusionMesh = new THREE.Mesh(path, beetle.newLambertMaterial());
-    beetle.extrusionMesh.name = 'in progress';
-
-    stage.myObjects.remove(stage.myObjects.getObjectByName('in progress'));
     stage.myObjects.add(beetle.extrusionMesh);
+
+
+    if (!beetle.extrusionEndCap) { 
+        var circleGeometry = new THREE.CircleGeometry(beetle.extrusionDiameter / 2 * beetle.multiplierScale, 12);
+        beetle.extrusionEndCap = new THREE.Mesh(circleGeometry, beetle.newLambertMaterial());
+        stage.myObjects.add(beetle.extrusionEndCap);
+    }
+    
+    // Update extrusion end cap position and rotation
+
+    beetle.extrusionEndCap.position.copy(beetle.position);
+    beetle.extrusionEndCap.rotation.copy(beetle.rotation);	
 
     stage.reRender();
 }
@@ -500,7 +496,6 @@ Process.prototype.stopDrawing = function() {
 };
 
 // Negative Geometry
-
 Process.prototype.startNegativeGeometry = function() {
     var beetle = this.homeContext.receiver.beetle;
 

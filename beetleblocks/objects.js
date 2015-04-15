@@ -107,7 +107,8 @@ SpriteMorph.prototype.initBeetle = function() {
             color: this.color,
             transparent: true,
             opacity: this.shape.material.opacity,
-            wireframe: myself.parentThatIsA(StageMorph).renderer.isWireframeMode
+            wireframe: myself.parentThatIsA(StageMorph).renderer.isWireframeMode,
+            side: THREE.DoubleSide
         });
     }
 
