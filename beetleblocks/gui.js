@@ -26,6 +26,7 @@ IDE_Morph.prototype.originalInit = IDE_Morph.prototype.init;
 IDE_Morph.prototype.init = function(isAutoFill) {
 	this.originalInit();
 	this.backgroundColor = new Color(255,255,255);
+        this.setColor(this.backgroundColor);
 }
 
 // Overriding these functions as we cannot proxy them. They don't return a menu, they create one and pop it up
@@ -132,18 +133,6 @@ IDE_Morph.prototype.projectMenu = function () {
 		    );
 
 	menu.addLine();
-	menu.addItem(
-			'Import tools',
-			function () {
-			myself.droppedText(
-				myself.getURLsbeOrRelative(
-					'tools.xml'
-					),
-				'tools'
-				);
-			},
-			'load the official library of\npowerful blocks'
-		    );
 	menu.addItem(
 			'Libraries...',
 			function () {
@@ -634,19 +623,30 @@ ProjectDialogMorph.prototype.setSource = function (source) {
 };
 
 ProjectDialogMorph.prototype.openProject = function () {
-    var proj = this.listField.selected,
-        src;
-    if (!proj) {return; }
-    this.ide.source = this.source;
-    if (this.source === 'cloud') {
-        this.openCloudProject(proj);
-    } else if (this.source === 'examples') {
-        src = this.ide.getURL('beetleblocks/examples/' + proj.name + '.xml');
-        this.ide.openProjectString(src);
-        this.destroy();
-    } else { // 'local'
-        this.ide.openProject(proj.name);
-        this.destroy();
+
+    var myself = this;
+
+    this.ide.confirm(
+        'All unsaved changes will be lost.\nContinue loading this project?',
+        'Load Project',
+        function () { doOpenProject() }
+    );
+
+    function doOpenProject() {
+        var proj = myself.listField.selected,
+            src;
+        if (!proj) {return; }
+        myself.ide.source = myself.source;
+        if (myself.source === 'cloud') {
+            myself.openCloudProject(proj);
+        } else if (myself.source === 'examples') {
+            src = myself.ide.getURL('beetleblocks/examples/' + proj.name + '.xml');
+            myself.ide.openProjectString(src);
+            myself.destroy();
+        } else { // 'local'
+            myself.ide.openProject(proj.name);
+            myself.destroy();
+        }
     }
 };
 
