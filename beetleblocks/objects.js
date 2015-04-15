@@ -20,16 +20,16 @@ THREE.Object3D.prototype.add = function(object, negative, scene) {
     }
 
     if (object instanceof THREE.Mesh) {
-		if (negative) {
-			var totalObjects = this.children.length,
-				myself = this;
-			for (i = 0; i < totalObjects; i++) { 
-				result = new ThreeBSP(this.children[i]).subtract(new ThreeBSP(object));
-				mesh = result.toMesh(this.children[i].material);
-				myself.add(mesh, false);
-			} 
-			for (i = 0; i < totalObjects; i++) { this.remove(this.children[0]) }
-		}
+        if (negative) {
+            var totalObjects = this.children.length,
+                myself = this;
+	    for (i = 0; i < totalObjects; i++) { 
+		result = new ThreeBSP(this.children[i]).subtract(new ThreeBSP(object));
+		mesh = result.toMesh(this.children[i].material);
+		myself.add(mesh, false);
+            } 
+            for (i = 0; i < totalObjects; i++) { this.remove(this.children[0]) }
+        }
     }
 }
 
@@ -148,7 +148,7 @@ SpriteMorph.prototype.categories =
 ];
 
 SpriteMorph.prototype.blockColor = {
-		motion : new Color(68, 95, 153),
+         motion : new Color(68, 95, 153),
          shapes : new Color(48, 137, 151),
          colors : new Color(101, 61, 122),
          sound : new Color(207, 74, 217), // we need to keep this color for the zoom blocks dialog
@@ -934,7 +934,7 @@ SpriteMorph.prototype.blockTemplates = function(category) {
 }
 
 // Enable cloning
-// Still a lot of work left to get this working
+// Still _a lot_ of work left to get this working
 SpriteMorph.prototype.originalFullCopy = SpriteMorph.prototype.fullCopy;
 SpriteMorph.prototype.fullCopy = function () {
     var c = this.originalFullCopy();

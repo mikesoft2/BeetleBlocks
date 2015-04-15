@@ -713,6 +713,7 @@ IDE_Morph.prototype.fixLayout = function (situation) {
                 Math.max(0, this.stage.left() - padding - this.spriteEditor.left()),
                 this.bottom() - this.categories.top()
             ));
+            this.spriteEditor.fixLayout();
         }
 
         this.statusDisplay.fixLayout();
@@ -729,14 +730,56 @@ IDE_Morph.prototype.buildPanes = function () {
     this.createPalette();
     this.createStage();
     this.createSpriteEditor();
-	// It's easier to make a bogus spriteBar object than to remove all references to it
-	this.spriteBar = { 
-		tabBar: { 
-			tabTo: nop
-		}
-	};
-	this.createStatusDisplay();
+    // It's easier to make a bogus spriteBar object than to remove all references to it
+    this.spriteBar = { 
+	tabBar: { 
+            tabTo: nop
+        }
+    };
+    this.createStatusDisplay();
 };
+
+IDE_Morph.prototype.originalCreateSpriteEditor = IDE_Morph.prototype.createSpriteEditor;
+IDE_Morph.prototype.createSpriteEditor = function () {
+    this.originalCreateSpriteEditor();
+
+    var plusButton = new PushButtonMorph(this, 'scaleBlocksUp', ' + '),
+        equalButton = new PushButtonMorph(this, 'resetBlocksScale', ' = '),
+        minusButton = new PushButtonMorph(this, 'scaleBlocksDown', ' - ');
+
+    this.spriteEditor.add(plusButton);
+    this.spriteEditor.add(equalButton);
+    this.spriteEditor.add(minusButton);
+
+    this.spriteEditor.fixLayout = function() {
+        var padding = 5;
+
+        minusButton.setLeft(this.left() + this.width() - minusButton.width() - padding);
+        minusButton.setTop(this.top() + padding);
+        equalButton.setLeft(minusButton.left() - equalButton.width() - padding)
+        equalButton.setTop(this.top() + padding);
+        plusButton.setLeft(equalButton.left() - plusButton.width() - padding)
+        plusButton.setTop(this.top() + padding);
+
+        minusButton.fixLayout();
+        equalButton.fixLayout();
+        plusButton.fixLayout();
+    }
+
+    this.spriteEditor.fixLayout();
+}
+
+IDE_Morph.prototype.scaleBlocksUp = function() {
+    this.setBlocksScale(Math.min(SyntaxElementMorph.prototype.scale + 0.25, 12));
+}
+
+IDE_Morph.prototype.scaleBlocksDown = function() {
+    this.setBlocksScale(Math.max(SyntaxElementMorph.prototype.scale - 0.25, 1));
+}
+
+IDE_Morph.prototype.resetBlocksScale = function() {
+    this.setBlocksScale(1);
+}
 
 IDE_Morph.prototype.originalCreatePalette = IDE_Morph.prototype.createPalette;
 IDE_Morph.prototype.createPalette = function(){
@@ -747,11 +790,11 @@ IDE_Morph.prototype.createPalette = function(){
 
 IDE_Morph.prototype.createStatusDisplay = function () {
     var frame,
-		padding = 1,
-		myself = this,
-		elements = [],
-		beetle = this.currentSprite.beetle,
-		stage = this.stage;
+	padding = 1,
+	myself = this,
+	elements = [],
+	beetle = this.currentSprite.beetle,
+	stage = this.stage;
 
     if (this.statusDisplay) {
         this.statusDisplay.destroy();
@@ -773,9 +816,9 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     this.statusDisplay.fixLayout = function () {
         this.setLeft(myself.stage.left());
         this.setTop(myself.stage.bottom() + padding);
-		this.setWidth(myself.stage.width());
-		this.setHeight(myself.height() - myself.stage.height() - myself.controlBar.height() - padding);
-		this.frame.setExtent(this.extent());
+	this.setWidth(myself.stage.width());
+	this.setHeight(myself.height() - myself.stage.height() - myself.controlBar.height() - padding);
+	this.frame.setExtent(this.extent());
         this.arrangeContents()
         this.refresh();
     };
@@ -785,20 +828,20 @@ IDE_Morph.prototype.createStatusDisplay = function () {
             y = this.top() + padding,
             max = this.right() - padding,
             start = x,
-			middle = (max - start) / 2 + start;
+            middle = (max - start) / 2 + start;
 
         this.frame.contents.children.forEach(function (element) {
-			element.setPosition(new Point(x, y));
-			x += element.width();
+	    element.setPosition(new Point(x, y));
+            x += element.width();
 
-			if (element.newLines) {
-				y += 14 * element.newLines;
-				x = start;
-			};
+            if (element.newLines) {
+		y += 14 * element.newLines;
+		x = start;
+            };
 
-			if (element.newColumn) {
-				x = middle;
-			};
+            if (element.newColumn) {
+		x = middle;
+	    };
         });
 
         this.frame.contents.adjustBounds();
@@ -806,22 +849,22 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 
     this.statusDisplay.addElement = function (element) {
 
-		if (typeof element == 'string') {
-			element = new StringMorph(localize(element), 12, null, true);
-		};
+	if (typeof element == 'string') {
+	    element = new StringMorph(localize(element), 12, null, true);
+	};
 
-		this.frame.contents.add(element);
+	this.frame.contents.add(element);
         this.fixLayout();
     };
 
     this.statusDisplay.refresh = function () {
         this.frame.contents.children.forEach(function (element) {
             if (element.hasOwnProperty('update')) {
-				element.update();
-		   		element.changed();
-		   		element.drawNew();
-		   		element.changed();
-			};
+                element.update();
+                element.changed();
+                element.drawNew();
+                element.changed();
+            };
         });
     };
 
