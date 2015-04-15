@@ -26,6 +26,7 @@ IDE_Morph.prototype.originalInit = IDE_Morph.prototype.init;
 IDE_Morph.prototype.init = function(isAutoFill) {
 	this.originalInit();
 	this.backgroundColor = new Color(255,255,255);
+        this.setColor(this.backgroundColor);
 }
 
 // Overriding these functions as we cannot proxy them. They don't return a menu, they create one and pop it up
@@ -132,18 +133,6 @@ IDE_Morph.prototype.projectMenu = function () {
 		    );
 
 	menu.addLine();
-	menu.addItem(
-			'Import tools',
-			function () {
-			myself.droppedText(
-				myself.getURLsbeOrRelative(
-					'tools.xml'
-					),
-				'tools'
-				);
-			},
-			'load the official library of\npowerful blocks'
-		    );
 	menu.addItem(
 			'Libraries...',
 			function () {
