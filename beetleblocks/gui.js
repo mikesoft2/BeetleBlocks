@@ -1045,8 +1045,8 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	// Buttons and toggles
 
 	var resetCameraButton = new PushButtonMorph(
-		stage.camera,
-		'reset',
+		null,
+		function() { stage.camera.reset() },
 		'Reset Camera'
 		);
 	resetCameraButton.columns = 3;
@@ -1083,8 +1083,8 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	elements.push(toggleBeetleButton);
 
 	var fitCameraButton = new PushButtonMorph(
-		stage.camera,
-		'fitScene',
+		null,
+		function() { stage.camera.fitScene() },
 		'Zoom to fit'
 		);
 	fitCameraButton.columns = 3;
@@ -1125,6 +1125,20 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 
 	elements.push(space);
 
+	var toggleTurboButton = new ToggleMorph(
+		'checkbox',
+		null,
+		function () {
+			myself.toggleFastTracking();
+		},
+		'Turbo mode',
+		function () {
+        	return stage.isFastTracked
+        });
+	toggleTurboButton.columns = 3;
+	toggleTurboButton.newColumn = 2;
+	elements.push(toggleTurboButton);
+
 	var toggleGridButton = new ToggleMorph(
 		'checkbox',
 		null,
@@ -1135,7 +1149,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 		function () {
 			return stage.scene.grid.visible
         });
-	toggleGridButton.newLines = 3;
+	toggleGridButton.newLines = 2;
 	elements.push(toggleGridButton);
 
 	// It should be done like this, so it also updates if we toggle visibility from somewhere else...
@@ -1152,9 +1166,9 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	elements.push('Position: ');
 	element = new StringMorph();
 	element.update = function() {
-		this.text = beetle.position.z.toFixed(2).toString().replace('.00','') + ', ' 
-					+ beetle.position.x.toFixed(2).toString().replace('.00','') + ', ' 
-					+ beetle.position.y.toFixed(2).toString().replace('.00','')
+		this.text = 'x: ' + beetle.position.z.toFixed(2).toString().replace('.00','') 
+					+ ', y: ' + beetle.position.x.toFixed(2).toString().replace('.00','') 
+					+ ', z: ' + beetle.position.y.toFixed(2).toString().replace('.00','')
 	};
 	element.newColumn = true;
 	elements.push(element);
@@ -1172,9 +1186,9 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	elements.push('Rotation: ');
 	element = new StringMorph();
 	element.update = function() {
-		this.text = degrees(beetle.rotation.z * -1).toFixed(2).toString().replace('.00','') + ', ' 
-					+ degrees(beetle.rotation.x * -1).toFixed(2).toString().replace('.00','') + ', ' 
-					+ degrees(beetle.rotation.y).toFixed(2).toString().replace('.00','')
+		this.text = 'x:' + degrees(beetle.rotation.z * -1).toFixed(2).toString().replace('.00','')
+					+ ', y: ' + degrees(beetle.rotation.x * -1).toFixed(2).toString().replace('.00','')
+					+ ', z: ' + degrees(beetle.rotation.y).toFixed(2).toString().replace('.00','')
 	};
 	element.newColumn = true;
 	elements.push(element);
