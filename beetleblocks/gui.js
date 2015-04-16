@@ -165,7 +165,133 @@ IDE_Morph.prototype.projectMenu = function () {
 			'Select categories of additional blocks to add to this project.'
 				);
 
+	menu.addLine();
 
+    if (shiftClicked) {
+        menu.addItem(
+            'Cloud url...',
+            'setCloudURL',
+            null,
+            new Color(100, 0, 0)
+        );
+        menu.addLine();
+    }
+    if (!SnapCloud.username) {
+        menu.addItem(
+            'Login...',
+            'initializeCloud'
+        );
+        menu.addItem(
+            'Signup...',
+            'createCloudAccount'
+        );
+        menu.addItem(
+            'Reset Password...',
+            'resetCloudPassword'
+        );
+    } else {
+        menu.addItem(
+            localize('Logout') + ' ' + SnapCloud.username,
+            'logout'
+        );
+        menu.addItem(
+            'Change Password...',
+            'changeCloudPassword'
+        );
+    }
+    if (shiftClicked) {
+        menu.addLine();
+        menu.addItem(
+            'export project media only...',
+            function () {
+                if (myself.projectName) {
+                    myself.exportProjectMedia(myself.projectName);
+                } else {
+                    myself.prompt('Export Project As...', function (name) {
+                        myself.exportProjectMedia(name);
+                    }, null, 'exportProject');
+                }
+            },
+            null,
+            this.hasChangedMedia ? new Color(100, 0, 0) : new Color(0, 100, 0)
+        );
+        menu.addItem(
+            'export project without media...',
+            function () {
+                if (myself.projectName) {
+                    myself.exportProjectNoMedia(myself.projectName);
+                } else {
+                    myself.prompt('Export Project As...', function (name) {
+                        myself.exportProjectNoMedia(name);
+                    }, null, 'exportProject');
+                }
+            },
+            null,
+            new Color(100, 0, 0)
+        );
+        menu.addItem(
+            'export project as cloud data...',
+            function () {
+                if (myself.projectName) {
+                    myself.exportProjectAsCloudData(myself.projectName);
+                } else {
+                    myself.prompt('Export Project As...', function (name) {
+                        myself.exportProjectAsCloudData(name);
+                    }, null, 'exportProject');
+                }
+            },
+            null,
+            new Color(100, 0, 0)
+        );
+        menu.addLine();
+        menu.addItem(
+            'open shared project from cloud...',
+            function () {
+                myself.prompt('Author name…', function (usr) {
+                    myself.prompt('Project name...', function (prj) {
+                        var id = 'Username=' +
+                            encodeURIComponent(usr.toLowerCase()) +
+                            '&ProjectName=' +
+                            encodeURIComponent(prj);
+                        myself.showMessage(
+                            'Fetching project\nfrom the cloud...'
+                        );
+                        SnapCloud.getPublicProject(
+                            id,
+                            function (projectData) {
+                                var msg;
+                                if (!Process.prototype.isCatchingErrors) {
+                                    window.open(
+                                        'data:text/xml,' + projectData
+                                    );
+                                }
+                                myself.nextSteps([
+                                    function () {
+                                        msg = myself.showMessage(
+                                            'Opening project...'
+                                        );
+                                    },
+                                    function () {nop(); }, // yield (Chrome)
+                                    function () {
+                                        myself.rawOpenCloudDataString(
+                                            projectData
+                                        );
+                                    },
+                                    function () {
+                                        msg.destroy();
+                                    }
+                                ]);
+                            },
+                            myself.cloudError()
+                        );
+
+                    }, null, 'project');
+                }, null, 'project');
+            },
+            null,
+            new Color(100, 0, 0)
+        );
+    }
 	menu.popup(world, pos);
 }
 
@@ -335,6 +461,42 @@ IDE_Morph.prototype.settingsMenu = function () {
         'check for block\nto text mapping features',
         false
     );
+	menu.addLine();
+	menu.addItem(
+		'Set background color', 
+		function(){ 
+			this.pickColor(null, function(color) { 
+				stage.renderer.setClearColor('rgb(' + color.r + ',' + color.g + ',' + color.b + ')', 1);
+				stage.reRender();
+			})
+		});
+	menu.addLine();
+	menu.addItem(
+		'Set grid interval',
+		function(){
+			new DialogBoxMorph(
+		        this,
+		        function(point) { stage.scene.grid.setInterval(point) },
+		        this
+		    ).promptVector(
+		        'Grid intervals',
+		        stage.scene.grid.interval, // current
+		        new Point(1, 1), // default
+		        'x interval',
+		        'y interval',
+		        this.world(),
+		        null, // pic
+		        null // msg
+		    );
+		});
+	menu.addItem(
+		'Set grid color', 
+		function(){ 
+			this.pickColor(null, function(color) { 
+				stage.scene.grid.setColor('0x' + color.r.toString(16) + color.g.toString(16) + color.b.toString(16));
+				stage.reRender();
+			})
+		});
     menu.popup(world, pos);
 };
 
@@ -365,6 +527,8 @@ IDE_Morph.prototype.downloadOBJ = function() {
 IDE_Morph.prototype.originalCreateControlBar = IDE_Morph.prototype.createControlBar;
 IDE_Morph.prototype.createControlBar = function () {
 	this.originalCreateControlBar();
+
+	this.controlBar.cloudButton.destroy();
 
 	var myself = this,
 	    colors = [
@@ -400,6 +564,8 @@ IDE_Morph.prototype.createControlBar = function () {
 
 	this.controlBar.fixLayout = function () {
 		this.originalFixLayout();
+
+		this.settingsButton.setLeft(this.projectButton.right() + 5);
 
 		cameraButton.setCenter(myself.controlBar.center());
 		cameraButton.setLeft(this.settingsButton.right() + 5);
@@ -445,42 +611,6 @@ IDE_Morph.prototype.cameraMenu = function () {
 		'Zoom to extents',
 		function() { stage.camera.fitScene() }
 		);
-	menu.addLine();
-	menu.addItem(
-		'Set background color', 
-		function(){ 
-			this.pickColor(null, function(color) { 
-				stage.renderer.setClearColor('rgb(' + color.r + ',' + color.g + ',' + color.b + ')', 1);
-				stage.reRender();
-			})
-		});
-	menu.addLine();
-	menu.addItem(
-		'Set grid interval',
-		function(){
-			new DialogBoxMorph(
-		        this,
-		        function(point) { stage.scene.grid.setInterval(point) },
-		        this
-		    ).promptVector(
-		        'Grid intervals',
-		        stage.scene.grid.interval, // current
-		        new Point(1, 1), // default
-		        'x interval',
-		        'y interval',
-		        this.world(),
-		        null, // pic
-		        null // msg
-		    );
-		});
-	menu.addItem(
-		'Set grid color', 
-		function(){ 
-			this.pickColor(null, function(color) { 
-				stage.scene.grid.setColor('0x' + color.r.toString(16) + color.g.toString(16) + color.b.toString(16));
-				stage.reRender();
-			})
-		});
 	menu.popup(world, pos);
 };
 
@@ -1046,7 +1176,6 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
         elements = [
             this.logo,
             this.controlBar.cameraButton,
-            this.controlBar.cloudButton,
             this.controlBar.projectButton,
             this.controlBar.settingsButton,
             this.controlBar.stageSizeButton,
