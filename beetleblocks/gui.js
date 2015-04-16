@@ -530,89 +530,14 @@ IDE_Morph.prototype.createControlBar = function () {
 
 	this.controlBar.cloudButton.destroy();
 
-	var myself = this,
-	    colors = [
-		    this.groupColor,
-	    this.frameColor.darker(50),
-	    this.frameColor.darker(50)
-		    ];
-
-	// cameraButton
-	button = new PushButtonMorph(
-			this,
-			'cameraMenu',
-			new SymbolMorph('camera', 14)
-			);
-	button.corner = 12;
-	button.color = colors[0];
-	button.highlightColor = colors[1];
-	button.pressColor = colors[2];
-	button.labelMinExtent = new Point(36, 18);
-	button.padding = 0;
-	button.labelShadowOffset = new Point(-1, -1);
-	button.labelShadowColor = colors[1];
-	button.labelColor = this.buttonLabelColor;
-	button.contrast = this.buttonContrast;
-	button.drawNew();
-	button.hint = '3D world settings';
-	button.fixLayout();
-	cameraButton = button;
-	this.controlBar.add(cameraButton);
-	this.controlBar.cameraButton = cameraButton; // for menu positioning	
-
 	this.controlBar.originalFixLayout = this.controlBar.fixLayout;
-
 	this.controlBar.fixLayout = function () {
 		this.originalFixLayout();
-
+		this.projectButton.setLeft(this.projectButton.left() + 6);
 		this.settingsButton.setLeft(this.projectButton.right() + 5);
-
-		cameraButton.setCenter(myself.controlBar.center());
-		cameraButton.setLeft(this.settingsButton.right() + 5);
-
 		this.updateLabel();
 	};
-
-	this.controlBar.originalUpdateLabel = this.controlBar.updateLabel;
-
-	this.controlBar.updateLabel = function() {
-		this.originalUpdateLabel();
-		this.label.setLeft(cameraButton.right() + 5);
-	}
 }
-
-IDE_Morph.prototype.cameraMenu = function () {
-	var menu,
-	    stage = this.stage,
-	    world = this.world(),
-	    myself = this,
-	    pos = this.controlBar.cameraButton.bottomLeft(),
-	    shiftClicked = (world.currentKey === 16);
-
-	function addPreference(label, toggle, test, onHint, offHint, hide) {
-		var on = '\u2611 ',
-		    off = '\u2610 ';
-		if (!hide || shiftClicked) {
-			menu.addItem(
-					(test ? on : off) + localize(label),
-					toggle,
-					test ? onHint : offHint,
-					hide ? new Color(100, 0, 0) : null
-				    );
-		}
-	}
-
-	menu = new MenuMorph(this);
-	menu.addItem(
-		'Reset camera',
-		function() { stage.camera.reset() }
-		);
-	menu.addItem(
-		'Zoom to extents',
-		function() { stage.camera.fitScene() }
-		);
-	menu.popup(world, pos);
-};
 
 IDE_Morph.prototype.originalSetStageExtent = IDE_Morph.prototype.setStageExtent;
 IDE_Morph.prototype.setStageExtent = function (aPoint) {
@@ -1237,7 +1162,6 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
     var world = this.world(),
         elements = [
             this.logo,
-            this.controlBar.cameraButton,
             this.controlBar.projectButton,
             this.controlBar.settingsButton,
             this.controlBar.stageSizeButton,
