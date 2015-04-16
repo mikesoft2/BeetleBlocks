@@ -45,9 +45,9 @@ tempDict = {
 		'Exportar model 3D a STL',
 	'Export 3D model as OBJ':
 		'Exportar model 3D a OBJ',
-	'Reset camera':
+	'Reset Camera':
 		'Reinicia càmera',
-	'Zoom to extents':
+	'Zoom to fit':
 		'Mostra escena sencera',
 	'Set background color':
 		'Defineix el color de fons',
@@ -55,30 +55,16 @@ tempDict = {
 		'Defineix l\'interval de la graella',
 	'Set grid color':
 		'Defineix el color de la graella',
-	'3D world settings':
-		'Configuració del món 3D',
-	'Hide beetle':
-		'Amaga beetle',
-	'Show beetle':
-		'Mostra beetle',
-	'Hide axes':
-		'Amaga eixos',
-	'Show axes':
-		'Mostra eixos',
-	'Wireframe mode':
+	'Beetle':
+		'Beetle',
+	'Axes':
+		'Eixos',
+	'Wireframe':
 		'Model de filferros',
-	'Shaded mode':
-		'Model ombrejat',
-	'  Parallel projection  ':
-		'  Projecció paral·lela  ',
 	'Parallel projection':
 		'Projecció paral·lela',
-	'Perspective projection':
-		'Projecció perspectiva',
-	'Hide grid':
-		'Amaga graella',
-	'Show grid':
-		'Mostra graella',
+	'Grid':
+		'Graella',
 	'Position: ':
 		'Posició: ',
 	'Rotation: ':

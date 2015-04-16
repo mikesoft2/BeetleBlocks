@@ -55,30 +55,16 @@ tempDict = {
 		'Define el intervalo de la rejilla',
 	'Set grid color':
 		'Define el color de rejilla',
-	'3D world settings':
-		'Configuración del mundo 3D',
-	'Hide beetle':
-		'Oculta beetle',
-	'Show beetle':
-		'Muestra beetle',
-	'Hide axes':
-		'Oculta ejes',
-	'Show axes':
-		'Muestra ejes',
-	'Wireframe mode':
+	'Beetle':
+		'Beetle',
+	'Axes':
+		'Ejes',
+	'Wireframe':
 		'Modelo de alambre',
-	'Shaded mode':
-		'Modelo sombreado',
-	'  Parallel projection  ':
-		'  Proyección paralela  ',
 	'Parallel projection':
 		'Proyección paralela',
-	'Perspective projection':
-		'Proyección perspectiva',
-	'Hide grid':
-		'Oculta rejilla',
-	'Show grid':
-		'Muestra rejilla',
+	'Grid':
+		'Rejilla',
 	'Position: ':
 		'Posición: ',
 	'Rotation: ':
