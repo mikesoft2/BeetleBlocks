@@ -946,9 +946,9 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     this.statusDisplay.fixLayout = function () {
         this.setLeft(myself.stage.left());
         this.setTop(myself.stage.bottom() + padding);
-	this.setWidth(myself.stage.width());
-	this.setHeight(myself.height() - myself.stage.height() - myself.controlBar.height() - padding);
-	this.frame.setExtent(this.extent());
+		this.setWidth(myself.stage.width());
+		this.setHeight(myself.height() - myself.stage.height() - myself.controlBar.height() - padding);
+		this.frame.setExtent(this.extent());
         this.arrangeContents()
         this.refresh();
     };
@@ -961,17 +961,23 @@ IDE_Morph.prototype.createStatusDisplay = function () {
             middle = (max - start) / 2 + start;
 
         this.frame.contents.children.forEach(function (element) {
-	    element.setPosition(new Point(x, y));
+			element.setPosition(new Point(x, y));
             x += element.width();
 
+			if (element instanceof ToggleMorph) { x+= element.label.width() + 2 };
+
             if (element.newLines) {
-		y += 14 * element.newLines;
-		x = start;
+				y += 14 * element.newLines;
+				x = start;
             };
 
             if (element.newColumn) {
-		x = middle;
-	    };
+				if (element.columns) {
+					x = ((max - start) / element.columns) * element.newColumn + start;
+				} else {
+					x = middle;
+				}
+			};
         });
 
         this.frame.contents.adjustBounds();
@@ -1036,57 +1042,99 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 	this.statusDisplay.lastWatcherUpdate = Date.now();
 	this.statusDisplay.watcherUpdateFrequency = 250;
 
-	// Buttons
-	
-	var toggleBeetleButton = new PushButtonMorph(
-		null,
-		function () {
-			beetle.toggleVisibility();
-			toggleBeetleButton.labelString = (beetle.shape.visible ? 'Hide' : 'Show') + ' beetle';
-			toggleBeetleButton.drawNew();
-		},
-		'Hide beetle'
-	);
-	elements.push(toggleBeetleButton);
+	// Buttons and toggles
 
-	var toggleAxesButton = new PushButtonMorph(
-		null,
-		function () {
-			stage.renderer.toggleAxes();
-			toggleAxesButton.labelString = (stage.renderer.showingAxes ? 'Hide' : 'Show') + ' axes';
-			toggleAxesButton.drawNew();
-		},
-		'Hide axes');
-	elements.push(toggleAxesButton);
+	var resetCameraButton = new PushButtonMorph(
+		stage.camera,
+		'reset',
+		'Reset Camera'
+		);
+	resetCameraButton.columns = 3;
+	resetCameraButton.newColumn = 1;
+	elements.push(resetCameraButton);
 
-	var toggleWireframeButton = new PushButtonMorph(
+	var toggleWireframeButton = new ToggleMorph(
+		'checkbox',
 		null,
 		function () {
 			stage.renderer.toggleWireframe();
-			toggleWireframeButton.labelString = (stage.renderer.isWireframeMode ? 'Shaded' : 'Wireframe') + ' mode';
-			toggleWireframeButton.drawNew();
 		},
-		'Wireframe mode');
+		'Wireframe',
+		function () {
+			return stage.renderer.isWireframeMode
+        });
+	toggleWireframeButton.columns = 3;
+	toggleWireframeButton.newColumn = 2;
 	elements.push(toggleWireframeButton);
 
-	var toggleParallelProjectionButton = new PushButtonMorph(
+	var toggleBeetleButton = new ToggleMorph(
+		'checkbox',
+		null,
+		function () {
+			beetle.toggleVisibility();
+		},
+		'Beetle',
+		function () {
+			return beetle.shape.visible;
+        }
+
+	);
+	toggleBeetleButton.newLines = 2;
+	elements.push(toggleBeetleButton);
+
+	var fitCameraButton = new PushButtonMorph(
+		stage.camera,
+		'fitScene',
+		'Zoom to fit'
+		);
+	fitCameraButton.columns = 3;
+	fitCameraButton.newColumn = 1;
+	elements.push(fitCameraButton);
+	
+	var toggleParallelProjectionButton = new ToggleMorph(
+		'checkbox',
 		null,
 		function () {
 			stage.renderer.toggleParallelProjection();
-			toggleParallelProjectionButton.labelString = (stage.renderer.isParallelProjection ? 'Perspective' : 'Parallel') + ' projection';
-			toggleParallelProjectionButton.drawNew();
 		},
-		'  Parallel projection  ');
+		'Parallel projection',
+		function () {
+			return stage.renderer.isParallelProjection
+        });
+	toggleParallelProjectionButton.columns = 3;
+	toggleParallelProjectionButton.newColumn = 2;
 	elements.push(toggleParallelProjectionButton);
 
-	var toggleGridButton = new PushButtonMorph(
+	var toggleAxesButton = new ToggleMorph(
+		'checkbox',
+		null,
+		function () {
+			stage.renderer.toggleAxes();
+		},
+		'Axes',
+		function () {
+			return stage.renderer.showingAxes;
+        });
+	toggleAxesButton.newLines = 2;
+	elements.push(toggleAxesButton);
+
+	var space = new Morph();
+	space.alpha = 0;
+	space.columns = 3;
+	space.newColumn = 1;
+
+	elements.push(space);
+
+	var toggleGridButton = new ToggleMorph(
+		'checkbox',
 		null,
 		function () {
 			stage.scene.grid.toggle();
-			toggleGridButton.labelString = (stage.scene.grid.visible ? 'Hide' : 'Show') + ' grid';
-			toggleGridButton.drawNew();
 		},
-		'Hide grid');
+		'Grid',
+		function () {
+			return stage.scene.grid.visible
+        });
 	toggleGridButton.newLines = 3;
 	elements.push(toggleGridButton);
 
