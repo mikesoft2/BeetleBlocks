@@ -45,9 +45,9 @@ tempDict = {
 		'Exportar modelo 3D a STL',
 	'Export 3D model as OBJ':
 		'Exportar modelo 3D a OBJ',
-	'Reset camera':
+	'Reset Camera':
 		'Reinicia cámara',
-	'Zoom to extents':
+	'Zoom to fit':
 		'Muestra escena completa',
 	'Set background color':
 		'Define el color de fondo',
@@ -55,6 +55,8 @@ tempDict = {
 		'Define el intervalo de la rejilla',
 	'Set grid color':
 		'Define el color de rejilla',
+	'Turbo mode':
+		'Modo turbo',
 	'Beetle':
 		'Beetle',
 	'Axes':

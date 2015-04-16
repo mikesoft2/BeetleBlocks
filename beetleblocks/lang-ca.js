@@ -55,6 +55,8 @@ tempDict = {
 		'Defineix l\'interval de la graella',
 	'Set grid color':
 		'Defineix el color de la graella',
+	'Turbo mode':
+		'Mode turbo',
 	'Beetle':
 		'Beetle',
 	'Axes':
