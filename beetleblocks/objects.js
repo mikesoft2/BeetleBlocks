@@ -478,6 +478,12 @@ SpriteMorph.prototype.initBlocks = function() {
         category: 'shapes',
         defaults: [1]
     };
+
+// Removing this until it works like it should
+// You can still test negative geometry by giving negative
+// values to the volumes of cubes, cuboids and spheres
+
+/*
     this.blocks.startNegativeGeometry =
     {
         type: 'command',
@@ -490,6 +496,7 @@ SpriteMorph.prototype.initBlocks = function() {
         spec: 'stop negative geometry',
         category: 'shapes'
     };
+*/
 
     // color
     this.blocks.setHSLA =
@@ -637,8 +644,8 @@ SpriteMorph.prototype.blockTemplates = function(category) {
         blocks.push(block('stopExtrusion'));
         blocks.push(block('setExtrusionDiameter'));
         blocks.push(block('changeExtrusionDiameter'));
-        blocks.push(block('startNegativeGeometry'));
-        blocks.push(block('stopNegativeGeometry'));
+//        blocks.push(block('startNegativeGeometry'));
+//        blocks.push(block('stopNegativeGeometry'));
 
     } else if (cat === 'colors') {
         blocks.push(block('setHSLA'));

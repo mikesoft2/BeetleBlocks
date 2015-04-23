@@ -34,7 +34,7 @@ Process.prototype.setScale = function(scale) {
         beetle = sprite.beetle,
         ide = sprite.parentThatIsA(IDE_Morph);
 
-    beetle.multiplierScale = Number(scale);
+    beetle.multiplierScale = Math.max(0, Number(scale));
     ide.statusDisplay.refresh();
 }
 
@@ -44,6 +44,9 @@ Process.prototype.changeScale = function(delta) {
         ide = sprite.parentThatIsA(IDE_Morph);
 
     beetle.multiplierScale += Number(delta);
+
+    if (beetle.multiplierScale < 0) { beetle.multiplierScale = 0 };
+
     ide.statusDisplay.refresh();
 }
 
@@ -237,6 +240,7 @@ Process.prototype.cube = function(size) {
     stage = this.homeContext.receiver.parentThatIsA(StageMorph);
 
     size = Number(size) * beetle.multiplierScale;
+    
     this.addBoxGeom(size, size, size);
 
     stage.reRender();
@@ -257,13 +261,14 @@ Process.prototype.cuboid = function(length, width, height) {
 Process.prototype.addBoxGeom = function(length, width, height) {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-        boxGeometry = new THREE.BoxGeometry(length, width, height);
+        boxGeometry = new THREE.BoxGeometry(Math.abs(length), Math.abs(width), Math.abs(height));
 
     var box = new THREE.Mesh(boxGeometry, beetle.newLambertMaterial());
     box.position.copy(beetle.position);
     box.rotation.copy(beetle.rotation);	
 
-    stage.myObjects.add(box, beetle.negative);
+    // If any of the sides is negative, we carve a negative cuboid
+    stage.myObjects.add(box, (length < 0 || width < 0 || height < 0));
     stage.reRender();
 }
 
@@ -273,19 +278,20 @@ Process.prototype.sphere = function(diam) {
 
     diam = Number(diam) * beetle.multiplierScale;
     this.addSphereGeom(diam);
-
-    stage.reRender();
 };
 
 Process.prototype.addSphereGeom = function(diam, isExtrusionCap) {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-        sphereGeometry = new THREE.SphereGeometry(diam/2, isExtrusionCap ? 6 : 16, isExtrusionCap ? 6 : 12);
+        sphereGeometry = new THREE.SphereGeometry(Math.abs(diam/2), isExtrusionCap ? 6 : 16, isExtrusionCap ? 6 : 12);
 
     var sphere = new THREE.Mesh(sphereGeometry, beetle.newLambertMaterial());
     sphere.position.copy(beetle.position);
-    sphere.rotation.copy(beetle.rotation);	
-    stage.myObjects.add(sphere, beetle.negative);
+    sphere.rotation.copy(beetle.rotation);
+    
+    // If the diameter is negative, we carve a negative sphere
+    stage.myObjects.add(sphere, diam < 0);
+    stage.reRender();
 }
 
 Process.prototype.tube = function(length, outer, inner) {
@@ -344,11 +350,7 @@ Process.prototype.text = function(textString, height, depth) {
         stage = this.homeContext.receiver.parentThatIsA(StageMorph), 
         height = Number(height) * beetle.multiplierScale,
         depth = Number(depth) * beetle.multiplierScale,
-        textGeometry = new THREE.TextGeometry(textString, {
-            font: 'helvetiker',
-            size: height,
-            height: depth
-            });
+        textGeometry = new THREE.TextGeometry(textString, { font: 'helvetiker', size: height, height: depth });
 
     var mesh = new THREE.Mesh(textGeometry, beetle.newLambertMaterial());
 
@@ -384,11 +386,6 @@ Process.prototype.startExtrusion = function() {
         stage = this.homeContext.receiver.parentThatIsA(StageMorph);
 
     if (beetle.extruding) { return }
-
-    if (beetle.negative) { 
-        throw new Error('Cannot extrude while in negative geometry mode');
-        return;
-    };
 
     beetle.extruding = true;
     beetle.extrusionPoints = new Array();
@@ -496,12 +493,6 @@ Process.prototype.stopDrawing = function() {
 // Negative Geometry
 Process.prototype.startNegativeGeometry = function() {
     var beetle = this.homeContext.receiver.beetle;
-
-    if (beetle.extruding) { 
-        throw new Error('Cannot switch to negative geometry mode while extruding');
-        return;
-    }
-
     beetle.negative = true;
 }
 
