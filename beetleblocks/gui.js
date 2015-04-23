@@ -1,22 +1,22 @@
 IDE_Morph.prototype.originalCreateLogo = IDE_Morph.prototype.createLogo;
 IDE_Morph.prototype.createLogo = function () {
-	this.originalCreateLogo();
-	this.logo.texture = 'beetleblocks/logo.png';
-	this.logo.drawNew();
+    this.originalCreateLogo();
+    this.logo.texture = 'beetleblocks/logo.png';
+    this.logo.drawNew();
 }
 
 IDE_Morph.prototype.originalNewProject = IDE_Morph.prototype.newProject;
 IDE_Morph.prototype.newProject = function () {
-	this.originalNewProject();
-	this.createStatusDisplay();
+    this.originalNewProject();
+    this.createStatusDisplay();
 }
 
 IDE_Morph.prototype.originalRemoveSprite = IDE_Morph.prototype.removeSprite;
 IDE_Morph.prototype.removeSprite = function (sprite) {
-	var stage = sprite.parentThatIsA(StageMorph);
-	stage.scene.remove(sprite.beetle);
-	stage.reRender();
-	this.originalRemoveSprite(sprite);
+    var stage = sprite.parentThatIsA(StageMorph);
+    stage.scene.remove(sprite.beetle);
+    stage.reRender();
+    this.originalRemoveSprite(sprite);
 }
 
 // Force flat design
@@ -24,238 +24,236 @@ IDE_Morph.prototype.setDefaultDesign = IDE_Morph.prototype.setFlatDesign;
 
 IDE_Morph.prototype.originalInit = IDE_Morph.prototype.init;
 IDE_Morph.prototype.init = function(isAutoFill) {
-	this.originalInit();
-	this.backgroundColor = new Color(255,255,255);
-        this.setColor(this.backgroundColor);
+    this.originalInit();
+
+    // Borders are actually just paddings, so we set the bg white to get them to be white
+    this.backgroundColor = new Color(255,255,255);
+    this.setColor(this.backgroundColor);
 }
 
 // Overriding these functions as we cannot proxy them. They don't return a menu, they create one and pop it up
 IDE_Morph.prototype.projectMenu = function () {
-	var menu,
-	    myself = this,
-	    world = this.world(),
-	    pos = this.controlBar.projectButton.bottomLeft(),
-	    graphicsName = this.currentSprite instanceof SpriteMorph ?
-		    'Costumes' : 'Backgrounds',
-	    shiftClicked = (world.currentKey === 16);
+    var menu,
+        myself = this,
+        world = this.world(),
+        pos = this.controlBar.projectButton.bottomLeft(),
+        graphicsName = this.currentSprite instanceof SpriteMorph ?
+            'Costumes' : 'Backgrounds',
+        shiftClicked = (world.currentKey === 16);
 
-	menu = new MenuMorph(this);
-	menu.addItem('Project notes...', 'editProjectNotes');
-	menu.addLine();
-	menu.addItem('New', 'createNewProject');
-	menu.addItem('Open...', 'openProjectsBrowser');
-	menu.addItem('Save', "save");
-	if (shiftClicked) {
-		menu.addItem(
-				'Save to disk',
-				'saveProjectToDisk',
-				'experimental - store this project\nin your downloads folder',
-				new Color(100, 0, 0)
-			    );
-	}
-	menu.addItem('Save As...', 'saveProjectsBrowser');
-	menu.addLine();
-	menu.addItem(
-			'Import...',
-			function () {
-			var inp = document.createElement('input');
-			if (myself.filePicker) {
-			document.body.removeChild(myself.filePicker);
-			myself.filePicker = null;
-			}
-			inp.type = 'file';
-			inp.style.color = "transparent";
-			inp.style.backgroundColor = "transparent";
-			inp.style.border = "none";
-			inp.style.outline = "none";
-			inp.style.position = "absolute";
-			inp.style.top = "0px";
-			inp.style.left = "0px";
-			inp.style.width = "0px";
-			inp.style.height = "0px";
-			inp.addEventListener(
-				"change",
-				function () {
-				document.body.removeChild(inp);
-				myself.filePicker = null;
-				world.hand.processDrop(inp.files);
-				},
-				false
-				);
-			document.body.appendChild(inp);
-			myself.filePicker = inp;
-			inp.click();
-			},
-			'file menu import hint' // looks up the actual text in the translator
-				);
+    menu = new MenuMorph(this);
+    menu.addItem('Project notes...', 'editProjectNotes');
+    menu.addLine();
+    menu.addItem('New', 'createNewProject');
+    menu.addItem('Open...', 'openProjectsBrowser');
+    menu.addItem('Save', "save");
+    if (shiftClicked) {
+        menu.addItem(
+                'Save to disk',
+                'saveProjectToDisk',
+                'experimental - store this project\nin your downloads folder',
+                new Color(100, 0, 0)
+                );
+    }
+    menu.addItem('Save As...', 'saveProjectsBrowser');
+    menu.addLine();
+    menu.addItem(
+            'Import...',
+            function () {
+                var inp = document.createElement('input');
+                if (myself.filePicker) {
+                    document.body.removeChild(myself.filePicker);
+                    myself.filePicker = null;
+                }
+                inp.type = 'file';
+                inp.style.color = "transparent";
+                inp.style.backgroundColor = "transparent";
+                inp.style.border = "none";
+                inp.style.outline = "none";
+                inp.style.position = "absolute";
+                inp.style.top = "0px";
+                inp.style.left = "0px";
+                inp.style.width = "0px";
+                inp.style.height = "0px";
+                inp.addEventListener(
+                    "change",
+                    function () {
+                        document.body.removeChild(inp);
+                        myself.filePicker = null;
+                        world.hand.processDrop(inp.files);
+                    },
+                    false
+                    );
+                document.body.appendChild(inp);
+                myself.filePicker = inp;
+                inp.click();
+            },
+            'file menu import hint' // looks up the actual text in the translator
+                );
 
-	menu.addItem(
-			shiftClicked ?
-			'Export project as plain text...' : 'Export project...',
-			function () {
-			if (myself.projectName) {
-			myself.exportProject(myself.projectName, shiftClicked);
-			} else {
-			myself.prompt('Export Project As...', function (name) {
-				myself.exportProject(name);
-				}, null, 'exportProject');
-			}
-			},
-			'show project data as XML\nin a new browser window',
-			shiftClicked ? new Color(100, 0, 0) : null
-		    );
+    menu.addItem(
+            shiftClicked ?
+            'Export project as plain text...' : 'Export project...',
+            function () {
+                if (myself.projectName) {
+                    myself.exportProject(myself.projectName, shiftClicked);
+                } else {
+                    myself.prompt('Export Project As...', function (name) {
+                        myself.exportProject(name);
+                    }, null, 'exportProject');
+                }
+            },
+            'show project data as XML\nin a new browser window',
+            shiftClicked ? new Color(100, 0, 0) : null
+            );
 
-	menu.addItem(
-			'Export blocks...',
-			function () { myself.exportGlobalBlocks(); },
-			'show global custom block definitions as XML\nin a new browser window'
-		    );
-
-	if (shiftClicked) {
-		menu.addItem(
-				'Export all scripts as pic...',
-				function () { myself.exportScriptsPicture(); },
-				'show a picture of all scripts\nand block definitions',
-				new Color(100, 0, 0)
-			    );
-	}
-
-	menu.addLine();
-	menu.addItem(
-			'Export 3D model as STL',
-			function() { myself.downloadSTL() },
-			'download the currently rendered 3D model\ninto an STL file ready to be printed'
-		    );
-	menu.addItem(
-			'Export 3D model as OBJ',
-			function() { myself.downloadOBJ() },
-			'download the currently rendered 3D model\ninto an OBJ file'
-		    );
-
-	menu.addLine();
-	menu.addItem(
-			'Libraries...',
-			function () {
-			// read a list of libraries from an external file,
-			var libMenu = new MenuMorph(this, 'Import library'),
-			libUrl = 'libraries/LIBRARIES';
-
-			function loadLib(name) {
-			var url = 'libraries/'
-			+ name
-			+ '.xml';
-			myself.droppedText(myself.getURL(url), name);
-			}
-
-			myself.getURL(libUrl).split('\n').forEach(function (line) {
-				if (line.length > 0) {
-				libMenu.addItem(
-					line.substring(line.indexOf('\t') + 1),
-					function () {
-					loadLib(
-						line.substring(0, line.indexOf('\t'))
-					       );
-					}
-					);
-				}
-				});
-
-			libMenu.popup(world, pos);
-			},
-			'Select categories of additional blocks to add to this project.'
-				);
-
-	menu.addLine();
+    menu.addItem(
+            'Export blocks...',
+            function () { myself.exportGlobalBlocks(); },
+            'show global custom block definitions as XML\nin a new browser window'
+            );
 
     if (shiftClicked) {
         menu.addItem(
-            'Cloud url...',
-            'setCloudURL',
-            null,
-            new Color(100, 0, 0)
-        );
+                'Export all scripts as pic...',
+                function () { myself.exportScriptsPicture(); },
+                'show a picture of all scripts\nand block definitions',
+                new Color(100, 0, 0)
+                );
+    }
+
+    menu.addLine();
+    menu.addItem(
+            'Export 3D model as STL',
+            function() { myself.downloadSTL() },
+            'download the currently rendered 3D model\ninto an STL file ready to be printed'
+            );
+    menu.addItem(
+            'Export 3D model as OBJ',
+            function() { myself.downloadOBJ() },
+            'download the currently rendered 3D model\ninto an OBJ file'
+            );
+
+    menu.addLine();
+    menu.addItem(
+            'Libraries...',
+            function () {
+                // read a list of libraries from an external file,
+                var libMenu = new MenuMorph(this, 'Import library'),
+        libUrl = 'libraries/LIBRARIES';
+
+    function loadLib(name) {
+        var url = 'libraries/'
+        + name
+        + '.xml';
+    myself.droppedText(myself.getURL(url), name);
+    }
+
+    myself.getURL(libUrl).split('\n').forEach(function (line) {
+        if (line.length > 0) {
+            libMenu.addItem(
+                line.substring(line.indexOf('\t') + 1),
+                function () { loadLib(line.substring(0, line.indexOf('\t'))) }
+                );
+        }
+    });
+
+    libMenu.popup(world, pos);
+            },
+            'Select categories of additional blocks to add to this project.'
+                );
+
+    menu.addLine();
+
+    if (shiftClicked) {
+        menu.addItem(
+                'Cloud url...',
+                'setCloudURL',
+                null,
+                new Color(100, 0, 0)
+                );
         menu.addLine();
     }
     if (!SnapCloud.username) {
         menu.addItem(
-            'Login...',
-            'initializeCloud'
-        );
+                'Login...',
+                'initializeCloud'
+                );
         menu.addItem(
-            'Signup...',
-            'createCloudAccount'
-        );
+                'Signup...',
+                'createCloudAccount'
+                );
         menu.addItem(
-            'Reset Password...',
-            'resetCloudPassword'
-        );
+                'Reset Password...',
+                'resetCloudPassword'
+                );
     } else {
         menu.addItem(
-            localize('Logout') + ' ' + SnapCloud.username,
-            'logout'
-        );
+                localize('Logout') + ' ' + SnapCloud.username,
+                'logout'
+                );
         menu.addItem(
-            'Change Password...',
-            'changeCloudPassword'
-        );
+                'Change Password...',
+                'changeCloudPassword'
+                );
     }
     if (shiftClicked) {
         menu.addLine();
         menu.addItem(
-            'export project media only...',
-            function () {
-                if (myself.projectName) {
-                    myself.exportProjectMedia(myself.projectName);
-                } else {
-                    myself.prompt('Export Project As...', function (name) {
-                        myself.exportProjectMedia(name);
-                    }, null, 'exportProject');
-                }
-            },
-            null,
-            this.hasChangedMedia ? new Color(100, 0, 0) : new Color(0, 100, 0)
-        );
+                'export project media only...',
+                function () {
+                    if (myself.projectName) {
+                        myself.exportProjectMedia(myself.projectName);
+                    } else {
+                        myself.prompt('Export Project As...', function (name) {
+                            myself.exportProjectMedia(name);
+                        }, null, 'exportProject');
+                    }
+                },
+                null,
+                this.hasChangedMedia ? new Color(100, 0, 0) : new Color(0, 100, 0)
+                );
         menu.addItem(
-            'export project without media...',
-            function () {
-                if (myself.projectName) {
-                    myself.exportProjectNoMedia(myself.projectName);
-                } else {
-                    myself.prompt('Export Project As...', function (name) {
-                        myself.exportProjectNoMedia(name);
-                    }, null, 'exportProject');
-                }
-            },
-            null,
-            new Color(100, 0, 0)
-        );
+                'export project without media...',
+                function () {
+                    if (myself.projectName) {
+                        myself.exportProjectNoMedia(myself.projectName);
+                    } else {
+                        myself.prompt('Export Project As...', function (name) {
+                            myself.exportProjectNoMedia(name);
+                        }, null, 'exportProject');
+                    }
+                },
+                null,
+                new Color(100, 0, 0)
+                );
         menu.addItem(
-            'export project as cloud data...',
-            function () {
-                if (myself.projectName) {
-                    myself.exportProjectAsCloudData(myself.projectName);
-                } else {
-                    myself.prompt('Export Project As...', function (name) {
-                        myself.exportProjectAsCloudData(name);
-                    }, null, 'exportProject');
-                }
-            },
-            null,
-            new Color(100, 0, 0)
-        );
+                'export project as cloud data...',
+                function () {
+                    if (myself.projectName) {
+                        myself.exportProjectAsCloudData(myself.projectName);
+                    } else {
+                        myself.prompt('Export Project As...', function (name) {
+                            myself.exportProjectAsCloudData(name);
+                        }, null, 'exportProject');
+                    }
+                },
+                null,
+                new Color(100, 0, 0)
+                );
         menu.addLine();
         menu.addItem(
-            'open shared project from cloud...',
-            function () {
-                myself.prompt('Author name…', function (usr) {
-                    myself.prompt('Project name...', function (prj) {
-                        var id = 'Username=' +
+                'open shared project from cloud...',
+                function () {
+                    myself.prompt('Author name…', function (usr) {
+                        myself.prompt('Project name...', function (prj) {
+                            var id = 'Username=' +
                             encodeURIComponent(usr.toLowerCase()) +
                             '&ProjectName=' +
                             encodeURIComponent(prj);
                         myself.showMessage(
                             'Fetching project\nfrom the cloud...'
-                        );
+                            );
                         SnapCloud.getPublicProject(
                             id,
                             function (projectData) {
@@ -263,36 +261,36 @@ IDE_Morph.prototype.projectMenu = function () {
                                 if (!Process.prototype.isCatchingErrors) {
                                     window.open(
                                         'data:text/xml,' + projectData
-                                    );
+                                        );
                                 }
                                 myself.nextSteps([
                                     function () {
                                         msg = myself.showMessage(
                                             'Opening project...'
-                                        );
+                                            );
                                     },
                                     function () {nop(); }, // yield (Chrome)
                                     function () {
                                         myself.rawOpenCloudDataString(
                                             projectData
-                                        );
+                                            );
                                     },
                                     function () {
                                         msg.destroy();
                                     }
-                                ]);
+                                    ]);
                             },
                             myself.cloudError()
-                        );
+                                );
 
+                        }, null, 'project');
                     }, null, 'project');
-                }, null, 'project');
-            },
-            null,
-            new Color(100, 0, 0)
-        );
+                },
+                null,
+                new Color(100, 0, 0)
+                    );
     }
-	menu.popup(world, pos);
+    menu.popup(world, pos);
 }
 
 IDE_Morph.prototype.settingsMenu = function () {
@@ -308,258 +306,264 @@ IDE_Morph.prototype.settingsMenu = function () {
             off = '\u2610 ';
         if (!hide || shiftClicked) {
             menu.addItem(
-                (test ? on : off) + localize(label),
-                toggle,
-                test ? onHint : offHint,
-                hide ? new Color(100, 0, 0) : null
-            );
+                    (test ? on : off) + localize(label),
+                    toggle,
+                    test ? onHint : offHint,
+                    hide ? new Color(100, 0, 0) : null
+                    );
         }
     }
 
     menu = new MenuMorph(this);
     menu.addItem('Language...', 'languageMenu');
     menu.addItem(
-        'Zoom blocks...',
-        'userSetBlocksScale'
-    );
+            'Zoom blocks...',
+            'userSetBlocksScale'
+            );
     menu.addLine();
     addPreference(
-        'Blurred shadows',
-        'toggleBlurredShadows',
-        useBlurredShadows,
-        'uncheck to use solid drop\nshadows and highlights',
-        'check to use blurred drop\nshadows and highlights',
-        true
-    );
+            'Blurred shadows',
+            'toggleBlurredShadows',
+            useBlurredShadows,
+            'uncheck to use solid drop\nshadows and highlights',
+            'check to use blurred drop\nshadows and highlights',
+            true
+            );
     addPreference(
-        'Zebra coloring',
-        'toggleZebraColoring',
-        BlockMorph.prototype.zebraContrast,
-        'uncheck to disable alternating\ncolors for nested block',
-        'check to enable alternating\ncolors for nested blocks',
-        true
-    );
+            'Zebra coloring',
+            'toggleZebraColoring',
+            BlockMorph.prototype.zebraContrast,
+            'uncheck to disable alternating\ncolors for nested block',
+            'check to enable alternating\ncolors for nested blocks',
+            true
+            );
     addPreference(
-        'Dynamic input labels',
-        'toggleDynamicInputLabels',
-        SyntaxElementMorph.prototype.dynamicInputLabels,
-        'uncheck to disable dynamic\nlabels for variadic inputs',
-        'check to enable dynamic\nlabels for variadic inputs',
-        true
-    );
+            'Dynamic input labels',
+            'toggleDynamicInputLabels',
+            SyntaxElementMorph.prototype.dynamicInputLabels,
+            'uncheck to disable dynamic\nlabels for variadic inputs',
+            'check to enable dynamic\nlabels for variadic inputs',
+            true
+            );
     addPreference(
-        'Prefer empty slot drops',
-        'togglePreferEmptySlotDrops',
-        ScriptsMorph.prototype.isPreferringEmptySlots,
-        'uncheck to allow dropped\nreporters to kick out others',
-        'settings menu prefer empty slots hint',
-        true
-    );
+            'Prefer empty slot drops',
+            'togglePreferEmptySlotDrops',
+            ScriptsMorph.prototype.isPreferringEmptySlots,
+            'uncheck to allow dropped\nreporters to kick out others',
+            'settings menu prefer empty slots hint',
+            true
+            );
     addPreference(
-        'Long form input dialog',
-        'toggleLongFormInputDialog',
-        InputSlotDialogMorph.prototype.isLaunchingExpanded,
-        'uncheck to use the input\ndialog in short form',
-        'check to always show slot\ntypes in the input dialog'
-    );
+            'Long form input dialog',
+            'toggleLongFormInputDialog',
+            InputSlotDialogMorph.prototype.isLaunchingExpanded,
+            'uncheck to use the input\ndialog in short form',
+            'check to always show slot\ntypes in the input dialog'
+            );
     addPreference(
-        'Plain prototype labels',
-        'togglePlainPrototypeLabels',
-        BlockLabelPlaceHolderMorph.prototype.plainLabel,
-        'uncheck to always show (+) symbols\nin block prototype labels',
-        'check to hide (+) symbols\nin block prototype labels'
-    );
+            'Plain prototype labels',
+            'togglePlainPrototypeLabels',
+            BlockLabelPlaceHolderMorph.prototype.plainLabel,
+            'uncheck to always show (+) symbols\nin block prototype labels',
+            'check to hide (+) symbols\nin block prototype labels'
+            );
     addPreference(
-        'Virtual keyboard',
-        'toggleVirtualKeyboard',
-        MorphicPreferences.useVirtualKeyboard,
-        'uncheck to disable\nvirtual keyboard support\nfor mobile devices',
-        'check to enable\nvirtual keyboard support\nfor mobile devices',
-        true
-    );
+            'Virtual keyboard',
+            'toggleVirtualKeyboard',
+            MorphicPreferences.useVirtualKeyboard,
+            'uncheck to disable\nvirtual keyboard support\nfor mobile devices',
+            'check to enable\nvirtual keyboard support\nfor mobile devices',
+            true
+            );
     addPreference(
-        'Input sliders',
-        'toggleInputSliders',
-        MorphicPreferences.useSliderForInput,
-        'uncheck to disable\ninput sliders for\nentry fields',
-        'check to enable\ninput sliders for\nentry fields'
-    );
+            'Input sliders',
+            'toggleInputSliders',
+            MorphicPreferences.useSliderForInput,
+            'uncheck to disable\ninput sliders for\nentry fields',
+            'check to enable\ninput sliders for\nentry fields'
+            );
     if (MorphicPreferences.useSliderForInput) {
         addPreference(
-            'Execute on slider change',
-            'toggleSliderExecute',
-            InputSlotMorph.prototype.executeOnSliderEdit,
-            'uncheck to supress\nrunning scripts\nwhen moving the slider',
-            'check to run\nthe edited script\nwhen moving the slider'
-        );
+                'Execute on slider change',
+                'toggleSliderExecute',
+                InputSlotMorph.prototype.executeOnSliderEdit,
+                'uncheck to supress\nrunning scripts\nwhen moving the slider',
+                'check to run\nthe edited script\nwhen moving the slider'
+                );
     }
     addPreference(
-        'Clicking sound',
-        function () {
-            BlockMorph.prototype.toggleSnapSound();
-            if (BlockMorph.prototype.snapSound) {
-                myself.saveSetting('click', true);
-            } else {
-                myself.removeSetting('click');
-            }
-        },
-        BlockMorph.prototype.snapSound,
-        'uncheck to turn\nblock clicking\nsound off',
-        'check to turn\nblock clicking\nsound on'
-    );
+            'Clicking sound',
+            function () {
+                BlockMorph.prototype.toggleSnapSound();
+                if (BlockMorph.prototype.snapSound) {
+                    myself.saveSetting('click', true);
+                } else {
+                    myself.removeSetting('click');
+                }
+            },
+            BlockMorph.prototype.snapSound,
+            'uncheck to turn\nblock clicking\nsound off',
+            'check to turn\nblock clicking\nsound on'
+            );
     addPreference(
-        'Animations',
-        function () {myself.isAnimating = !myself.isAnimating; },
-        myself.isAnimating,
-        'uncheck to disable\nIDE animations',
-        'check to enable\nIDE animations',
-        true
-    );
+            'Animations',
+            function () {myself.isAnimating = !myself.isAnimating; },
+            myself.isAnimating,
+            'uncheck to disable\nIDE animations',
+            'check to enable\nIDE animations',
+            true
+            );
     addPreference(
-        'Turbo mode',
-        'toggleFastTracking',
-        this.stage.isFastTracked,
-        'uncheck to run scripts\nat normal speed',
-        'check to prioritize\nscript execution'
-    );
+            'Turbo mode',
+            'toggleFastTracking',
+            this.stage.isFastTracked,
+            'uncheck to run scripts\nat normal speed',
+            'check to prioritize\nscript execution'
+            );
     menu.addLine(); // everything below this line is stored in the project
     addPreference(
-        'Thread safe scripts',
-        function () {stage.isThreadSafe = !stage.isThreadSafe; },
-        this.stage.isThreadSafe,
-        'uncheck to allow\nscript reentrance',
-        'check to disallow\nscript reentrance'
-    );
+            'Thread safe scripts',
+            function () {stage.isThreadSafe = !stage.isThreadSafe; },
+            this.stage.isThreadSafe,
+            'uncheck to allow\nscript reentrance',
+            'check to disallow\nscript reentrance'
+            );
     addPreference(
-        'Prefer smooth animations',
-        'toggleVariableFrameRate',
-        StageMorph.prototype.frameRate,
-        'uncheck for greater speed\nat variable frame rates',
-        'check for smooth, predictable\nanimations across computers'
-    );
+            'Prefer smooth animations',
+            'toggleVariableFrameRate',
+            StageMorph.prototype.frameRate,
+            'uncheck for greater speed\nat variable frame rates',
+            'check for smooth, predictable\nanimations across computers'
+            );
     addPreference(
-        'Flat line ends',
-        function () {
-            SpriteMorph.prototype.useFlatLineEnds =
-                !SpriteMorph.prototype.useFlatLineEnds;
-        },
-        SpriteMorph.prototype.useFlatLineEnds,
-        'uncheck for round ends of lines',
-        'check for flat ends of lines'
-    );
+            'Flat line ends',
+            function () {
+                SpriteMorph.prototype.useFlatLineEnds =
+        !SpriteMorph.prototype.useFlatLineEnds;
+            },
+            SpriteMorph.prototype.useFlatLineEnds,
+            'uncheck for round ends of lines',
+            'check for flat ends of lines'
+            );
     addPreference(
-        'Codification support',
-        function () {
-            StageMorph.prototype.enableCodeMapping =
-                !StageMorph.prototype.enableCodeMapping;
-            myself.currentSprite.blocksCache.variables = null;
-            myself.currentSprite.paletteCache.variables = null;
-            myself.refreshPalette();
-        },
-        StageMorph.prototype.enableCodeMapping,
-        'uncheck to disable\nblock to text mapping features',
-        'check for block\nto text mapping features',
-        false
-    );
-	menu.addLine();
-	menu.addItem(
-		'Set background color', 
-		function(){ 
-			this.pickColor(null, function(color) { 
-				stage.renderer.setClearColor('rgb(' + color.r + ',' + color.g + ',' + color.b + ')', 1);
-				stage.reRender();
-			})
-		});
-	menu.addLine();
-	menu.addItem(
-		'Set grid interval',
-		function(){
-			new DialogBoxMorph(
-		        this,
-		        function(point) { stage.scene.grid.setInterval(point) },
-		        this
-		    ).promptVector(
-		        'Grid intervals',
-		        stage.scene.grid.interval, // current
-		        new Point(1, 1), // default
-		        'x interval',
-		        'y interval',
-		        this.world(),
-		        null, // pic
-		        null // msg
-		    );
-		});
-	menu.addItem(
-		'Set grid color', 
-		function(){ 
-			this.pickColor(null, function(color) { 
-				stage.scene.grid.setColor('0x' + color.r.toString(16) + color.g.toString(16) + color.b.toString(16));
-				stage.reRender();
-			})
-		});
-    menu.popup(world, pos);
+            'Codification support',
+            function () {
+                StageMorph.prototype.enableCodeMapping =
+        !StageMorph.prototype.enableCodeMapping;
+    myself.currentSprite.blocksCache.variables = null;
+    myself.currentSprite.paletteCache.variables = null;
+    myself.refreshPalette();
+            },
+            StageMorph.prototype.enableCodeMapping,
+            'uncheck to disable\nblock to text mapping features',
+            'check for block\nto text mapping features',
+            false
+            );
+    menu.addLine();
+    menu.addItem(
+            'Set background color', 
+            function(){ 
+                this.pickColor(null, function(color) { 
+                    stage.renderer.setClearColor('rgb(' + color.r + ',' + color.g + ',' + color.b + ')', 1);
+                        stage.reRender();
+                        })
+                    });
+                menu.addLine();
+                menu.addItem(
+                    'Set grid interval',
+                    function(){
+                        new DialogBoxMorph(
+                            this,
+                            function(point) { stage.scene.grid.setInterval(point) },
+                            this
+                            ).promptVector(
+                                'Grid intervals',
+                                stage.scene.grid.interval, // current
+                                new Point(1, 1), // default
+                                'x interval',
+                                'y interval',
+                                this.world(),
+                                null, // pic
+                                null // msg
+                                );
+                    });
+                menu.addItem(
+                        'Set grid color', 
+                        function(){ 
+                            this.pickColor(null, function(color) { 
+                                stage.scene.grid.setColor('0x' + color.r.toString(16) + color.g.toString(16) + color.b.toString(16));
+                                stage.reRender();
+                            })
+                        });
+                menu.popup(world, pos);
 };
 
 // STL export
 IDE_Morph.prototype.downloadSTL = function() {
-	var exporter = new THREE.STLExporter(),
-		stlString = exporter.exportScene(this.stage.scene);
-		blob = new Blob([stlString], {type: 'text/plain;charset=utf-8'});
+    var exporter = new THREE.STLExporter(),
+        stlString = exporter.exportScene(this.stage.scene),
+        blob = new Blob([stlString], {type: 'text/plain;charset=utf-8'});
 
-	saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_export') + '.stl'); 
+    saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_export') + '.stl'); 
 }
 
 // OBJ export
 IDE_Morph.prototype.downloadOBJ = function() {
-	var exporter = new THREE.OBJExporter(),
-		scene = copy(this.stage.scene),
-		objString, 
-		blob;
+    var exporter = new THREE.OBJExporter(),
+        scene = copy(this.stage.scene),
+        objString, 
+        blob;
 
-	scene.children = scene.children.filter(function(each) { return each.name != 'beetle' });
-	objString = exporter.parse(scene);
-	blob = new Blob([objString], {type: 'text/plain;charset=utf-8'});
+    scene.children = scene.children.filter(function(each) { return each.name != 'beetle' });
+    objString = exporter.parse(scene);
+    blob = new Blob([objString], {type: 'text/plain;charset=utf-8'});
 
-	saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_export') + '.obj'); 
+    saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_export') + '.obj'); 
 }
 
 // IDE_Morph.prototype.createControlBar proxy
 IDE_Morph.prototype.originalCreateControlBar = IDE_Morph.prototype.createControlBar;
 IDE_Morph.prototype.createControlBar = function () {
-	this.originalCreateControlBar();
+    this.originalCreateControlBar();
 
-	this.controlBar.cloudButton.destroy();
+    var myself = this;
 
-	this.controlBar.originalFixLayout = this.controlBar.fixLayout;
-	this.controlBar.fixLayout = function () {
-		this.originalFixLayout();
-		this.projectButton.setLeft(this.projectButton.left() + 6);
-		this.settingsButton.setLeft(this.projectButton.right() + 5);
-		this.updateLabel();
-	};
+    this.controlBar.cloudButton.destroy();
+
+    this.controlBar.stageSizeButton.labelString = new SymbolMorph('normalStage', 14);
+    this.controlBar.stageSizeButton.query = function(){};
+
+    this.controlBar.originalFixLayout = this.controlBar.fixLayout;
+    this.controlBar.fixLayout = function () {
+        this.originalFixLayout();
+        this.projectButton.setLeft(this.projectButton.left() + 6);
+        this.settingsButton.setLeft(this.projectButton.right() + 5);
+        this.updateLabel();
+    };
 }
 
 IDE_Morph.prototype.originalSetStageExtent = IDE_Morph.prototype.setStageExtent;
 IDE_Morph.prototype.setStageExtent = function (aPoint) {
-	this.originalSetStageExtent(aPoint);
-	this.stage.renderer.setSize(aPoint.x, aPoint.y);
-	this.stage.reRender();
+    this.originalSetStageExtent(aPoint);
+    this.stage.renderer.setSize(aPoint.x, aPoint.y);
+    this.stage.reRender();
 }
 
-// Examples now pulls from local. We need to override, proxying is too complex in this case
+// Examples now pulls from local
 ProjectDialogMorph.prototype.getExamplesProjectList = function () {
     var dir,
         projects = [];
+
     dir = JSON.parse(this.ide.getURL('https://api.github.com/repos/ericrosenbaum/BeetleBlocks/contents/beetleblocks/examples'));
-	dir.forEach(function(each){
-		var dta = {
-			name: each.name.replace('.xml',''),
-			thumb: null,
-			notes: null,
-			path: each.path
-		};
-		projects.push(dta)
-	})
+    dir.forEach(function(each){
+        var dta = {
+            name: each.name.replace('.xml',''),
+        thumb: null,
+        notes: null,
+        path: each.path
+        };
+        projects.push(dta)
+    })
     projects.sort(function (x, y) {
         return x.name < y.name ? -1 : 1;
     });
@@ -575,38 +579,38 @@ ProjectDialogMorph.prototype.setSource = function (source) {
         button.refresh();
     });
     switch (this.source) {
-    case 'cloud':
-        msg = myself.ide.showMessage('Updating\nproject list...');
-        this.projectList = [];
-        SnapCloud.getProjectList(
-            function (projectList) {
-                myself.installCloudProjectList(projectList);
-                msg.destroy();
-            },
-            function (err, lbl) {
-                msg.destroy();
-                myself.ide.cloudError().call(null, err, lbl);
-            }
-        );
-        return;
-    case 'examples':
-        this.projectList = this.getExamplesProjectList();
-        break;
-    case 'local':
-        this.projectList = this.getLocalProjectList();
-        break;
+        case 'cloud':
+            msg = myself.ide.showMessage('Updating\nproject list...');
+            this.projectList = [];
+            SnapCloud.getProjectList(
+                    function (projectList) {
+                        myself.installCloudProjectList(projectList);
+                        msg.destroy();
+                    },
+                    function (err, lbl) {
+                        msg.destroy();
+                        myself.ide.cloudError().call(null, err, lbl);
+                    }
+                    );
+            return;
+        case 'examples':
+            this.projectList = this.getExamplesProjectList();
+            break;
+        case 'local':
+            this.projectList = this.getLocalProjectList();
+            break;
     }
 
     this.listField.destroy();
     this.listField = new ListMorph(
-        this.projectList,
-        this.projectList.length > 0 ?
-                function (element) {
-                    return element.name;
-                } : null,
-        null,
-        function () {myself.ok(); }
-    );
+            this.projectList,
+            this.projectList.length > 0 ?
+            function (element) {
+                return element.name;
+            } : null,
+            null,
+            function () {myself.ok(); }
+            );
 
     this.fixListFieldItemColors();
     this.listField.fixLayout = nop;
@@ -682,10 +686,10 @@ ProjectDialogMorph.prototype.openProject = function () {
     var myself = this;
 
     this.ide.confirm(
-        'All unsaved changes will be lost.\nContinue loading this project?',
-        'Load Project',
-        function () { doOpenProject() }
-    );
+            'All unsaved changes will be lost.\nContinue loading this project?',
+            'Load Project',
+            function () { doOpenProject() }
+            );
 
     function doOpenProject() {
         var proj = myself.listField.selected,
@@ -707,14 +711,14 @@ ProjectDialogMorph.prototype.openProject = function () {
 
 IDE_Morph.prototype.originalRawOpenProjectString = IDE_Morph.prototype.rawOpenProjectString;
 IDE_Morph.prototype.rawOpenProjectString = function (str) {
-	this.originalRawOpenProjectString(str);
-	this.createStatusDisplay();
+    this.originalRawOpenProjectString(str);
+    this.createStatusDisplay();
 }
 
 IDE_Morph.prototype.originalRawOpenCloudDataString = IDE_Morph.prototype.rawOpenCloudDataString;
 IDE_Morph.prototype.rawOpenCloudDataString = function (str) {
-	this.originalRawOpenCloudDataString(str);
-	this.createStatusDisplay();
+    this.originalRawOpenCloudDataString(str);
+    this.createStatusDisplay();
 }
 
 // Single Morph mode, no corral and no tabs in the scripting area
@@ -736,7 +740,7 @@ IDE_Morph.prototype.fixLayout = function (situation) {
         this.controlBar.fixLayout();
 
         // categories
-		this.categories.padding = this.padding;
+        this.categories.padding = this.padding;
         this.categories.setLeft(this.logo.left());
         this.categories.setTop(this.logo.bottom());
     }
@@ -750,10 +754,10 @@ IDE_Morph.prototype.fixLayout = function (situation) {
         // stage
         if (this.isAppMode) {
             this.stage.setScale(Math.floor(Math.min(
-                (this.width() - padding * 2) / this.stage.dimensions.x,
-                (this.height() - this.controlBar.height() * 2 - padding * 2)
-                    / this.stage.dimensions.y
-            ) * 10) / 10);
+                            (this.width() - padding * 2) / this.stage.dimensions.x,
+                            (this.height() - this.controlBar.height() * 2 - padding * 2)
+                            / this.stage.dimensions.y
+                            ) * 10) / 10);
             this.stage.setCenter(this.center());
         } else {
             this.stage.setScale(this.isSmallStage ? this.stageRatio : 1);
@@ -765,9 +769,9 @@ IDE_Morph.prototype.fixLayout = function (situation) {
         if (this.spriteEditor.isVisible) {
             this.spriteEditor.setPosition(this.categories.topRight().add(new Point(padding, padding - 1)));
             this.spriteEditor.setExtent(new Point(
-                Math.max(0, this.stage.left() - padding - this.spriteEditor.left()),
-                this.bottom() - this.categories.top()
-            ));
+                        Math.max(0, this.stage.left() - padding - this.spriteEditor.left()),
+                        this.bottom() - this.categories.top()
+                        ));
             this.spriteEditor.fixLayout();
         }
 
@@ -787,7 +791,7 @@ IDE_Morph.prototype.buildPanes = function () {
     this.createSpriteEditor();
     // It's easier to make a bogus spriteBar object than to remove all references to it
     this.spriteBar = { 
-	tabBar: { 
+        tabBar: { 
             tabTo: nop
         }
     };
@@ -812,9 +816,9 @@ IDE_Morph.prototype.createSpriteEditor = function () {
         minusButton.setLeft(this.left() + this.width() - minusButton.width() - padding);
         minusButton.setTop(this.top() + padding);
         equalButton.setLeft(minusButton.left() - equalButton.width() - padding)
-        equalButton.setTop(this.top() + padding);
+            equalButton.setTop(this.top() + padding);
         plusButton.setLeft(equalButton.left() - plusButton.width() - padding)
-        plusButton.setTop(this.top() + padding);
+            plusButton.setTop(this.top() + padding);
 
         minusButton.fixLayout();
         equalButton.fixLayout();
@@ -838,18 +842,18 @@ IDE_Morph.prototype.resetBlocksScale = function() {
 
 IDE_Morph.prototype.originalCreatePalette = IDE_Morph.prototype.createPalette;
 IDE_Morph.prototype.createPalette = function(){
-	this.originalCreatePalette();
-	this.palette.color = new Color(230, 230, 230);
+    this.originalCreatePalette();
+    this.palette.color = new Color(230, 230, 230);
 }
 
 
 IDE_Morph.prototype.createStatusDisplay = function () {
     var frame,
-	padding = 1,
-	myself = this,
-	elements = [],
-	beetle = this.currentSprite.beetle,
-	stage = this.stage;
+        padding = 1,
+        myself = this,
+        elements = [],
+        beetle = this.currentSprite.beetle,
+        stage = this.stage;
 
     if (this.statusDisplay) {
         this.statusDisplay.destroy();
@@ -871,11 +875,11 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     this.statusDisplay.fixLayout = function () {
         this.setLeft(myself.stage.left());
         this.setTop(myself.stage.bottom() + padding);
-		this.setWidth(myself.stage.width());
-		this.setHeight(myself.height() - myself.stage.height() - myself.controlBar.height() - padding);
-		this.frame.setExtent(this.extent());
+        this.setWidth(myself.stage.width());
+        this.setHeight(myself.height() - myself.stage.height() - myself.controlBar.height() - padding);
+        this.frame.setExtent(this.extent());
         this.arrangeContents()
-        this.refresh();
+            this.refresh();
     };
 
     this.statusDisplay.arrangeContents = function () {
@@ -886,23 +890,23 @@ IDE_Morph.prototype.createStatusDisplay = function () {
             middle = (max - start) / 2 + start;
 
         this.frame.contents.children.forEach(function (element) {
-			element.setPosition(new Point(x, y));
+            element.setPosition(new Point(x, y));
             x += element.width();
 
-			if (element instanceof ToggleMorph) { x+= element.label.width() + 2 };
+            if (element instanceof ToggleMorph) { x+= element.label.width() + 2 };
 
             if (element.newLines) {
-				y += 14 * element.newLines;
-				x = start;
+                y += 14 * element.newLines;
+                x = start;
             };
 
             if (element.newColumn) {
-				if (element.columns) {
-					x = ((max - start) / element.columns) * element.newColumn + start;
-				} else {
-					x = middle;
-				}
-			};
+                if (element.columns) {
+                    x = ((max - start) / element.columns) * element.newColumn + start;
+                } else {
+                    x = middle;
+                }
+            };
         });
 
         this.frame.contents.adjustBounds();
@@ -910,11 +914,11 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 
     this.statusDisplay.addElement = function (element) {
 
-	if (typeof element == 'string') {
-	    element = new StringMorph(localize(element), 12, null, true);
-	};
+        if (typeof element == 'string') {
+            element = new StringMorph(localize(element), 12, null, true);
+        };
 
-	this.frame.contents.add(element);
+        this.frame.contents.add(element);
         this.fixLayout();
     };
 
@@ -933,221 +937,211 @@ IDE_Morph.prototype.createStatusDisplay = function () {
         return false;
     };
 
-	this.statusDisplay.watchers = function (leftPos) {
-	/*
-	    answer an array of all currently visible watchers.
-	    If leftPos is specified, filter the list for all
-	    shown or hidden watchers whose left side equals
-	    the given border (for automatic positioning)
-	*/
-		return this.children.filter(function (morph) {
-			if (morph instanceof WatcherMorph) {
-				if (leftPos) {
-					return morph.left() === leftPos;
-				}
-				return morph.isVisible;
-			}
-			return false;
-		});
-	};
+    this.statusDisplay.watchers = function (leftPos) {
+        /* answer an array of all currently visible watchers.
+           If leftPos is specified, filter the list for all
+           shown or hidden watchers whose left side equals
+           the given border (for automatic positioning) */
 
-	this.statusDisplay.step = function() {
-		// update watchers
-    	current = Date.now();
-    	elapsed = current - this.lastWatcherUpdate;
-    	leftover = (1000 / this.watcherUpdateFrequency) - elapsed;
-    	if (leftover < 1) {
-    	    this.watchers().forEach(function (w) {
-    	        w.update();
-    	    });
-    	this.lastWatcherUpdate = Date.now();
-    	}
-	}
-
-	this.statusDisplay.lastWatcherUpdate = Date.now();
-	this.statusDisplay.watcherUpdateFrequency = 250;
-
-	// Buttons and toggles
-
-	var resetCameraButton = new PushButtonMorph(
-		null,
-		function() { stage.camera.reset() },
-		'Reset Camera'
-		);
-	resetCameraButton.columns = 3;
-	resetCameraButton.newColumn = 1;
-	elements.push(resetCameraButton);
-
-	var toggleWireframeButton = new ToggleMorph(
-		'checkbox',
-		null,
-		function () {
-			stage.renderer.toggleWireframe();
-		},
-		'Wireframe',
-		function () {
-			return stage.renderer.isWireframeMode
+        return this.children.filter(function (morph) {
+            if (morph instanceof WatcherMorph) {
+                if (leftPos) {
+                    return morph.left() === leftPos;
+                }
+                return morph.isVisible;
+            }
+            return false;
         });
-	toggleWireframeButton.columns = 3;
-	toggleWireframeButton.newColumn = 2;
-	elements.push(toggleWireframeButton);
+    };
 
-	var toggleBeetleButton = new ToggleMorph(
-		'checkbox',
-		null,
-		function () {
-			beetle.toggleVisibility();
-		},
-		'Beetle',
-		function () {
-			return beetle.shape.visible;
+    this.statusDisplay.step = function() {
+        // update watchers
+        current = Date.now();
+        elapsed = current - this.lastWatcherUpdate;
+        leftover = (1000 / this.watcherUpdateFrequency) - elapsed;
+        if (leftover < 1) {
+            this.watchers().forEach(function (w) {
+                w.update();
+            });
+            this.lastWatcherUpdate = Date.now();
         }
+    }
 
-	);
-	toggleBeetleButton.newLines = 2;
-	elements.push(toggleBeetleButton);
+    this.statusDisplay.lastWatcherUpdate = Date.now();
+    this.statusDisplay.watcherUpdateFrequency = 250;
 
-	var fitCameraButton = new PushButtonMorph(
-		null,
-		function() { stage.camera.fitScene() },
-		'Zoom to fit'
-		);
-	fitCameraButton.columns = 3;
-	fitCameraButton.newColumn = 1;
-	elements.push(fitCameraButton);
-	
-	var toggleParallelProjectionButton = new ToggleMorph(
-		'checkbox',
-		null,
-		function () {
-			stage.renderer.toggleParallelProjection();
-		},
-		'Parallel projection',
-		function () {
-			return stage.renderer.isParallelProjection
-        });
-	toggleParallelProjectionButton.columns = 3;
-	toggleParallelProjectionButton.newColumn = 2;
-	elements.push(toggleParallelProjectionButton);
+    // Buttons and toggles
 
-	var toggleAxesButton = new ToggleMorph(
-		'checkbox',
-		null,
-		function () {
-			stage.renderer.toggleAxes();
-		},
-		'Axes',
-		function () {
-			return stage.renderer.showingAxes;
-        });
-	toggleAxesButton.newLines = 2;
-	elements.push(toggleAxesButton);
+    var resetCameraButton = new PushButtonMorph(
+            null,
+            function() { stage.camera.reset() },
+            'Reset Camera'
+            );
+    resetCameraButton.columns = 3;
+    resetCameraButton.newColumn = 1;
+    elements.push(resetCameraButton);
 
-	var space = new Morph();
-	space.alpha = 0;
-	space.columns = 3;
-	space.newColumn = 1;
+    var toggleWireframeButton = new ToggleMorph(
+            'checkbox',
+            null,
+            function () {
+                stage.renderer.toggleWireframe();
+            },
+            'Wireframe',
+            function () {
+                return stage.renderer.isWireframeMode
+            });
+    toggleWireframeButton.columns = 3;
+    toggleWireframeButton.newColumn = 2;
+    elements.push(toggleWireframeButton);
 
-	elements.push(space);
+    var toggleBeetleButton = new ToggleMorph(
+            'checkbox',
+            null,
+            function () {
+                beetle.toggleVisibility();
+            },
+            'Beetle',
+            function () {
+                return beetle.shape.visible;
+            }
 
-	var toggleTurboButton = new ToggleMorph(
-		'checkbox',
-		null,
-		function () {
-			myself.toggleFastTracking();
-		},
-		'Turbo mode',
-		function () {
-        	return stage.isFastTracked
-        });
-	toggleTurboButton.columns = 3;
-	toggleTurboButton.newColumn = 2;
-	elements.push(toggleTurboButton);
+            );
+    toggleBeetleButton.newLines = 2;
+    elements.push(toggleBeetleButton);
 
-	var toggleGridButton = new ToggleMorph(
-		'checkbox',
-		null,
-		function () {
-			stage.scene.grid.toggle();
-		},
-		'Grid',
-		function () {
-			return stage.scene.grid.visible
-        });
-	toggleGridButton.newLines = 2;
-	elements.push(toggleGridButton);
+    var fitCameraButton = new PushButtonMorph(
+            null,
+            function() { stage.camera.fitScene() },
+            'Zoom to fit'
+            );
+    fitCameraButton.columns = 3;
+    fitCameraButton.newColumn = 1;
+    elements.push(fitCameraButton);
 
-	// It should be done like this, so it also updates if we toggle visibility from somewhere else...
-	// For some reason this doesn't work
+    var toggleParallelProjectionButton = new ToggleMorph(
+            'checkbox',
+            null,
+            function () {
+                stage.renderer.toggleParallelProjection();
+            },
+            'Parallel projection',
+            function () {
+                return stage.renderer.isParallelProjection
+            });
+    toggleParallelProjectionButton.columns = 3;
+    toggleParallelProjectionButton.newColumn = 2;
+    elements.push(toggleParallelProjectionButton);
 
-	/*
-	element.update = function() {
-		this.labelString = (beetle.shape.visible ? 'Hide' : 'Show') + ' beetle';
-	};
-	*/
+    var toggleAxesButton = new ToggleMorph(
+            'checkbox',
+            null,
+            function () {
+                stage.renderer.toggleAxes();
+            },
+            'Axes',
+            function () {
+                return stage.renderer.showingAxes;
+            });
+    toggleAxesButton.newLines = 2;
+    elements.push(toggleAxesButton);
 
-	// Status watchers
+    var space = new Morph();
+    space.alpha = 0;
+    space.columns = 3;
+    space.newColumn = 1;
 
-	elements.push('Position: ');
-	element = new StringMorph();
-	element.update = function() {
-		this.text = 'x: ' + beetle.position.z.toFixed(2).toString().replace('.00','') 
-					+ ', y: ' + beetle.position.x.toFixed(2).toString().replace('.00','') 
-					+ ', z: ' + beetle.position.y.toFixed(2).toString().replace('.00','')
-	};
-	element.newColumn = true;
-	elements.push(element);
+    elements.push(space);
 
-	elements.push('Color: ');
-	element = new Morph();
-	element.update = function() {
-		this.setColor(new Color(beetle.color.r * 255, beetle.color.g * 255, beetle.color.b * 255));
-	}
-	element.setWidth(30);
-	element.setHeight(12);
-	element.newLines = 1.5;
-	elements.push(element);
+    var toggleTurboButton = new ToggleMorph(
+            'checkbox',
+            null,
+            function () {
+                myself.toggleFastTracking();
+            },
+            'Turbo mode',
+            function () {
+                return stage.isFastTracked
+            });
+    toggleTurboButton.columns = 3;
+    toggleTurboButton.newColumn = 2;
+    elements.push(toggleTurboButton);
 
-	elements.push('Rotation: ');
-	element = new StringMorph();
-	element.update = function() {
-		this.text = 'x:' + degrees(beetle.rotation.z * -1).toFixed(2).toString().replace('.00','')
-					+ ', y: ' + degrees(beetle.rotation.x * -1).toFixed(2).toString().replace('.00','')
-					+ ', z: ' + degrees(beetle.rotation.y).toFixed(2).toString().replace('.00','')
-	};
-	element.newColumn = true;
-	elements.push(element);
+    var toggleGridButton = new ToggleMorph(
+            'checkbox',
+            null,
+            function () {
+                stage.scene.grid.toggle();
+            },
+            'Grid',
+            function () {
+                return stage.scene.grid.visible
+            });
+    toggleGridButton.newLines = 2;
+    elements.push(toggleGridButton);
 
-	elements.push('HSL: ');
-	element = new StringMorph();
-	element.update = function() {
-		this.text = beetle.color.state.h.toFixed(2).toString().replace('.00','') + ', ' 
-					+ beetle.color.state.s.toFixed(2).toString().replace('.00','') + ', ' 
-					+ beetle.color.state.l.toFixed(2).toString().replace('.00','')
-   	};
-	element.newLines = 1.5;
-	elements.push(element);
+    // Status watchers
 
-	elements.push('Scale: ');
-	element = new StringMorph();
-	element.update = function() {
-		this.text = beetle.multiplierScale.toString() 
-					+ ' (' + (beetle.multiplierScale * 100).toString() + '%)'
-	}
-	element.newColumn = true;
-	elements.push(element);
+    elements.push('Position: ');
+    element = new StringMorph();
+    element.update = function() {
+        this.text = 'x: ' + beetle.position.z.toFixed(2).toString().replace('.00','') 
+            + ', y: ' + beetle.position.x.toFixed(2).toString().replace('.00','') 
+            + ', z: ' + beetle.position.y.toFixed(2).toString().replace('.00','')
+    };
+    element.newColumn = true;
+    elements.push(element);
 
-	elements.push('Opacity: ');
-	element = new StringMorph();
-	element.update = function() {
-		this.text = (beetle.shape.material.opacity * 100).toFixed(2).toString().replace('.00','') + '%'
-	}
-	element.newLines = 1.5;
-	elements.push(element);
-	
-	// Add all contents
+    elements.push('Color: ');
+    element = new Morph();
+    element.update = function() {
+        this.setColor(new Color(beetle.color.r * 255, beetle.color.g * 255, beetle.color.b * 255));
+    }
+    element.setWidth(30);
+    element.setHeight(12);
+    element.newLines = 1.5;
+    elements.push(element);
 
-	elements.forEach(function(each) { myself.statusDisplay.addElement(each) });
+    elements.push('Rotation: ');
+    element = new StringMorph();
+    element.update = function() {
+        this.text = 'x:' + degrees(beetle.rotation.z * -1).toFixed(2).toString().replace('.00','')
+            + ', y: ' + degrees(beetle.rotation.x * -1).toFixed(2).toString().replace('.00','')
+            + ', z: ' + degrees(beetle.rotation.y).toFixed(2).toString().replace('.00','')
+    };
+    element.newColumn = true;
+    elements.push(element);
+
+    elements.push('HSL: ');
+    element = new StringMorph();
+    element.update = function() {
+        this.text = beetle.color.state.h.toFixed(2).toString().replace('.00','') + ', ' 
+            + beetle.color.state.s.toFixed(2).toString().replace('.00','') + ', ' 
+            + beetle.color.state.l.toFixed(2).toString().replace('.00','')
+    };
+    element.newLines = 1.5;
+    elements.push(element);
+
+    elements.push('Scale: ');
+    element = new StringMorph();
+    element.update = function() {
+        this.text = beetle.multiplierScale.toString() 
+            + ' (' + (beetle.multiplierScale * 100).toString() + '%)'
+    }
+    element.newColumn = true;
+    elements.push(element);
+
+    elements.push('Opacity: ');
+    element = new StringMorph();
+    element.update = function() {
+        this.text = (beetle.shape.material.opacity * 100).toFixed(2).toString().replace('.00','') + '%'
+    }
+    element.newLines = 1.5;
+    elements.push(element);
+
+    // Add all contents
+
+    elements.forEach(function(each) { myself.statusDisplay.addElement(each) });
 };
 
 IDE_Morph.prototype.selectSprite = function (sprite) {
@@ -1161,15 +1155,14 @@ IDE_Morph.prototype.selectSprite = function (sprite) {
 IDE_Morph.prototype.toggleAppMode = function (appMode) {
     var world = this.world(),
         elements = [
-            this.logo,
-            this.controlBar.projectButton,
-            this.controlBar.settingsButton,
-            this.controlBar.stageSizeButton,
-            this.spriteEditor,
-            this.palette,
-			this.statusDisplay,
-            this.categories
-        ];
+                this.logo,
+                this.controlBar.projectButton,
+                this.controlBar.settingsButton,
+                this.controlBar.stageSizeButton,
+                this.spriteEditor,
+                this.palette,
+                this.statusDisplay,
+                this.categories ];
 
     this.isAppMode = isNil(appMode) ? !this.isAppMode : appMode;
 
@@ -1212,32 +1205,32 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
 // Addressing #54: Stage occasionally goes blank
 IDE_Morph.prototype.originalRefreshPalette = IDE_Morph.prototype.refreshPalette;
 IDE_Morph.prototype.refreshPalette = function (shouldIgnorePosition) {
-	this.originalRefreshPalette(shouldIgnorePosition);
-	this.stage.reRender();
+    this.originalRefreshPalette(shouldIgnorePosition);
+    this.stage.reRender();
 };
 
 // Language
 
 IDE_Morph.prototype.originalSetLanguage = IDE_Morph.prototype.setLanguage;
 IDE_Morph.prototype.setLanguage = function(lang, callback) {
-		var myself = this;
+    var myself = this;
 
-		myself.originalSetLanguage(lang, function() {
-				var translation = document.getElementById('bb-language'),
-				src = 'beetleblocks/lang-' + lang + '.js',
-				myInnerSelf = this;
-		if (translation) {
-				document.head.removeChild(translation);
-		}
-		if (lang === 'en') {
-				return this.reflectLanguage('en', callback);
-		}
-		translation = document.createElement('script');
-		translation.id = 'bb-language';
-		translation.onload = function () {
-				myInnerSelf.reflectLanguage(lang, callback);
-		};
-		document.head.appendChild(translation);
-		translation.src = src; 
-		});
+    myself.originalSetLanguage(lang, function() {
+        var translation = document.getElementById('bb-language'),
+        src = 'beetleblocks/lang-' + lang + '.js',
+        myInnerSelf = this;
+    if (translation) {
+        document.head.removeChild(translation);
+    }
+    if (lang === 'en') {
+        return this.reflectLanguage('en', callback);
+    }
+    translation = document.createElement('script');
+    translation.id = 'bb-language';
+    translation.onload = function () {
+        myInnerSelf.reflectLanguage(lang, callback);
+    };
+    document.head.appendChild(translation);
+    translation.src = src; 
+    });
 };

@@ -101,12 +101,14 @@ CSlotMorph.prototype.fixLayout = function () {
     }
 };
 
+// SymbolMorph icons
+
 // Camera SymbolMorph
 // Not used anymore, but I'm keeping it here as documentation
 // in case we need to add new symbols in the future
 
-/*
 
+/*
 SymbolMorph.prototype.names.push('camera');
 
 SymbolMorph.prototype.originalSymbolCanvasColored = SymbolMorph.prototype.symbolCanvasColored;
@@ -139,8 +141,69 @@ SymbolMorph.prototype.drawSymbolCamera = function (canvas, color) {
 
     return canvas;
 };
-
 */
+
+SymbolMorph.prototype.names.push('largeStage');
+
+SymbolMorph.prototype.originalSymbolCanvasColored = SymbolMorph.prototype.symbolCanvasColored;
+SymbolMorph.prototype.symbolCanvasColored = function (aColor) {
+    if (this.name == 'largeStage') {
+        return this.drawSymbolLargeStage(newCanvas(new Point(this.symbolWidth(), this.size)), aColor);
+    } else {
+        return this.originalSymbolCanvasColored(aColor)
+    }
+}
+
+SymbolMorph.prototype.drawSymbolLargeStage = function (canvas, color) {
+    var ctx = canvas.getContext('2d'),
+        w = canvas.width,
+        h = canvas.height,
+        w2 = w * 1 / 3,
+        h2 = h * 2 / 3;
+
+    ctx.strokeStyle = color.toString();
+    ctx.lineWidth = Math.round(w/8);
+    ctx.rect(0, 0, w, h);
+    ctx.stroke();
+    ctx.rect(w2, 0, w, h2);
+    ctx.stroke();
+
+    return canvas;
+};
+
+SymbolMorph.prototype.drawSymbolNormalStage = function (canvas, color) {
+    var ctx = canvas.getContext('2d'),
+        w = canvas.width,
+        h = canvas.height,
+        w2 = w / 2,
+        h2 = h / 2;
+
+    ctx.strokeStyle = color.toString();
+    ctx.lineWidth = Math.round(w/8);
+    ctx.rect(0, 0, w, h);
+    ctx.stroke();
+    ctx.rect(w2, 0, w2, h2);
+    ctx.stroke();
+
+    return canvas;
+};
+
+SymbolMorph.prototype.drawSymbolSmallStage = function (canvas, color) {
+    var ctx = canvas.getContext('2d'),
+        w = canvas.width,
+        h = canvas.height,
+        w2 = w * 2 / 3,
+        h2 = h * 1 / 3;
+
+    ctx.strokeStyle = color.toString();
+    ctx.lineWidth = Math.round(w/8);
+    ctx.rect(0, 0, w, h);
+    ctx.stroke();
+    ctx.rect(w2, 0, w2, h2);
+    ctx.stroke();
+
+    return canvas;
+};
 
 SymbolMorph.prototype.originalSymbolWidth = SymbolMorph.prototype.symbolWidth;
 SymbolMorph.prototype.symbolWidth = function () {
