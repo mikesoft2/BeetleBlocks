@@ -525,22 +525,121 @@ IDE_Morph.prototype.downloadOBJ = function() {
 IDE_Morph.prototype.originalCreateControlBar = IDE_Morph.prototype.createControlBar;
 IDE_Morph.prototype.createControlBar = function () {
     this.originalCreateControlBar();
+    colors = [
+        this.controlBar.stageSizeButton.color, 
+        this.controlBar.stageSizeButton.labelShadowColor, 
+        this.controlBar.stageSizeButton.pressColor
+    ];
 
     var myself = this;
 
     this.controlBar.cloudButton.destroy();
 
     this.controlBar.stageSizeButton.labelString = new SymbolMorph('normalStage', 14);
+    this.controlBar.stageSizeButton.action = 'setSmallStageSize';
     this.controlBar.stageSizeButton.query = function(){};
+
+    button = new ToggleButtonMorph(
+        null, //colors,
+        myself, // the IDE is the target
+        'setLargeStageSize',
+        new SymbolMorph('largeStage', 14)
+    );
+    button.corner = 12;
+    button.color = colors[0];
+    button.highlightColor = colors[1];
+    button.pressColor = colors[2];
+    button.labelMinExtent = new Point(36, 18);
+    button.padding = 0;
+    button.labelShadowOffset = new Point(-1, -1);
+    button.labelShadowColor = colors[1];
+    button.labelColor = this.buttonLabelColor;
+    button.query = function(){};
+    button.contrast = this.buttonContrast;
+    button.drawNew();
+    button.fixLayout();
+    button.refresh();
+    largeStageSizeButton = button;
+    this.controlBar.add(largeStageSizeButton);
+    this.controlBar.largeStageSizeButton = button; // for refreshing
+
+    button = new ToggleButtonMorph(
+        null, //colors,
+        myself, // the IDE is the target
+        'setNormalStageSize',
+        new SymbolMorph('normalStage', 14)
+    );
+    button.corner = 12;
+    button.color = colors[0];
+    button.highlightColor = colors[1];
+    button.pressColor = colors[2];
+    button.labelMinExtent = new Point(36, 18);
+    button.padding = 0;
+    button.labelShadowOffset = new Point(-1, -1);
+    button.labelShadowColor = colors[1];
+    button.labelColor = this.buttonLabelColor;
+    button.query = function(){};
+    button.contrast = this.buttonContrast;
+    button.drawNew();
+    button.fixLayout();
+    button.refresh();
+    normalStageSizeButton = button;
+    this.controlBar.add(normalStageSizeButton);
+    this.controlBar.normalStageSizeButton = button; // for refreshing
 
     this.controlBar.originalFixLayout = this.controlBar.fixLayout;
     this.controlBar.fixLayout = function () {
         this.originalFixLayout();
+
         this.projectButton.setLeft(this.projectButton.left() + 6);
         this.settingsButton.setLeft(this.projectButton.right() + 5);
+
+        this.largeStageSizeButton.setTop(this.stageSizeButton.top());
+        this.largeStageSizeButton.setLeft(this.stageSizeButton.left() - 6);
+
+        this.normalStageSizeButton.setTop(this.stageSizeButton.top());
+        this.normalStageSizeButton.setLeft(this.largeStageSizeButton.right() + 5);
+        
+        this.stageSizeButton.setLeft(this.normalStageSizeButton.right() + 5);
+        this.appModeButton.setLeft(this.stageSizeButton.right() + 5);
+
         this.updateLabel();
     };
 }
+
+IDE_Morph.prototype.setLargeStageSize = function () {
+    this.setStageSize(1.5);
+}
+IDE_Morph.prototype.setNormalStageSize = function () {
+    this.setStageSize(1);
+}
+
+IDE_Morph.prototype.setSmallStageSize = function () {
+    this.setStageSize(0.5);
+}
+
+IDE_Morph.prototype.setStageSize = function (value) {
+    var myself = this,
+        world = this.world(),
+        ratio = value,
+        shiftClicked = (world.currentKey === 16);
+
+    myself.step = function () {
+        myself.stageRatio = ratio;
+        myself.setExtent(world.extent());
+        myself.controlBar.stageSizeButton.refresh();
+        delete myself.step;
+    }
+
+    // not working yet
+    /*
+    if (shiftClicked) {
+        ratio = SpriteIconMorph.prototype.thumbSize.x * 3 / 
+            this.stage.dimensions.x;
+    }
+    */
+};
+
 
 IDE_Morph.prototype.originalSetStageExtent = IDE_Morph.prototype.setStageExtent;
 IDE_Morph.prototype.setStageExtent = function (aPoint) {
@@ -798,6 +897,7 @@ IDE_Morph.prototype.buildPanes = function () {
     this.createStatusDisplay();
 };
 
+// Scale buttons, embedded into the script editor
 IDE_Morph.prototype.originalCreateSpriteEditor = IDE_Morph.prototype.createSpriteEditor;
 IDE_Morph.prototype.createSpriteEditor = function () {
     this.originalCreateSpriteEditor();

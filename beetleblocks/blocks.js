@@ -107,7 +107,6 @@ CSlotMorph.prototype.fixLayout = function () {
 // Not used anymore, but I'm keeping it here as documentation
 // in case we need to add new symbols in the future
 
-
 /*
 SymbolMorph.prototype.names.push('camera');
 
@@ -154,6 +153,41 @@ SymbolMorph.prototype.symbolCanvasColored = function (aColor) {
     }
 }
 
+SymbolMorph.prototype.drawSymbolFullScreen = function (canvas, color) {
+    // answer a canvas showing two arrows pointing diagonally outwards
+    var ctx = canvas.getContext('2d'),
+        h = canvas.height,
+        c = canvas.width / 2,
+        off = canvas.width / 10,
+        w = canvas.width / 2;
+
+    ctx.strokeStyle = color.toString();
+    ctx.lineWidth = 1.5;
+    ctx.moveTo(c - off, c + off);
+    ctx.lineTo(0, h);
+    ctx.stroke();
+
+    ctx.moveTo(c + off, c - off);
+    ctx.lineTo(h, 0);
+    ctx.stroke();
+
+    ctx.moveTo(0, h);
+    ctx.lineTo(0, h - w);
+    ctx.stroke();
+    ctx.moveTo(0, h);
+    ctx.lineTo(w, h);
+    ctx.stroke();
+
+    ctx.moveTo(h, 0);
+    ctx.lineTo(h - w, 0);
+    ctx.stroke();
+    ctx.moveTo(h, 0);
+    ctx.lineTo(h, w);
+    ctx.stroke();
+
+    return canvas;
+};
+
 SymbolMorph.prototype.drawSymbolLargeStage = function (canvas, color) {
     var ctx = canvas.getContext('2d'),
         w = canvas.width,
@@ -162,7 +196,7 @@ SymbolMorph.prototype.drawSymbolLargeStage = function (canvas, color) {
         h2 = h * 2 / 3;
 
     ctx.strokeStyle = color.toString();
-    ctx.lineWidth = Math.round(w/8);
+    ctx.lineWidth = 2;
     ctx.rect(0, 0, w, h);
     ctx.stroke();
     ctx.rect(w2, 0, w, h2);
@@ -179,7 +213,7 @@ SymbolMorph.prototype.drawSymbolNormalStage = function (canvas, color) {
         h2 = h / 2;
 
     ctx.strokeStyle = color.toString();
-    ctx.lineWidth = Math.round(w/8);
+    ctx.lineWidth = 2;
     ctx.rect(0, 0, w, h);
     ctx.stroke();
     ctx.rect(w2, 0, w2, h2);
@@ -196,7 +230,7 @@ SymbolMorph.prototype.drawSymbolSmallStage = function (canvas, color) {
         h2 = h * 1 / 3;
 
     ctx.strokeStyle = color.toString();
-    ctx.lineWidth = Math.round(w/8);
+    ctx.lineWidth = 2;
     ctx.rect(0, 0, w, h);
     ctx.stroke();
     ctx.rect(w2, 0, w2, h2);
