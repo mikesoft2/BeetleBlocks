@@ -599,7 +599,7 @@ IDE_Morph.prototype.createControlBar = function () {
 
         this.normalStageSizeButton.setTop(this.stageSizeButton.top());
         this.normalStageSizeButton.setLeft(this.largeStageSizeButton.right() + 5);
-        
+
         this.stageSizeButton.setLeft(this.normalStageSizeButton.right() + 5);
         this.appModeButton.setLeft(this.stageSizeButton.right() + 5);
 
@@ -618,48 +618,83 @@ IDE_Morph.prototype.setSmallStageSize = function () {
     this.setStageSize(0.5);
 }
 
-IDE_Morph.prototype.setStageSize = function (value) {
-    var myself = this,
-        world = this.world(),
-        ratio = value,
-        shiftClicked = (world.currentKey === 16);
+IDE_Morph.prototype.setStageSize = function (ratio) {
+    /*    var myself = this,
+          world = this.world(),
+          shiftClicked = (world.currentKey === 16);*/
 
-    myself.step = function () {
-        myself.stageRatio = ratio;
-        myself.setExtent(world.extent());
-        myself.controlBar.stageSizeButton.refresh();
-        delete myself.step;
-    }
+    this.setStageExtent(new Point(480 * ratio, 360 * ratio))
 
-    // not working yet
     /*
-    if (shiftClicked) {
+       myself.step = function () {
+       myself.stageRatio = ratio;
+       myself.setExtent(world.extent());
+       myself.controlBar.stageSizeButton.refresh();
+       delete myself.step;
+       }
+
+        // not working yet
+        if (shiftClicked) {
         ratio = SpriteIconMorph.prototype.thumbSize.x * 3 / 
-            this.stage.dimensions.x;
-    }
-    */
+        this.stage.dimensions.x;
+        }
+        */
 };
 
 
-IDE_Morph.prototype.originalSetStageExtent = IDE_Morph.prototype.setStageExtent;
-IDE_Morph.prototype.setStageExtent = function (aPoint) {
-    this.originalSetStageExtent(aPoint);
-    this.stage.renderer.setSize(aPoint.x, aPoint.y);
+IDE_Morph.prototype.setStageExtent = function (ext) {
+    var myself = this,
+        world = this.world();
+
+    function zoom() {
+        myself.step = function () {
+            var delta = ext.subtract(
+                StageMorph.prototype.dimensions
+            ).divideBy(2);
+            if (delta.abs().lt(new Point(5, 5))) {
+                StageMorph.prototype.dimensions = ext;
+                delete myself.step;
+            } else {
+                StageMorph.prototype.dimensions =
+                    StageMorph.prototype.dimensions.add(delta);
+            }
+            myself.stage.setExtent(StageMorph.prototype.dimensions);
+            myself.stage.clearPenTrails();
+            myself.fixLayout();
+            this.setExtent(world.extent());
+        };
+    }
+
+    this.stageRatio = 1;
+    this.isSmallStage = false;
+    this.controlBar.stageSizeButton.refresh();
+    this.setExtent(world.extent());
+    if (this.isAnimating) {
+        zoom();
+    } else {
+        StageMorph.prototype.dimensions = ext;
+        this.stage.setExtent(StageMorph.prototype.dimensions);
+        this.stage.clearPenTrails();
+        this.fixLayout();
+        this.setExtent(world.extent());
+    }
+
+    this.stage.renderer.setSize(ext.x, ext.y);
     this.stage.reRender();
 }
 
 // Examples now pulls from local
 ProjectDialogMorph.prototype.getExamplesProjectList = function () {
     var dir,
-        projects = [];
+    projects = [];
 
     dir = JSON.parse(this.ide.getURL('https://api.github.com/repos/ericrosenbaum/BeetleBlocks/contents/beetleblocks/examples'));
     dir.forEach(function(each){
         var dta = {
             name: each.name.replace('.xml',''),
-        thumb: null,
-        notes: null,
-        path: each.path
+            thumb: null,
+            notes: null,
+            path: each.path
         };
         projects.push(dta)
     })
@@ -680,36 +715,36 @@ ProjectDialogMorph.prototype.setSource = function (source) {
     switch (this.source) {
         case 'cloud':
             msg = myself.ide.showMessage('Updating\nproject list...');
-            this.projectList = [];
-            SnapCloud.getProjectList(
-                    function (projectList) {
-                        myself.installCloudProjectList(projectList);
-                        msg.destroy();
-                    },
-                    function (err, lbl) {
-                        msg.destroy();
-                        myself.ide.cloudError().call(null, err, lbl);
-                    }
-                    );
-            return;
+        this.projectList = [];
+        SnapCloud.getProjectList(
+            function (projectList) {
+                myself.installCloudProjectList(projectList);
+                msg.destroy();
+            },
+            function (err, lbl) {
+                msg.destroy();
+                myself.ide.cloudError().call(null, err, lbl);
+            }
+        );
+        return;
         case 'examples':
             this.projectList = this.getExamplesProjectList();
-            break;
+        break;
         case 'local':
             this.projectList = this.getLocalProjectList();
-            break;
+        break;
     }
 
     this.listField.destroy();
     this.listField = new ListMorph(
-            this.projectList,
-            this.projectList.length > 0 ?
+        this.projectList,
+        this.projectList.length > 0 ?
             function (element) {
-                return element.name;
-            } : null,
-            null,
-            function () {myself.ok(); }
-            );
+            return element.name;
+        } : null,
+        null,
+        function () {myself.ok(); }
+    );
 
     this.fixListFieldItemColors();
     this.listField.fixLayout = nop;
@@ -735,12 +770,12 @@ ProjectDialogMorph.prototype.setSource = function (source) {
 
                 myself.notesText.text = xml.childNamed('notes').contents
                     || '';
-                myself.notesText.drawNew();
-                myself.notesField.contents.adjustBounds();
-                myself.preview.texture = xml.childNamed('thumbnail').contents
-                    || null;
-                myself.preview.cachedTexture = null;
-                myself.preview.drawNew();
+                    myself.notesText.drawNew();
+                    myself.notesField.contents.adjustBounds();
+                    myself.preview.texture = xml.childNamed('thumbnail').contents
+                        || null;
+                        myself.preview.cachedTexture = null;
+                        myself.preview.drawNew();
             }
             myself.edit();
         };
@@ -756,13 +791,13 @@ ProjectDialogMorph.prototype.setSource = function (source) {
             xml = myself.ide.serializer.parse(src);
             myself.notesText.text = xml.childNamed('notes').contents
                 || '';
-            myself.notesText.drawNew();
-            myself.notesField.contents.adjustBounds();
-            myself.preview.texture = xml.childNamed('thumbnail').contents
-                || null;
-            myself.preview.cachedTexture = null;
-            myself.preview.drawNew();
-            myself.edit();
+                myself.notesText.drawNew();
+                myself.notesField.contents.adjustBounds();
+                myself.preview.texture = xml.childNamed('thumbnail').contents
+                    || null;
+                    myself.preview.cachedTexture = null;
+                    myself.preview.drawNew();
+                    myself.edit();
         };
     }
     this.body.add(this.listField);
@@ -785,10 +820,10 @@ ProjectDialogMorph.prototype.openProject = function () {
     var myself = this;
 
     this.ide.confirm(
-            'All unsaved changes will be lost.\nContinue loading this project?',
-            'Load Project',
-            function () { doOpenProject() }
-            );
+        'All unsaved changes will be lost.\nContinue loading this project?',
+        'Load Project',
+        function () { doOpenProject() }
+    );
 
     function doOpenProject() {
         var proj = myself.listField.selected,
@@ -853,10 +888,10 @@ IDE_Morph.prototype.fixLayout = function (situation) {
         // stage
         if (this.isAppMode) {
             this.stage.setScale(Math.floor(Math.min(
-                            (this.width() - padding * 2) / this.stage.dimensions.x,
-                            (this.height() - this.controlBar.height() * 2 - padding * 2)
-                            / this.stage.dimensions.y
-                            ) * 10) / 10);
+                (this.width() - padding * 2) / this.stage.dimensions.x,
+                (this.height() - this.controlBar.height() * 2 - padding * 2)
+                / this.stage.dimensions.y
+            ) * 10) / 10);
             this.stage.setCenter(this.center());
         } else {
             this.stage.setScale(this.isSmallStage ? this.stageRatio : 1);
@@ -868,9 +903,9 @@ IDE_Morph.prototype.fixLayout = function (situation) {
         if (this.spriteEditor.isVisible) {
             this.spriteEditor.setPosition(this.categories.topRight().add(new Point(padding, padding - 1)));
             this.spriteEditor.setExtent(new Point(
-                        Math.max(0, this.stage.left() - padding - this.spriteEditor.left()),
-                        this.bottom() - this.categories.top()
-                        ));
+                Math.max(0, this.stage.left() - padding - this.spriteEditor.left()),
+                this.bottom() - this.categories.top()
+            ));
             this.spriteEditor.fixLayout();
         }
 
@@ -916,9 +951,9 @@ IDE_Morph.prototype.createSpriteEditor = function () {
         minusButton.setLeft(this.left() + this.width() - minusButton.width() - padding);
         minusButton.setTop(this.top() + padding);
         equalButton.setLeft(minusButton.left() - equalButton.width() - padding)
-            equalButton.setTop(this.top() + padding);
+        equalButton.setTop(this.top() + padding);
         plusButton.setLeft(equalButton.left() - plusButton.width() - padding)
-            plusButton.setTop(this.top() + padding);
+        plusButton.setTop(this.top() + padding);
 
         minusButton.fixLayout();
         equalButton.fixLayout();
@@ -949,7 +984,7 @@ IDE_Morph.prototype.createPalette = function(){
 
 IDE_Morph.prototype.createStatusDisplay = function () {
     var frame,
-        padding = 1,
+    padding = 1,
         myself = this,
         elements = [],
         beetle = this.currentSprite.beetle,
@@ -979,7 +1014,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
         this.setHeight(myself.height() - myself.stage.height() - myself.controlBar.height() - padding);
         this.frame.setExtent(this.extent());
         this.arrangeContents()
-            this.refresh();
+        this.refresh();
     };
 
     this.statusDisplay.arrangeContents = function () {
@@ -1073,29 +1108,29 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     // Buttons and toggles
 
     var resetCameraButton = new PushButtonMorph(
-            null,
-            function() { stage.camera.reset() },
-            'Reset Camera'
-            );
+        null,
+        function() { stage.camera.reset() },
+        'Reset Camera'
+    );
     resetCameraButton.columns = 3;
     resetCameraButton.newColumn = 1;
     elements.push(resetCameraButton);
 
     var toggleWireframeButton = new ToggleMorph(
-            'checkbox',
-            null,
-            function () {
-                stage.renderer.toggleWireframe();
-            },
-            'Wireframe',
-            function () {
-                return stage.renderer.isWireframeMode
-            });
-    toggleWireframeButton.columns = 3;
-    toggleWireframeButton.newColumn = 2;
-    elements.push(toggleWireframeButton);
+        'checkbox',
+        null,
+        function () {
+            stage.renderer.toggleWireframe();
+        },
+        'Wireframe',
+        function () {
+            return stage.renderer.isWireframeMode
+        });
+        toggleWireframeButton.columns = 3;
+        toggleWireframeButton.newColumn = 2;
+        elements.push(toggleWireframeButton);
 
-    var toggleBeetleButton = new ToggleMorph(
+        var toggleBeetleButton = new ToggleMorph(
             'checkbox',
             null,
             function () {
@@ -1106,20 +1141,20 @@ IDE_Morph.prototype.createStatusDisplay = function () {
                 return beetle.shape.visible;
             }
 
-            );
-    toggleBeetleButton.newLines = 2;
-    elements.push(toggleBeetleButton);
+        );
+        toggleBeetleButton.newLines = 2;
+        elements.push(toggleBeetleButton);
 
-    var fitCameraButton = new PushButtonMorph(
+        var fitCameraButton = new PushButtonMorph(
             null,
             function() { stage.camera.fitScene() },
             'Zoom to fit'
-            );
-    fitCameraButton.columns = 3;
-    fitCameraButton.newColumn = 1;
-    elements.push(fitCameraButton);
+        );
+        fitCameraButton.columns = 3;
+        fitCameraButton.newColumn = 1;
+        elements.push(fitCameraButton);
 
-    var toggleParallelProjectionButton = new ToggleMorph(
+        var toggleParallelProjectionButton = new ToggleMorph(
             'checkbox',
             null,
             function () {
@@ -1129,119 +1164,119 @@ IDE_Morph.prototype.createStatusDisplay = function () {
             function () {
                 return stage.renderer.isParallelProjection
             });
-    toggleParallelProjectionButton.columns = 3;
-    toggleParallelProjectionButton.newColumn = 2;
-    elements.push(toggleParallelProjectionButton);
+            toggleParallelProjectionButton.columns = 3;
+            toggleParallelProjectionButton.newColumn = 2;
+            elements.push(toggleParallelProjectionButton);
 
-    var toggleAxesButton = new ToggleMorph(
-            'checkbox',
-            null,
-            function () {
-                stage.renderer.toggleAxes();
-            },
-            'Axes',
-            function () {
-                return stage.renderer.showingAxes;
-            });
-    toggleAxesButton.newLines = 2;
-    elements.push(toggleAxesButton);
+            var toggleAxesButton = new ToggleMorph(
+                'checkbox',
+                null,
+                function () {
+                    stage.renderer.toggleAxes();
+                },
+                'Axes',
+                function () {
+                    return stage.renderer.showingAxes;
+                });
+                toggleAxesButton.newLines = 2;
+                elements.push(toggleAxesButton);
 
-    var space = new Morph();
-    space.alpha = 0;
-    space.columns = 3;
-    space.newColumn = 1;
+                var space = new Morph();
+                space.alpha = 0;
+                space.columns = 3;
+                space.newColumn = 1;
 
-    elements.push(space);
+                elements.push(space);
 
-    var toggleTurboButton = new ToggleMorph(
-            'checkbox',
-            null,
-            function () {
-                myself.toggleFastTracking();
-            },
-            'Turbo mode',
-            function () {
-                return stage.isFastTracked
-            });
-    toggleTurboButton.columns = 3;
-    toggleTurboButton.newColumn = 2;
-    elements.push(toggleTurboButton);
+                var toggleTurboButton = new ToggleMorph(
+                    'checkbox',
+                    null,
+                    function () {
+                        myself.toggleFastTracking();
+                    },
+                    'Turbo mode',
+                    function () {
+                        return stage.isFastTracked
+                    });
+                    toggleTurboButton.columns = 3;
+                    toggleTurboButton.newColumn = 2;
+                    elements.push(toggleTurboButton);
 
-    var toggleGridButton = new ToggleMorph(
-            'checkbox',
-            null,
-            function () {
-                stage.scene.grid.toggle();
-            },
-            'Grid',
-            function () {
-                return stage.scene.grid.visible
-            });
-    toggleGridButton.newLines = 2;
-    elements.push(toggleGridButton);
+                    var toggleGridButton = new ToggleMorph(
+                        'checkbox',
+                        null,
+                        function () {
+                            stage.scene.grid.toggle();
+                        },
+                        'Grid',
+                        function () {
+                            return stage.scene.grid.visible
+                        });
+                        toggleGridButton.newLines = 2;
+                        elements.push(toggleGridButton);
 
-    // Status watchers
+                        // Status watchers
 
-    elements.push('Position: ');
-    element = new StringMorph();
-    element.update = function() {
-        this.text = 'x: ' + beetle.position.z.toFixed(2).toString().replace('.00','') 
-            + ', y: ' + beetle.position.x.toFixed(2).toString().replace('.00','') 
-            + ', z: ' + beetle.position.y.toFixed(2).toString().replace('.00','')
-    };
-    element.newColumn = true;
-    elements.push(element);
+                        elements.push('Position: ');
+                        element = new StringMorph();
+                        element.update = function() {
+                            this.text = 'x: ' + beetle.position.z.toFixed(2).toString().replace('.00','') 
+                            + ', y: ' + beetle.position.x.toFixed(2).toString().replace('.00','') 
+                            + ', z: ' + beetle.position.y.toFixed(2).toString().replace('.00','')
+                        };
+                        element.newColumn = true;
+                        elements.push(element);
 
-    elements.push('Color: ');
-    element = new Morph();
-    element.update = function() {
-        this.setColor(new Color(beetle.color.r * 255, beetle.color.g * 255, beetle.color.b * 255));
-    }
-    element.setWidth(30);
-    element.setHeight(12);
-    element.newLines = 1.5;
-    elements.push(element);
+                        elements.push('Color: ');
+                        element = new Morph();
+                        element.update = function() {
+                            this.setColor(new Color(beetle.color.r * 255, beetle.color.g * 255, beetle.color.b * 255));
+                        }
+                        element.setWidth(30);
+                        element.setHeight(12);
+                        element.newLines = 1.5;
+                        elements.push(element);
 
-    elements.push('Rotation: ');
-    element = new StringMorph();
-    element.update = function() {
-        this.text = 'x:' + degrees(beetle.rotation.z * -1).toFixed(2).toString().replace('.00','')
-            + ', y: ' + degrees(beetle.rotation.x * -1).toFixed(2).toString().replace('.00','')
-            + ', z: ' + degrees(beetle.rotation.y).toFixed(2).toString().replace('.00','')
-    };
-    element.newColumn = true;
-    elements.push(element);
+                        elements.push('Rotation: ');
+                        element = new StringMorph();
+                        element.update = function() {
+                            this.text = 'x:' + degrees(beetle.rotation.z * -1).toFixed(2).toString().replace('.00','')
+                            + ', y: ' + degrees(beetle.rotation.x * -1).toFixed(2).toString().replace('.00','')
+                            + ', z: ' + degrees(beetle.rotation.y).toFixed(2).toString().replace('.00','')
+                        };
+                        element.newColumn = true;
+                        elements.push(element);
 
-    elements.push('HSL: ');
-    element = new StringMorph();
-    element.update = function() {
-        this.text = beetle.color.state.h.toFixed(2).toString().replace('.00','') + ', ' 
-            + beetle.color.state.s.toFixed(2).toString().replace('.00','') + ', ' 
-            + beetle.color.state.l.toFixed(2).toString().replace('.00','')
-    };
-    element.newLines = 1.5;
-    elements.push(element);
+                        elements.push('HSL: ');
+                        element = new StringMorph();
+                        element.update = function() {
+                            this.text = beetle.color.state.h.toFixed(2).toString().replace('.00','') + ', ' 
+                            + beetle.color.state.s.toFixed(2).toString().replace('.00','') + ', ' 
+                            + beetle.color.state.l.toFixed(2).toString().replace('.00','')
+                        };
+                        element.newLines = 1.5;
+                        elements.push(element);
 
-    elements.push('Scale: ');
-    element = new StringMorph();
-    element.update = function() {
-        this.text = beetle.multiplierScale.toString() 
-            + ' (' + (beetle.multiplierScale * 100).toString() + '%)'
-    }
-    element.newColumn = true;
-    elements.push(element);
+                        elements.push('Scale: ');
+                        element = new StringMorph();
+                        element.update = function() {
+                            this.text = beetle.multiplierScale.toString() 
+                            + ' (' + (beetle.multiplierScale * 100).toString() + '%)'
+                        }
+                        element.newColumn = true;
+                        elements.push(element);
 
-    elements.push('Opacity: ');
-    element = new StringMorph();
-    element.update = function() {
-        this.text = (beetle.shape.material.opacity * 100).toFixed(2).toString().replace('.00','') + '%'
-    }
-    element.newLines = 1.5;
-    elements.push(element);
+                        elements.push('Opacity: ');
+                        element = new StringMorph();
+                        element.update = function() {
+                            this.text = (beetle.shape.material.opacity * 100).toFixed(2).toString().replace('.00','') + '%'
+                        }
+                        element.newLines = 1.5;
+                        elements.push(element);
 
-    // Add all contents
+                        // Add all contents
 
-    elements.forEach(function(each) { myself.statusDisplay.addElement(each) });
+                        elements.forEach(function(each) { myself.statusDisplay.addElement(each) });
 };
 
 IDE_Morph.prototype.selectSprite = function (sprite) {
@@ -1255,51 +1290,53 @@ IDE_Morph.prototype.selectSprite = function (sprite) {
 IDE_Morph.prototype.toggleAppMode = function (appMode) {
     var world = this.world(),
         elements = [
-                this.logo,
-                this.controlBar.projectButton,
-                this.controlBar.settingsButton,
-                this.controlBar.stageSizeButton,
-                this.spriteEditor,
-                this.palette,
-                this.statusDisplay,
-                this.categories ];
+        this.logo,
+        this.controlBar.projectButton,
+        this.controlBar.settingsButton,
+        this.controlBar.stageSizeButton,
+        this.controlBar.normalStageSizeButton,
+        this.controlBar.largeStageSizeButton,
+        this.spriteEditor,
+        this.palette,
+        this.statusDisplay,
+        this.categories ];
 
-    this.isAppMode = isNil(appMode) ? !this.isAppMode : appMode;
+        this.isAppMode = isNil(appMode) ? !this.isAppMode : appMode;
 
-    Morph.prototype.trackChanges = false;
-    if (this.isAppMode) {
-        this.setColor(this.appModeColor);
-        this.controlBar.setColor(this.color);
-        this.controlBar.appModeButton.refresh();
-        elements.forEach(function (e) {
-            e.hide();
-        });
-        world.children.forEach(function (morph) {
-            if (morph instanceof DialogBoxMorph) {
-                morph.hide();
-            }
-        });
-    } else {
-        this.setColor(this.backgroundColor);
-        this.controlBar.setColor(this.frameColor);
-        elements.forEach(function (e) {
-            e.show();
-        });
-        this.stage.setScale(1);
-        // show all hidden dialogs
-        world.children.forEach(function (morph) {
-            if (morph instanceof DialogBoxMorph) {
-                morph.show();
-            }
-        });
-        // prevent scrollbars from showing when morph appears
-        world.allChildren().filter(function (c) {
-            return c instanceof ScrollFrameMorph;
-        }).forEach(function (s) {
-            s.adjustScrollBars();
-        });
-    }
-    this.setExtent(this.world().extent()); // resume trackChanges
+        Morph.prototype.trackChanges = false;
+        if (this.isAppMode) {
+            this.setColor(this.appModeColor);
+            this.controlBar.setColor(this.color);
+            this.controlBar.appModeButton.refresh();
+            elements.forEach(function (e) {
+                e.hide();
+            });
+            world.children.forEach(function (morph) {
+                if (morph instanceof DialogBoxMorph) {
+                    morph.hide();
+                }
+            });
+        } else {
+            this.setColor(this.backgroundColor);
+            this.controlBar.setColor(this.frameColor);
+            elements.forEach(function (e) {
+                e.show();
+            });
+            this.stage.setScale(1);
+            // show all hidden dialogs
+            world.children.forEach(function (morph) {
+                if (morph instanceof DialogBoxMorph) {
+                    morph.show();
+                }
+            });
+            // prevent scrollbars from showing when morph appears
+            world.allChildren().filter(function (c) {
+                return c instanceof ScrollFrameMorph;
+            }).forEach(function (s) {
+                s.adjustScrollBars();
+            });
+        }
+        this.setExtent(this.world().extent()); // resume trackChanges
 };
 
 // Addressing #54: Stage occasionally goes blank
