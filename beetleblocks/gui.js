@@ -133,6 +133,11 @@ IDE_Morph.prototype.projectMenu = function () {
             function() { myself.downloadOBJ() },
             'download the currently rendered 3D model\ninto an OBJ file'
             );
+    menu.addItem(
+            'Export 2D lines as SVG',
+            function() { myself.downloadSVG() },
+            'download the currently rendered 2D lines\ninto an SVG file'
+            );
 
     menu.addLine();
     menu.addItem(
@@ -519,6 +524,65 @@ IDE_Morph.prototype.downloadOBJ = function() {
     blob = new Blob([objString], {type: 'text/plain;charset=utf-8'});
 
     saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_export') + '.obj'); 
+}
+
+// SVG export
+IDE_Morph.prototype.downloadSVG = function() {
+	var lines = [];
+	stage.myObjects.children.forEach(
+		function(el,index, ar){
+			if (el instanceof THREE.Line) {
+				lines.push(el);
+			} 
+		}
+	);
+
+	var svgStr = '';
+	
+	var minX=0, maxX=0, minZ=0, maxZ=0;
+	var scaleMultiplier = 10;
+	for (var i=0; i<lines.length; i++) {
+		var x1 = lines[i].geometry.vertices[0].x * scaleMultiplier ;
+		var z1 = lines[i].geometry.vertices[0].z * scaleMultiplier ;
+		var x2 = lines[i].geometry.vertices[1].x * scaleMultiplier ;
+		var z2 = lines[i].geometry.vertices[1].z * scaleMultiplier ;
+		
+		if (x1<minX) minX = x1;
+		if (x2<minX) minX = x2;
+		if (x1>maxX) maxX = x1;
+		if (x2>maxX) maxX = x2;
+
+		if (z1<minZ) minZ = z1;
+		if (z2<minZ) minZ = z2;
+		if (z1>maxZ) maxZ = z1;
+		if (z2>maxZ) maxZ = z2;
+		
+		var red = Math.round(lines[i].material.color.r * 255); 
+		var green = Math.round(lines[i].material.color.g * 255); 
+		var blue = Math.round(lines[i].material.color.b * 255); 
+		
+		svgStr += '<line stroke=\"rgb(' + red + ',' + green + ',' + blue + ')\" '; 
+		svgStr += 'fill=\"none\" stroke-width=\"0.25\" ';
+		svgStr += 'stroke-linecap=\"round\" stroke-linejoin=\"round\" ';
+		svgStr += 'x1=\"' + x1 + '\" y1=\"' + z1 + '\" ';
+		svgStr += 'x2=\"' + x2 + '\" y2=\"' + z2 + '\" ';
+		svgStr += '/>\n';
+	}
+	
+	svgStr += '</svg>';
+	
+	svgHeader = '';
+	svgHeader += '<svg version=\"1.1\" id=\"Layer_1\" xmlns=\"http://www.w3.org/2000/svg\" ';
+	svgHeader += 'x=\" ' + minX + 'px\" ';
+	svgHeader += 'y=\" ' + minZ + 'px\" ';
+	svgHeader += 'width=\" ' + (maxX-minX) + 'px\" ';
+	svgHeader += 'height=\" ' + (maxZ-minZ) + 'px\" ';
+	svgHeader += '>\n';
+	
+	svgStr = svgHeader.concat(svgStr);
+	
+    blob = new Blob([svgStr], {type: 'text/plain;charset=utf-8'});
+    saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_export') + '.svg'); 
 }
 
 // IDE_Morph.prototype.createControlBar proxy
