@@ -404,6 +404,8 @@ Process.prototype.stopExtrusion = function() {
         beetle.extrusionMesh = null;
         beetle.extrusionEndCap = null;
 
+        this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true); // start cap
+
         // Below an attempt to merge all these shapes into one single body:
 
         /*
