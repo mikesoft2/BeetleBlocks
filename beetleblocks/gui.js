@@ -46,16 +46,10 @@ IDE_Morph.prototype.projectMenu = function () {
     menu.addLine();
     menu.addItem('New', 'createNewProject');
     menu.addItem('Open...', 'openProjectsBrowser');
-    menu.addItem('Save', "save");
-    if (shiftClicked) {
-        menu.addItem(
-                'Save to disk',
-                'saveProjectToDisk',
-                'experimental - store this project\nin your downloads folder',
-                new Color(100, 0, 0)
-                );
-    }
+    menu.addItem('Save', 'save');
+    menu.addItem('Save to disk', 'saveProjectToDisk');
     menu.addItem('Save As...', 'saveProjectsBrowser');
+    menu.addItem('Save and share', 'saveAndShare');
     menu.addLine();
     menu.addItem(
             'Import...',
@@ -90,22 +84,6 @@ IDE_Morph.prototype.projectMenu = function () {
             },
             'file menu import hint' // looks up the actual text in the translator
                 );
-
-    menu.addItem(
-            shiftClicked ?
-            'Export project as plain text...' : 'Export project...',
-            function () {
-                if (myself.projectName) {
-                    myself.exportProject(myself.projectName, shiftClicked);
-                } else {
-                    myself.prompt('Export Project As...', function (name) {
-                        myself.exportProject(name);
-                    }, null, 'exportProject');
-                }
-            },
-            'show project data as XML\nin a new browser window',
-            shiftClicked ? new Color(100, 0, 0) : null
-            );
 
     menu.addItem(
             'Export blocks...',
@@ -203,49 +181,6 @@ IDE_Morph.prototype.projectMenu = function () {
                 );
     }
     if (shiftClicked) {
-        menu.addLine();
-        menu.addItem(
-                'export project media only...',
-                function () {
-                    if (myself.projectName) {
-                        myself.exportProjectMedia(myself.projectName);
-                    } else {
-                        myself.prompt('Export Project As...', function (name) {
-                            myself.exportProjectMedia(name);
-                        }, null, 'exportProject');
-                    }
-                },
-                null,
-                this.hasChangedMedia ? new Color(100, 0, 0) : new Color(0, 100, 0)
-                );
-        menu.addItem(
-                'export project without media...',
-                function () {
-                    if (myself.projectName) {
-                        myself.exportProjectNoMedia(myself.projectName);
-                    } else {
-                        myself.prompt('Export Project As...', function (name) {
-                            myself.exportProjectNoMedia(name);
-                        }, null, 'exportProject');
-                    }
-                },
-                null,
-                new Color(100, 0, 0)
-                );
-        menu.addItem(
-                'export project as cloud data...',
-                function () {
-                    if (myself.projectName) {
-                        myself.exportProjectAsCloudData(myself.projectName);
-                    } else {
-                        myself.prompt('Export Project As...', function (name) {
-                            myself.exportProjectAsCloudData(name);
-                        }, null, 'exportProject');
-                    }
-                },
-                null,
-                new Color(100, 0, 0)
-                );
         menu.addLine();
         menu.addItem(
                 'open shared project from cloud...',
@@ -502,6 +437,40 @@ IDE_Morph.prototype.settingsMenu = function () {
                         });
                 menu.popup(world, pos);
 };
+
+IDE_Morph.prototype.saveProjectToDisk = function() {
+    var data,
+        blob;
+
+    if (Process.prototype.isCatchingErrors) {
+        try {
+            data = this.serializer.serialize(this.stage);
+        } catch (err) {
+            this.showMessage('Saving failed: ' + err);
+        }
+    } else {
+        data = this.serializer.serialize(this.stage);
+    }
+
+    blob = new Blob([data], {type: 'text/xml;charset=utf-8'});
+    saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_project') + '.xml');
+}
+
+IDE_Morph.prototype.saveAndShare = function() {
+    var myself = this;
+
+    if (this.projectName) {
+        this.showMessage('Saving project\nto the cloud...');
+        this.setProjectName(this.projectName);
+        SnapCloud.saveProject(
+            this,
+            function (response, url) {
+                prompt('This project is now public at the following URL:', url)
+            },
+            this.cloudError()
+        );
+    }
+}
 
 // STL export
 IDE_Morph.prototype.downloadSTL = function() {
