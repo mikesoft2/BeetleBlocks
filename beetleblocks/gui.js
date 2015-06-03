@@ -472,8 +472,6 @@ IDE_Morph.prototype.saveAndShare = function() {
                         SnapCloud.callService(
                             'publishProject',
                             function () {
-                                SnapCloud.disconnect();
-                                proj.Public = 'true';
                                 myself.showMessage('shared.', 2);
                             },
                             myself.cloudError(),
