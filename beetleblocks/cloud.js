@@ -5,10 +5,9 @@ Cloud.prototype.urlForMyProject = function (projectName) {
         return;
     }
 
-    var id = 'Username=' + encodeURIComponent(this.username) + '&projectName=' + encodeURIComponent(projectName),
+    var id = 'Username=' + encodeURIComponent(this.username) + '&ProjectName=' + encodeURIComponent(projectName),
         url = (this.hasProtocol() ? '' : 'http://')
-                + this.url + 'Public'
-                + '?'
+                + window.location.origin + window.location.pathname + '#present:'
                 + id;
     return url;
 }

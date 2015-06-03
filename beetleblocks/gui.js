@@ -480,7 +480,7 @@ IDE_Morph.prototype.saveAndShare = function() {
                     },
                     myself.cloudError()
                 );
-                prompt('This project is now public at the following URL:', SnapCloud.urlForMyProject(this.projectName));
+                prompt('This project is now public at the following URL:', SnapCloud.urlForMyProject(myself.projectName));
             },
             this.cloudError()
         )
