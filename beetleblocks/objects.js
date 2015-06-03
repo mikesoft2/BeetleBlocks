@@ -1,13 +1,13 @@
 // THREE additions
-THREE.Object3D.prototype.addLineToPointWithColor = function(point, color) {
-    return this.addLineFromPointToPointWithColor(new THREE.Vector3(), point, color)
+THREE.Object3D.prototype.addLineToPointWithColor = function(point, color, thickness) {
+    return this.addLineFromPointToPointWithColor(new THREE.Vector3(), point, color, thickness)
 }
 
-THREE.Object3D.prototype.addLineFromPointToPointWithColor = function(originPoint, destinationPoint, color) {
+THREE.Object3D.prototype.addLineFromPointToPointWithColor = function(originPoint, destinationPoint, color, thickness) {
     geometry = new THREE.Geometry();
     geometry.vertices.push(originPoint);
     geometry.vertices.push(destinationPoint);
-    var lineMaterial = new THREE.LineBasicMaterial({ color: color });
+    var lineMaterial = new THREE.LineBasicMaterial({ color: color, linewidth: (thickness ? thickness : 1) });
     var line = new THREE.Line(geometry, lineMaterial);
     this.add(line);
     return line;
@@ -1074,11 +1074,11 @@ StageMorph.prototype.initScene = function() {
 
     // Axes
     p = new THREE.Vector3(5,0,0);
-    this.scene.axes.push(this.scene.addLineToPointWithColor(p, 0x00FF00));
+    this.scene.axes.push(this.scene.addLineToPointWithColor(p, 0x00FF00, 2));
     p = new THREE.Vector3(0,5,0);
-    this.scene.axes.push(this.scene.addLineToPointWithColor(p, 0x0000FF));
+    this.scene.axes.push(this.scene.addLineToPointWithColor(p, 0x0000FF, 2));
     p = new THREE.Vector3(0,0,5);
-    this.scene.axes.push(this.scene.addLineToPointWithColor(p, 0xFF0000));
+    this.scene.axes.push(this.scene.addLineToPointWithColor(p, 0xFF0000, 2));
 }
 
 StageMorph.prototype.initRenderer = function() {
