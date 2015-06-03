@@ -465,7 +465,9 @@ IDE_Morph.prototype.saveAndShare = function() {
         SnapCloud.saveProject(
             this,
             function (response, url) {
-                prompt('This project is now public at the following URL:', url)
+            myself.showMessage('saved.', 2);
+                console.log(response, url);
+                prompt('This project is now public at the following URL:', url);
             },
             this.cloudError()
         );
