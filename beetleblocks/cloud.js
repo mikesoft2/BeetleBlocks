@@ -6,7 +6,7 @@ Cloud.prototype.urlForMyProject = function (projectName) {
     }
 
     var id = 'Username=' + encodeURIComponent(this.username) + '&projectName=' + encodeURIComponent(projectName),
-        url = this.hasProtocol() ? '' : 'http://')
+        url = (this.hasProtocol() ? '' : 'http://')
                 + this.url + 'Public'
                 + '?'
                 + id;
