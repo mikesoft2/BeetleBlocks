@@ -457,11 +457,12 @@ IDE_Morph.prototype.saveProjectToDisk = function() {
 }
 
 IDE_Morph.prototype.saveAndShare = function() {
-    var myself = this;
+    var myself = this,
+        projectName = this.projectName;
 
-    if (this.projectName) {
+    if (projectName) {
         this.showMessage('Saving project\nto the cloud...');
-        this.setProjectName(this.projectName);
+        this.setProjectName(projectName);
 
         SnapCloud.saveProject(
             this,
@@ -475,12 +476,12 @@ IDE_Morph.prototype.saveAndShare = function() {
                                 myself.showMessage('shared.', 2);
                             },
                             myself.cloudError(),
-                            [myself.projectName]
+                            [projectName]
                         );
                     },
                     myself.cloudError()
                 );
-                prompt('This project is now public at the following URL:', SnapCloud.urlForMyProject(myself.projectName));
+                prompt('This project is now public at the following URL:', SnapCloud.urlForMyProject(projectName));
             },
             this.cloudError()
         )
