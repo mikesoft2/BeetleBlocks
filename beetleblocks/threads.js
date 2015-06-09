@@ -280,10 +280,10 @@ Process.prototype.sphere = function(diam) {
     this.addSphereGeom(diam);
 };
 
-Process.prototype.addSphereGeom = function(diam, isExtrusionCap) {
+Process.prototype.addSphereGeom = function(diam) {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-        sphereGeometry = new THREE.SphereGeometry(Math.abs(diam/2), isExtrusionCap ? 6 : 16, isExtrusionCap ? 6 : 12);
+        sphereGeometry = new THREE.SphereGeometry(Math.abs(diam/2), 12, 12);
 
     var sphere = new THREE.Mesh(sphereGeometry, beetle.newLambertMaterial());
     sphere.position.copy(beetle.position);
@@ -391,7 +391,7 @@ Process.prototype.startExtrusion = function() {
     beetle.extruding = true;
 
     beetle.lastExtrusionPoint = p.copy(beetle.position);
-    this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true); // start cap
+    this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale); // start cap
 
     stage.reRender();
 };
@@ -415,10 +415,10 @@ Process.prototype.addPointToExtrusion = function() {
         distanceToLast = beetle.lastExtrusionPoint.distanceTo(beetle.position);
 
     var geometry = new THREE.CylinderGeometry(
-            beetle.extrusionDiameter / 2, //radiusTop
-            beetle.extrusionDiameter / 2, //radiusBottom
+            (beetle.extrusionDiameter / 2) * beetle.multiplierScale, //radiusTop
+            (beetle.extrusionDiameter / 2) * beetle.multiplierScale, //radiusBottom
             distanceToLast, //height
-            24 // radiusSegments
+            12 // radiusSegments
             ),
         cylinder = new THREE.Mesh(geometry, beetle.newLambertMaterial());
 
@@ -429,7 +429,7 @@ Process.prototype.addPointToExtrusion = function() {
 
     beetle.lastExtrusionPoint = p.copy(beetle.position);
 
-    this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true); // joint
+    this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale); // joint
     stage.myObjects.add(cylinder);
     stage.reRender();
 }
