@@ -1198,7 +1198,6 @@ StageMorph.prototype.initCamera = function() {
                 myself.controls.rotateLeft(radians(90));
             } else {
                 this.position.set(-5, 7, 5);
-                this.lookAt(new THREE.Vector3());
             }
 
             myself.controls.update();
@@ -1208,23 +1207,16 @@ StageMorph.prototype.initCamera = function() {
         myself.camera.fitScene = function() {
             this.reset();
 
-            var boundingBox = new THREE.Box3().setFromObject(myself.scene),
-                center = boundingBox.center(),
-                size = boundingBox.size(),
-                biggerAxis = (size.x > size.y) ? ((size.x > size.z) ? 'x' : 'z') : ((size.y > size.z) ? 'y' : 'z'),
-                distance = size[biggerAxis] / (2 * Math.tan(this.fov * Math.PI / 360));
+            var boundingBox = new THREE.Box3().setFromObject(myself.myObjects),
+                boundingSphere = boundingBox.getBoundingSphere(),
+                center = boundingSphere.center,
+                distance = boundingSphere.radius;
 
-            if (biggerAxis == 'x' ) {
-                this.position.set(center.x, center.y, distance * 1.5);
-            } else if (biggerAxis == 'y' ) {
-                this.position.set(distance * 1.5, center.y, center.z);
-            } else {
-                this.position.set(center.x, distance * 1.5, center.z);
-            }
-
-            this.lookAt(center);
-
-            myself.controls.update(); // ← Somehow this messes up the camera position!
+            this.position.set(center.x, center.y, center.z);
+            myself.controls.center.set(center.x, center.y, center.z);
+            this.translateZ(distance);
+            // myself.controls.dollyOut() something!!!
+            //myself.controls.update();
             myself.reRender();
         }
     }
