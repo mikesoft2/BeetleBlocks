@@ -23,17 +23,16 @@ THREE.Object3D.prototype.add = function(object, negative, scene) {
         if (negative) {
             var totalObjects = this.children.length,
                 myself = this;
-	    for (i = 0; i < totalObjects; i++) { 
-		result = new ThreeBSP(this.children[i]).subtract(new ThreeBSP(object));
-		mesh = result.toMesh(this.children[i].material);
-		myself.add(mesh, false);
+            for (i = 0; i < totalObjects; i++) { 
+                result = new ThreeBSP(this.children[i]).subtract(new ThreeBSP(object));
+                mesh = result.toMesh(this.children[i].material);
+                myself.add(mesh, false);
             } 
             for (i = 0; i < totalObjects; i++) { this.remove(this.children[0]) }
         }
     }
 }
 
-			
 // SpriteMorph
 SpriteMorph.prototype.initBeetle = function() {
     var myself = this;
@@ -105,10 +104,10 @@ SpriteMorph.prototype.initBeetle = function() {
     this.beetle.newLambertMaterial = function() {
         return new THREE.MeshLambertMaterial({
             color: this.color,
-            transparent: true,
-            opacity: this.shape.material.opacity,
-            wireframe: myself.parentThatIsA(StageMorph).renderer.isWireframeMode,
-            side: THREE.DoubleSide
+               transparent: true,
+               opacity: this.shape.material.opacity,
+               wireframe: myself.parentThatIsA(StageMorph).renderer.isWireframeMode,
+               side: THREE.DoubleSide
         });
     }
 
@@ -136,7 +135,7 @@ SpriteMorph.prototype.init = function(globals) {
 // Definition of new BeetleBlocks categories
 SpriteMorph.prototype.categories =
 [
-    'motion',
+'motion',
     'control',
     'shapes',
     'colors',
@@ -145,37 +144,37 @@ SpriteMorph.prototype.categories =
     'variables',
     'lists',
     'my blocks'
-];
+    ];
 
-SpriteMorph.prototype.blockColor = {
-         motion : new Color(68, 95, 153),
-         shapes : new Color(48, 137, 151),
-         colors : new Color(101, 61, 122),
-         sound : new Color(207, 74, 217), // we need to keep this color for the zoom blocks dialog
-         control : new Color(80, 80, 80),
-         sensing : new Color(130, 130, 130),
-         operators : new Color(94, 144, 52),
-         variables : new Color(191, 101, 36),
-         lists : new Color(168, 66, 32),
-         other : new Color(150, 150, 150),
-         'my blocks': new Color(4, 158, 235),
-};
+    SpriteMorph.prototype.blockColor = {
+        motion : new Color(68, 95, 153),
+        shapes : new Color(48, 137, 151),
+        colors : new Color(101, 61, 122),
+        sound : new Color(207, 74, 217), // we need to keep this color for the zoom blocks dialog
+        control : new Color(80, 80, 80),
+        sensing : new Color(130, 130, 130),
+        operators : new Color(94, 144, 52),
+        variables : new Color(191, 101, 36),
+        lists : new Color(168, 66, 32),
+        other : new Color(150, 150, 150),
+        'my blocks': new Color(4, 158, 235),
+    };
 
 /*
 // original 
 
 SpriteMorph.prototype.blockColor = {
 motion : new Color(74, 108, 212),
-         shapes : new Color(143, 86, 227),
-         colors : new Color(207, 74, 217),
-         sound : new Color(207, 74, 217), // we need to keep this color for the zoom blocks dialog
-         control : new Color(230, 168, 34),
-         sensing : new Color(4, 148, 220),
-         operators : new Color(98, 194, 19),
-         variables : new Color(243, 118, 29),
-         lists : new Color(217, 77, 17),
-         other : new Color(150, 150, 150),
-         'my blocks': new Color(150, 150, 60),
+shapes : new Color(143, 86, 227),
+colors : new Color(207, 74, 217),
+sound : new Color(207, 74, 217), // we need to keep this color for the zoom blocks dialog
+control : new Color(230, 168, 34),
+sensing : new Color(4, 148, 220),
+operators : new Color(98, 194, 19),
+variables : new Color(243, 118, 29),
+lists : new Color(217, 77, 17),
+other : new Color(150, 150, 150),
+'my blocks': new Color(150, 150, 60),
 };
 
 // blocks color scheme: blue, green, grays
@@ -195,7 +194,7 @@ other : new Color(50, 50, 50),
 sound : new Color(50, 50, 50), // we need to keep this color for the zoom blocks dialog
 };
 
- */
+*/
 
 /*    
 // USA (red, blue, gray)
@@ -213,7 +212,7 @@ lists : new Color(140, 20, 20),
 other : new Color(150, 150, 150),
 'my blocks': new Color(180, 180, 180),
 };
- */
+*/
 
 /*
 
@@ -233,7 +232,7 @@ operators : new Color(135, 135, 135),
 other : new Color(50, 50, 50),
 sound : new Color(50, 50, 50), // we need to keep this color for the zoom blocks dialog
 };
- */
+*/
 
 /*
 
@@ -252,7 +251,7 @@ operators : new Color(10, 84, 63),
 other : new Color(50, 50, 50),
 sound : new Color(50, 50, 50), // we need to keep this color for the zoom blocks dialog
 };
- */
+*/
 
 // Block specs
 
@@ -280,7 +279,7 @@ SpriteMorph.prototype.initBlocks = function() {
     // Additionally, you'll need to re-select global coordinates, as they are
     // now uppercase.
 
-     */
+*/
 
     // control
 
@@ -479,24 +478,24 @@ SpriteMorph.prototype.initBlocks = function() {
         defaults: [1]
     };
 
-// Removing this until it works like it should
-// You can still test negative geometry by giving negative
-// values to the volumes of cubes, cuboids and spheres
+    // Removing this until it works like it should
+    // You can still test negative geometry by giving negative
+    // values to the volumes of cubes, cuboids and spheres
 
-/*
-    this.blocks.startNegativeGeometry =
-    {
-        type: 'command',
-        spec: 'start negative geometry',
-        category: 'shapes'
-    };
-    this.blocks.stopNegativeGeometry =
-    {
-        type: 'command',
-        spec: 'stop negative geometry',
-        category: 'shapes'
-    };
-*/
+    /*
+       this.blocks.startNegativeGeometry =
+       {
+       type: 'command',
+       spec: 'start negative geometry',
+       category: 'shapes'
+       };
+       this.blocks.stopNegativeGeometry =
+       {
+       type: 'command',
+       spec: 'stop negative geometry',
+       category: 'shapes'
+       };
+       */
 
     // color
     this.blocks.setHSLA =
@@ -562,7 +561,7 @@ SpriteMorph.prototype.blockTemplates = function(category) {
                 'checkbox',
                 this,
                 function () {
-                myself.toggleWatcher(
+                    myself.toggleWatcher(
                         selector,
                         localize(info.spec),
                         myself.blockColor[info.category]
@@ -570,7 +569,7 @@ SpriteMorph.prototype.blockTemplates = function(category) {
                 },
                 null,
                 function () {
-                return myself.showingWatcher(selector);
+                    return myself.showingWatcher(selector);
                 },
                 null
                 );
@@ -581,11 +580,11 @@ SpriteMorph.prototype.blockTemplates = function(category) {
                 'checkbox',
                 this,
                 function () {
-                myself.toggleVariableWatcher(varName);
+                    myself.toggleVariableWatcher(varName);
                 },
                 null,
                 function () {
-                return myself.showingVariableWatcher(varName);
+                    return myself.showingVariableWatcher(varName);
                 },
                 null
                 );
@@ -644,8 +643,8 @@ SpriteMorph.prototype.blockTemplates = function(category) {
         blocks.push(block('stopExtrusion'));
         blocks.push(block('setExtrusionDiameter'));
         blocks.push(block('changeExtrusionDiameter'));
-//        blocks.push(block('startNegativeGeometry'));
-//        blocks.push(block('stopNegativeGeometry'));
+        //        blocks.push(block('startNegativeGeometry'));
+        //        blocks.push(block('stopNegativeGeometry'));
 
     } else if (cat === 'colors') {
         blocks.push(block('setHSLA'));
@@ -660,7 +659,7 @@ SpriteMorph.prototype.blockTemplates = function(category) {
         blocks.push('-');
         blocks.push(block('receiveGo'));
         blocks.push(block('receiveKey'));
-//        blocks.push(block('receiveClick')); // This should not be here, we have no sprites anymore!
+        //        blocks.push(block('receiveClick')); // This should not be here, we have no sprites anymore!
         blocks.push(block('receiveMessage'));
         blocks.push('-');
         blocks.push(block('doBroadcast'));
@@ -801,7 +800,7 @@ SpriteMorph.prototype.blockTemplates = function(category) {
         button = new PushButtonMorph(
                 null,
                 function () {
-                new VariableDialogMorph(
+                    new VariableDialogMorph(
                         null,
                         addVar,
                         myself
@@ -822,15 +821,15 @@ SpriteMorph.prototype.blockTemplates = function(category) {
             button = new PushButtonMorph(
                     null,
                     function () {
-                    var menu = new MenuMorph(
+                        var menu = new MenuMorph(
                             myself.deleteVariable,
                             null,
                             myself
                             );
-                    myself.variables.allNames().forEach(function (name) {
+                        myself.variables.allNames().forEach(function (name) {
                             menu.addItem(name, name);
-                            });
-                    menu.popUpAtHand(myself.world());
+                        });
+                        menu.popUpAtHand(myself.world());
                     },
                     'Delete a variable'
                     );
@@ -845,9 +844,9 @@ SpriteMorph.prototype.blockTemplates = function(category) {
         varNames = this.variables.allNames();
         if (varNames.length > 0) {
             varNames.forEach(function (name) {
-                    blocks.push(variableWatcherToggle(name));
-                    blocks.push(variableBlock(name));
-                    });
+                blocks.push(variableWatcherToggle(name));
+                blocks.push(variableBlock(name));
+            });
             blocks.push('-');
         }
 
@@ -906,31 +905,31 @@ SpriteMorph.prototype.blockTemplates = function(category) {
         button = new PushButtonMorph(
                 null,
                 function () {
-                var ide = myself.parentThatIsA(IDE_Morph),
-                stage = myself.parentThatIsA(StageMorph);
-                new BlockDialogMorph(
-                        null,
-                        function (definition) {
-                        if (definition.spec !== '') {
-                        if (definition.isGlobal) {
+                    var ide = myself.parentThatIsA(IDE_Morph),
+            stage = myself.parentThatIsA(StageMorph);
+        new BlockDialogMorph(
+            null,
+            function (definition) {
+                if (definition.spec !== '') {
+                    if (definition.isGlobal) {
                         stage.globalBlocks.push(definition);
-                        } else {
+                    } else {
                         myself.customBlocks.push(definition);
-                        }
-                        ide.flushPaletteCache();
-                        ide.refreshPalette();
-                        new BlockEditorMorph(definition, myself).popUp();
-                        }
-                        },
-                        myself
-                        ).prompt(
-                            'Make a block',
-                            null,
-                            myself.world()
-                            );
+                    }
+                    ide.flushPaletteCache();
+                    ide.refreshPalette();
+                    new BlockEditorMorph(definition, myself).popUp();
+                }
+            },
+            myself
+            ).prompt(
+                'Make a block',
+                null,
+                myself.world()
+                );
                 },
-                'Make a block'
-                    );
+                         'Make a block'
+                             );
         button.userMenu = helpMenu;
         button.selector = 'addCustomBlock';
         button.showHelp = BlockMorph.prototype.showHelp;
@@ -992,8 +991,8 @@ StageMorph.prototype.destroy = function() {
     var myself = this;
     this.scene.remove(this.myObjects);
     this.children.forEach(function(eachSprite) {
-            myself.removeChild(eachSprite);
-            });
+        myself.removeChild(eachSprite);
+    });
     this.originalDestroy();
 }
 
@@ -1097,8 +1096,8 @@ StageMorph.prototype.initRenderer = function() {
         var myInnerSelf = this;
         this.isWireframeMode = !this.isWireframeMode;
         myself.myObjects.children.forEach(function(eachObject) {
-                eachObject.material.wireframe = myInnerSelf.isWireframeMode;
-                });
+            eachObject.material.wireframe = myInnerSelf.isWireframeMode;
+        });
         myself.reRender();
     }
 
@@ -1108,10 +1107,10 @@ StageMorph.prototype.initRenderer = function() {
 
         myself.scene.axes.forEach(function(line){ line.visible = myInnerSelf.showingAxes });
         myself.children.forEach(function(morph) {
-                if (morph instanceof SpriteMorph) {
+            if (morph instanceof SpriteMorph) {
                 morph.beetle.axes.forEach(function(line){ line.visible = myInnerSelf.showingAxes });
-                }
-                })
+            }
+        })
         myself.reRender();
     }
 
@@ -1153,7 +1152,7 @@ StageMorph.prototype.initCamera = function() {
         if (myself.renderer.isParallelProjection) { 
             var zoom = myself.camera ? myself.camera.zoomFactor : 82,
                 width = Math.max(myself.width(), 480),
-                height = Math.max(myself.height(), 360);
+                      height = Math.max(myself.height(), 360);
             myself.camera = new THREE.OrthographicCamera(
                     width / - zoom,
                     width / zoom,
@@ -1211,17 +1210,17 @@ StageMorph.prototype.initCamera = function() {
 
             var boundingBox = new THREE.Box3().setFromObject(myself.scene),
                 center = boundingBox.center(),
-				size = boundingBox.size(),
-				biggerAxis = (size.x > size.y) ? ((size.x > size.z) ? 'x' : 'z') : ((size.y > size.z) ? 'y' : 'z'),
-				distance = size[biggerAxis] / (2 * Math.tan(this.fov * Math.PI / 360));
+                size = boundingBox.size(),
+                biggerAxis = (size.x > size.y) ? ((size.x > size.z) ? 'x' : 'z') : ((size.y > size.z) ? 'y' : 'z'),
+                distance = size[biggerAxis] / (2 * Math.tan(this.fov * Math.PI / 360));
 
-			if (biggerAxis == 'x' ) {
-				this.position.set(center.x, center.y, distance * 1.5);
-			} else if (biggerAxis == 'y' ) {
-            	this.position.set(distance * 1.5, center.y, center.z);
-			} else {
-				this.position.set(center.x, distance * 1.5, center.z);
-			}
+            if (biggerAxis == 'x' ) {
+                this.position.set(center.x, center.y, distance * 1.5);
+            } else if (biggerAxis == 'y' ) {
+                this.position.set(distance * 1.5, center.y, center.z);
+            } else {
+                this.position.set(center.x, distance * 1.5, center.z);
+            }
 
             this.lookAt(center);
 
@@ -1389,7 +1388,7 @@ StageMorph.prototype.userMenu = function () {
     menu.addItem(
             'pic...',
             function () {
-            window.open(myself.fullImageClassic().toDataURL());
+                window.open(myself.fullImageClassic().toDataURL());
             },
             'open a new window\nwith a picture of the scene'
             );
@@ -1397,14 +1396,14 @@ StageMorph.prototype.userMenu = function () {
     menu.addItem(
             'export as STL',
             function () {
-            ide.downloadSTL()
+                ide.downloadSTL()
             },
             'export scene as an STL\nfile ready to be printed'
             );
     menu.addItem(
             'export as OBJ',
             function () {
-            ide.downloadOBJ()
+                ide.downloadOBJ()
             },
             'export scene as an OBJ\nfile'
             );
@@ -1469,10 +1468,10 @@ SpriteMorph.prototype.findVariableWatcher = function (varName) {
     return detect(
             statusDisplay.children,
             function (morph) {
-            return morph instanceof WatcherMorph
-            && (morph.target === myself.variables
-                    || morph.target === myself.variables.parentFrame)
-            && morph.getter === varName;
+                return morph instanceof WatcherMorph
+        && (morph.target === myself.variables
+            || morph.target === myself.variables.parentFrame)
+        && morph.getter === varName;
             }
             );
 };

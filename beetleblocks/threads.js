@@ -280,10 +280,10 @@ Process.prototype.sphere = function(diam) {
     this.addSphereGeom(diam);
 };
 
-Process.prototype.addSphereGeom = function(diam, isExtrusionCap) {
+Process.prototype.addSphereGeom = function(diam) {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-        sphereGeometry = new THREE.SphereGeometry(Math.abs(diam/2), isExtrusionCap ? 6 : 16, isExtrusionCap ? 6 : 12);
+        sphereGeometry = new THREE.SphereGeometry(Math.abs(diam/2), 12, 12);
 
     var sphere = new THREE.Mesh(sphereGeometry, beetle.newLambertMaterial());
     sphere.position.copy(beetle.position);
@@ -383,14 +383,15 @@ Process.prototype.text2D = function(textString, size) {
 
 Process.prototype.startExtrusion = function() {
     var beetle = this.homeContext.receiver.beetle,
-        stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+        stage = this.homeContext.receiver.parentThatIsA(StageMorph),
+        p = new THREE.Vector3();
 
     if (beetle.extruding) { return }
 
     beetle.extruding = true;
-    beetle.extrusionPoints = new Array();
-    this.addPointToExtrusion();
-    this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true); // start cap
+
+    beetle.lastExtrusionPoint = p.copy(beetle.position);
+    this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale); // start cap
 
     stage.reRender();
 };
@@ -401,30 +402,7 @@ Process.prototype.stopExtrusion = function() {
 
     if (beetle.extruding) {
         beetle.extruding = false;
-        beetle.extrusionMesh = null;
-        beetle.extrusionEndCap = null;
-
-        this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true); // end cap
-
-        // Below an attempt to merge all these shapes into one single body:
-
-        /*
-           beetle.endCap = stage.myObjects.children.pop();
-
-           var startCapBSP = new ThreeBSP(beetle.startCap),
-           endCapBSP = new ThreeBSP(beetle.endCap),
-           extrusionBSP = new ThreeBSP(beetle.extrusionMesh),
-           unionBSP = extrusionBSP.union(endCapBSP),
-           finalMesh = unionBSP.toMesh( beetle.endCap.material );
-
-           finalMesh.geometry.computeVertexNormals();
-
-           stage.myObjects.remove(beetle.startCap);
-           stage.myObjects.remove(beetle.endCap);
-           stage.myObjects.remove(beetle.extrusionMesh);
-
-           stage.myObjects.add(finalMesh);
-         */
+        beetle.lastExtrusionPoint = null;
     }
 
     stage.reRender();
@@ -433,76 +411,28 @@ Process.prototype.stopExtrusion = function() {
 Process.prototype.addPointToExtrusion = function() {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-        p = new THREE.Vector3();
+        p = new THREE.Vector3(),
+        distanceToLast = beetle.lastExtrusionPoint.distanceTo(beetle.position);
 
-    beetle.extrusionPoints.push(p.copy(beetle.position));
+    var geometry = new THREE.CylinderGeometry(
+            (beetle.extrusionDiameter / 2) * beetle.multiplierScale, //radiusTop
+            (beetle.extrusionDiameter / 2) * beetle.multiplierScale, //radiusBottom
+            distanceToLast, //height
+            12 // radiusSegments
+            ),
+        cylinder = new THREE.Mesh(geometry, beetle.newLambertMaterial());
 
-    var extrudeBend = new THREE./*Closed*/SplineCurve3(beetle.extrusionPoints),
-        path = new THREE.TubeGeometry(
-                extrudeBend, 
-                beetle.extrusionPoints.length * beetle.multiplierScale * 10, 
-                beetle.extrusionDiameter/2 * beetle.multiplierScale, 
-                12, 
-                false
-                );
+    cylinder.position.copy(beetle.position);
+    cylinder.rotation.copy(beetle.rotation);
+    cylinder.rotateX(Math.PI/2);
+    cylinder.translateY(-distanceToLast/2);
 
-    // Remove the old mesh, add the updated one
-    if (beetle.extrusionMesh) { stage.myObjects.remove(beetle.extrusionMesh) };
-    beetle.extrusionMesh = new THREE.Mesh(path, beetle.newLambertMaterial());
-    stage.myObjects.add(beetle.extrusionMesh);
+    beetle.lastExtrusionPoint = p.copy(beetle.position);
 
-
-    if (!beetle.extrusionEndCap) { 
-        var circleGeometry = new THREE.CircleGeometry(beetle.extrusionDiameter / 2 * beetle.multiplierScale, 12);
-        beetle.extrusionEndCap = new THREE.Mesh(circleGeometry, beetle.newLambertMaterial());
-        stage.myObjects.add(beetle.extrusionEndCap);
-    }
-
-    // Update extrusion end cap position and rotation
-
-    beetle.extrusionEndCap.position.copy(beetle.position);
-    beetle.extrusionEndCap.rotation.copy(beetle.rotation);	
-
+    this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale); // joint
+    stage.myObjects.add(cylinder);
     stage.reRender();
 }
-
-/*
-Process.prototype.addPointToExtrusion = function() {
-    var beetle = this.homeContext.receiver.beetle,
-        stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-        p = new THREE.Vector3();
-
-    beetle.extrusionPoints.push(p.copy(beetle.position));
-
-    var extrudeBend = new THREE.SplineCurve3(beetle.extrusionPoints),
-        circleShape = new THREE.Shape(
-            new THREE.CircleGeometry(beetle.extrusionDiameter / 2 * beetle.multiplierScale, beetle.extrusionDiameter * beetle.multiplierScale * 25).vertices),
-        path = new THREE.ExtrudeGeometry(circleShape,
-                                          { steps: beetle.extrusionPoints.length * beetle.multiplierScale * 10,
-                                            curveSegments: 50,
-                                              bevelEnabled: false,
-                                              extrudePath: extrudeBend });
-
-    // Remove the old mesh, add the updated one
-    if (beetle.extrusionMesh) { stage.myObjects.remove(beetle.extrusionMesh) };
-    beetle.extrusionMesh = new THREE.Mesh(path, beetle.newLambertMaterial());
-    stage.myObjects.add(beetle.extrusionMesh);
-
-    if (!beetle.extrusionEndCap) { 
-        var circleGeometry = new THREE.CircleGeometry(beetle.extrusionDiameter / 2 * beetle.multiplierScale, 12);
-        beetle.extrusionEndCap = new THREE.Mesh(circleGeometry, beetle.newLambertMaterial());
-        stage.myObjects.add(beetle.extrusionEndCap);
-    }
-
-    // Update extrusion end cap position and rotation
-
-    beetle.extrusionEndCap.position.copy(beetle.position);
-    beetle.extrusionEndCap.rotation.copy(beetle.rotation);	
-
-
-    stage.reRender();
-}
-*/
 
 Process.prototype.setExtrusionDiameter = function(diameter) {
     var beetle = this.homeContext.receiver.beetle;
