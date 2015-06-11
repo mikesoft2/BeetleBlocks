@@ -1205,18 +1205,20 @@ StageMorph.prototype.initCamera = function() {
         }
 
         myself.camera.fitScene = function() {
-            this.reset();
 
             var boundingBox = new THREE.Box3().setFromObject(myself.myObjects),
                 boundingSphere = boundingBox.getBoundingSphere(),
                 center = boundingSphere.center,
                 distance = boundingSphere.radius;
 
+            this.reset();
+
             this.position.set(center.x, center.y, center.z);
+            this.translateZ(distance * 1.2);
+
             myself.controls.center.set(center.x, center.y, center.z);
-            this.translateZ(distance);
-            // myself.controls.dollyOut() something!!!
-            //myself.controls.update();
+            myself.controls.dollyOut(1.2);
+            myself.controls.update();
             myself.reRender();
         }
     }
