@@ -1016,6 +1016,7 @@ StageMorph.prototype.initScene = function() {
     var myself = this;
     this.scene = new THREE.Scene();
     this.scene.axes = [];
+    this.scene.labels = [];
     this.scene.grid = {};
     this.scene.grid.defaultColor = 0xAAAAAA;
     this.scene.grid.visible = true;
@@ -1078,6 +1079,26 @@ StageMorph.prototype.initScene = function() {
     this.scene.axes.push(this.scene.addLineToPointWithColor(p, 0x0000FF, 2));
     p = new THREE.Vector3(0,0,5);
     this.scene.axes.push(this.scene.addLineToPointWithColor(p, 0xFF0000, 2));
+
+    // Labels
+    var axes = { 
+        x: { realAxis: 'Z', color: 0xFF0000 },
+        y: { realAxis: 'X', color: 0x00FF00 },
+        z: { realAxis: 'Y', color: 0x0000FF }};
+
+    Object.keys(axes).forEach(function(axis) {
+
+        var map = THREE.ImageUtils.loadTexture( 'beetleblocks/axes/' + axis + '.png' ),
+            material = new THREE.SpriteMaterial( { map: map, color: axes[axis].color } ),
+            sprite = new THREE.Sprite( material );
+
+        sprite.position['set' + axes[axis].realAxis].call(sprite.position, 5.4);
+        sprite.scale.set(0.5, 0.5, 0.5);
+
+        myself.scene.labels.push(sprite);
+        myself.scene.add(sprite);
+    } )
+
 }
 
 StageMorph.prototype.initRenderer = function() {
