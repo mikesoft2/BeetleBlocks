@@ -1087,7 +1087,6 @@ StageMorph.prototype.initScene = function() {
         z: { realAxis: 'Y', color: 0x0000FF }};
 
     Object.keys(axes).forEach(function(axis) {
-
         var map = THREE.ImageUtils.loadTexture( 'beetleblocks/axes/' + axis + '.png' ),
             material = new THREE.SpriteMaterial( { map: map, color: axes[axis].color } ),
             sprite = new THREE.Sprite( material );
@@ -1097,8 +1096,7 @@ StageMorph.prototype.initScene = function() {
 
         myself.scene.labels.push(sprite);
         myself.scene.add(sprite);
-    } )
-
+    })
 }
 
 StageMorph.prototype.initRenderer = function() {
