@@ -1276,6 +1276,9 @@ StageMorph.prototype.mouseDownRight = function(pos) {
 };
 
 StageMorph.prototype.mouseMove = function(pos, button) {
+
+    if (this.referencePos === null) { return };
+
     deltaX = pos.x - this.referencePos.x;
     deltaY = pos.y - this.referencePos.y;
     this.referencePos = pos
@@ -1291,6 +1294,10 @@ StageMorph.prototype.mouseMove = function(pos, button) {
     this.controls.update();
     this.reRender();
 };
+
+StageMorph.prototype.mouseLeave = function() {
+    this.referencePos = null;
+}
 
 StageMorph.prototype.originalAdd = StageMorph.prototype.add;
 StageMorph.prototype.add = function(morph) {
