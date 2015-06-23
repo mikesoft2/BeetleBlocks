@@ -119,7 +119,7 @@ SpriteMorph.prototype.initBeetle = function() {
     this.beetle.axes = [];
     // beetle's local axis lines
     p = new THREE.Vector3(1,0,0);
-    this.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0x00FF00));
+    this.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0x00E11E));
     p = new THREE.Vector3(0,1,0);
     this.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0x0000FF));
     p = new THREE.Vector3(0,0,1);
@@ -260,26 +260,6 @@ SpriteMorph.prototype.initBlocks = function() {
 
     var myself = this;
     this.originalInitBlocks();
-
-    // Uncomment this to get backwards compatibility with previously saved projects.
-    // After fixing these projects, save them and comment this code again:
-
-    /*
-
-       this.blocks.setExtrusionRadius = this.blocks.setExtrusionDiameter;
-       this.blocks.changeExtrusionRadius = this.blocks.changeExtrusionDiameter;
-
-    // Projects using the old HSL blocks will fail to run, you'll need to replace
-    // all color related blocks.
-
-    this.blocks.setHSL = this.blocks.setHSLA;
-    this.blocks.changeHSL = this.blocks.changeHSLA;
-    this.blocks.getHSL = this.blocks.getHSLA;
-
-    // Additionally, you'll need to re-select global coordinates, as they are
-    // now uppercase.
-
-*/
 
     // control
 
@@ -906,30 +886,30 @@ SpriteMorph.prototype.blockTemplates = function(category) {
                 null,
                 function () {
                     var ide = myself.parentThatIsA(IDE_Morph),
-            stage = myself.parentThatIsA(StageMorph);
-        new BlockDialogMorph(
-            null,
-            function (definition) {
-                if (definition.spec !== '') {
-                    if (definition.isGlobal) {
-                        stage.globalBlocks.push(definition);
-                    } else {
-                        myself.customBlocks.push(definition);
-                    }
-                    ide.flushPaletteCache();
-                    ide.refreshPalette();
-                    new BlockEditorMorph(definition, myself).popUp();
-                }
-            },
-            myself
-            ).prompt(
-                'Make a block',
-                null,
-                myself.world()
-                );
+                    stage = myself.parentThatIsA(StageMorph);
+                    new BlockDialogMorph(
+                        null,
+                        function (definition) {
+                            if (definition.spec !== '') {
+                                if (definition.isGlobal) {
+                                    stage.globalBlocks.push(definition);
+                                } else {
+                                    myself.customBlocks.push(definition);
+                                }
+                                ide.flushPaletteCache();
+                                ide.refreshPalette();
+                                new BlockEditorMorph(definition, myself).popUp();
+                            }
+                        },
+                        myself
+                        ).prompt(
+                            'Make a block',
+                            null,
+                            myself.world()
+                            );
                 },
-                         'Make a block'
-                             );
+                'Make a block'
+            );
         button.userMenu = helpMenu;
         button.selector = 'addCustomBlock';
         button.showHelp = BlockMorph.prototype.showHelp;
@@ -1073,17 +1053,17 @@ StageMorph.prototype.initScene = function() {
     }
 
     // Axes
-    p = new THREE.Vector3(5,0,0);
-    this.scene.axes.push(this.scene.addLineToPointWithColor(p, 0x00FF00, 2));
-    p = new THREE.Vector3(0,5,0);
+    p = new THREE.Vector3(4,0,0);
+    this.scene.axes.push(this.scene.addLineToPointWithColor(p, 0x00E11E, 2));
+    p = new THREE.Vector3(0,4,0);
     this.scene.axes.push(this.scene.addLineToPointWithColor(p, 0x0000FF, 2));
-    p = new THREE.Vector3(0,0,5);
+    p = new THREE.Vector3(0,0,4);
     this.scene.axes.push(this.scene.addLineToPointWithColor(p, 0xFF0000, 2));
 
     // Labels
     var axes = { 
         x: { realAxis: 'Z', color: 0xFF0000 },
-        y: { realAxis: 'X', color: 0x00FF00 },
+        y: { realAxis: 'X', color: 0x00E11E },
         z: { realAxis: 'Y', color: 0x0000FF }};
 
     Object.keys(axes).forEach(function(axis) {
@@ -1091,8 +1071,8 @@ StageMorph.prototype.initScene = function() {
             material = new THREE.SpriteMaterial( { map: map, color: axes[axis].color } ),
             sprite = new THREE.Sprite( material );
 
-        sprite.position['set' + axes[axis].realAxis].call(sprite.position, 5.4);
-        sprite.scale.set(0.5, 0.5, 0.5);
+        sprite.position['set' + axes[axis].realAxis].call(sprite.position, 4.3);
+        sprite.scale.set(0.3, 0.3, 0.3);
 
         myself.scene.labels.push(sprite);
         myself.scene.add(sprite);
