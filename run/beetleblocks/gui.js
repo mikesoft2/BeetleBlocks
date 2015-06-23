@@ -740,7 +740,7 @@ ProjectDialogMorph.prototype.getExamplesProjectList = function () {
     var dir,
         projects = [];
 
-    dir = JSON.parse(this.ide.getURL('https://api.github.com/repos/ericrosenbaum/BeetleBlocks/contents/beetleblocks/examples'));
+    dir = JSON.parse(this.ide.getURL('https://api.github.com/repos/ericrosenbaum/BeetleBlocks/contents/run/beetleblocks/examples'));
     dir.forEach(function(each){
             var dta = {
 name: each.name.replace('.xml',''),
