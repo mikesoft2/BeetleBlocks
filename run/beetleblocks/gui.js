@@ -742,18 +742,18 @@ ProjectDialogMorph.prototype.getExamplesProjectList = function () {
 
     dir = JSON.parse(this.ide.getURL('https://api.github.com/repos/ericrosenbaum/BeetleBlocks/contents/run/beetleblocks/examples'));
     dir.forEach(function(each){
-            var dta = {
-name: each.name.replace('.xml',''),
-thumb: null,
-notes: null,
-path: each.path
-};
-projects.push(dta)
-})
-projects.sort(function (x, y) {
+        var dta = {
+            name: each.name.replace('.xml',''),
+            thumb: null,
+            notes: null,
+            path: each.path.substring(4) // remove '/run' from path
+        };
+        projects.push(dta)
+    })
+    projects.sort(function (x, y) {
         return x.name < y.name ? -1 : 1;
-        });
-return projects;
+    });
+    return projects;
 };
 
 ProjectDialogMorph.prototype.setSource = function (source) {
@@ -762,20 +762,20 @@ ProjectDialogMorph.prototype.setSource = function (source) {
 
     this.source = source; //this.task === 'save' ? 'local' : source;
     this.srcBar.children.forEach(function (button) {
-            button.refresh();
-            });
+        button.refresh();
+    });
     switch (this.source) {
         case 'cloud':
             msg = myself.ide.showMessage('Updating\nproject list...');
             this.projectList = [];
             SnapCloud.getProjectList(
                     function (projectList) {
-                    myself.installCloudProjectList(projectList);
-                    msg.destroy();
+                        myself.installCloudProjectList(projectList);
+                        msg.destroy();
                     },
                     function (err, lbl) {
-                    msg.destroy();
-                    myself.ide.cloudError().call(null, err, lbl);
+                        msg.destroy();
+                        myself.ide.cloudError().call(null, err, lbl);
                     }
                     );
             return;
@@ -792,7 +792,7 @@ ProjectDialogMorph.prototype.setSource = function (source) {
             this.projectList,
             this.projectList.length > 0 ?
             function (element) {
-            return element.name;
+                return element.name;
             } : null,
             null,
             function () {myself.ok(); }
@@ -977,8 +977,8 @@ IDE_Morph.prototype.buildPanes = function () {
     this.createSpriteEditor();
     // It's easier to make a bogus spriteBar object than to remove all references to it
     this.spriteBar = { 
-tabBar: { 
-tabTo: nop
+        tabBar: { 
+            tabTo: nop
         }
     };
     this.createStatusDisplay();
@@ -1077,24 +1077,24 @@ IDE_Morph.prototype.createStatusDisplay = function () {
             middle = (max - start) / 2 + start;
 
         this.frame.contents.children.forEach(function (element) {
-                element.setPosition(new Point(x, y));
-                x += element.width();
+            element.setPosition(new Point(x, y));
+            x += element.width();
 
-                if (element instanceof ToggleMorph) { x+= element.label.width() + 2 };
+            if (element instanceof ToggleMorph) { x+= element.label.width() + 2 };
 
-                if (element.newLines) {
+            if (element.newLines) {
                 y += 14 * element.newLines;
                 x = start;
-                };
+            };
 
-                if (element.newColumn) {
+            if (element.newColumn) {
                 if (element.columns) {
-                x = ((max - start) / element.columns) * element.newColumn + start;
+                    x = ((max - start) / element.columns) * element.newColumn + start;
                 } else {
-                x = middle;
+                    x = middle;
                 }
-                };
-                });
+            };
+        });
 
         this.frame.contents.adjustBounds();
     };
@@ -1111,13 +1111,13 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 
     this.statusDisplay.refresh = function () {
         this.frame.contents.children.forEach(function (element) {
-                if (element.hasOwnProperty('update')) {
+            if (element.hasOwnProperty('update')) {
                 element.update();
                 element.changed();
                 element.drawNew();
                 element.changed();
-                };
-                });
+            };
+        });
     };
 
     this.statusDisplay.acceptsDrops = function () {
@@ -1131,14 +1131,14 @@ IDE_Morph.prototype.createStatusDisplay = function () {
            the given border (for automatic positioning) */
 
         return this.children.filter(function (morph) {
-                if (morph instanceof WatcherMorph) {
+            if (morph instanceof WatcherMorph) {
                 if (leftPos) {
-                return morph.left() === leftPos;
+                    return morph.left() === leftPos;
                 }
                 return morph.isVisible;
-                }
-                return false;
-                });
+            }
+            return false;
+        });
     };
 
     this.statusDisplay.step = function() {
@@ -1148,8 +1148,8 @@ IDE_Morph.prototype.createStatusDisplay = function () {
         leftover = (1000 / this.watcherUpdateFrequency) - elapsed;
         if (leftover < 1) {
             this.watchers().forEach(function (w) {
-                    w.update();
-                    });
+                w.update();
+            });
             this.lastWatcherUpdate = Date.now();
         }
     }
@@ -1172,11 +1172,11 @@ IDE_Morph.prototype.createStatusDisplay = function () {
             'checkbox',
             null,
             function () {
-            stage.renderer.toggleWireframe();
+                stage.renderer.toggleWireframe();
             },
             'Wireframe',
             function () {
-            return stage.renderer.isWireframeMode
+                return stage.renderer.isWireframeMode
             });
     toggleWireframeButton.columns = 3;
     toggleWireframeButton.newColumn = 2;
@@ -1186,11 +1186,11 @@ IDE_Morph.prototype.createStatusDisplay = function () {
             'checkbox',
             null,
             function () {
-            beetle.toggleVisibility();
+                beetle.toggleVisibility();
             },
             'Beetle',
             function () {
-            return beetle.shape.visible;
+                return beetle.shape.visible;
             }
 
             );
@@ -1210,11 +1210,11 @@ IDE_Morph.prototype.createStatusDisplay = function () {
             'checkbox',
             null,
             function () {
-            stage.renderer.toggleParallelProjection();
+                stage.renderer.toggleParallelProjection();
             },
             'Parallel projection',
             function () {
-            return stage.renderer.isParallelProjection
+                return stage.renderer.isParallelProjection
             });
     toggleParallelProjectionButton.columns = 3;
     toggleParallelProjectionButton.newColumn = 2;
@@ -1224,11 +1224,11 @@ IDE_Morph.prototype.createStatusDisplay = function () {
             'checkbox',
             null,
             function () {
-            stage.renderer.toggleAxes();
+                stage.renderer.toggleAxes();
             },
             'Axes',
             function () {
-            return stage.renderer.showingAxes;
+                return stage.renderer.showingAxes;
             });
     toggleAxesButton.newLines = 2;
     elements.push(toggleAxesButton);
@@ -1244,11 +1244,11 @@ IDE_Morph.prototype.createStatusDisplay = function () {
             'checkbox',
             null,
             function () {
-            myself.toggleFastTracking();
+                myself.toggleFastTracking();
             },
             'Turbo mode',
             function () {
-            return stage.isFastTracked
+                return stage.isFastTracked
             });
     toggleTurboButton.columns = 3;
     toggleTurboButton.newColumn = 2;
@@ -1258,11 +1258,11 @@ IDE_Morph.prototype.createStatusDisplay = function () {
             'checkbox',
             null,
             function () {
-            stage.scene.grid.toggle();
+                stage.scene.grid.toggle();
             },
             'Grid',
             function () {
-            return stage.scene.grid.visible
+                return stage.scene.grid.visible
             });
     toggleGridButton.newLines = 2;
     elements.push(toggleGridButton);
@@ -1361,32 +1361,32 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
         this.controlBar.setColor(this.color);
         this.controlBar.appModeButton.refresh();
         elements.forEach(function (e) {
-                e.hide();
-                });
+            e.hide();
+        });
         world.children.forEach(function (morph) {
-                if (morph instanceof DialogBoxMorph) {
+            if (morph instanceof DialogBoxMorph) {
                 morph.hide();
-                }
-                });
+            }
+        });
     } else {
         this.setColor(this.backgroundColor);
         this.controlBar.setColor(this.frameColor);
         elements.forEach(function (e) {
-                e.show();
-                });
+            e.show();
+        });
         this.stage.setScale(1);
         // show all hidden dialogs
         world.children.forEach(function (morph) {
-                if (morph instanceof DialogBoxMorph) {
+            if (morph instanceof DialogBoxMorph) {
                 morph.show();
-                }
-                });
+            }
+        });
         // prevent scrollbars from showing when morph appears
         world.allChildren().filter(function (c) {
-                return c instanceof ScrollFrameMorph;
-                }).forEach(function (s) {
-                    s.adjustScrollBars();
-                    });
+            return c instanceof ScrollFrameMorph;
+        }).forEach(function (s) {
+            s.adjustScrollBars();
+        });
     }
     this.setExtent(this.world().extent()); // resume trackChanges
 };
@@ -1405,21 +1405,21 @@ IDE_Morph.prototype.setLanguage = function(lang, callback) {
     var myself = this;
 
     myself.originalSetLanguage(lang, function() {
-            var translation = document.getElementById('bb-language'),
-            src = 'beetleblocks/lang-' + lang + '.js',
-            myInnerSelf = this;
-            if (translation) {
-            document.head.removeChild(translation);
-            }
-            if (lang === 'en') {
-            return this.reflectLanguage('en', callback);
-            }
-            translation = document.createElement('script');
-            translation.id = 'bb-language';
-            translation.onload = function () {
-            myInnerSelf.reflectLanguage(lang, callback);
-            };
-            document.head.appendChild(translation);
-            translation.src = src; 
-            });
+        var translation = document.getElementById('bb-language'),
+        src = 'beetleblocks/lang-' + lang + '.js',
+        myInnerSelf = this;
+    if (translation) {
+        document.head.removeChild(translation);
+    }
+    if (lang === 'en') {
+        return this.reflectLanguage('en', callback);
+    }
+    translation = document.createElement('script');
+    translation.id = 'bb-language';
+    translation.onload = function () {
+        myInnerSelf.reflectLanguage(lang, callback);
+    };
+    document.head.appendChild(translation);
+    translation.src = src; 
+    });
 };
