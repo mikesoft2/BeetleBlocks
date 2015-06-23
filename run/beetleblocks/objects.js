@@ -1071,6 +1071,8 @@ StageMorph.prototype.initScene = function() {
             material = new THREE.SpriteMaterial( { map: map, color: axes[axis].color } ),
             sprite = new THREE.Sprite( material );
 
+        map.needsUpdate = true;
+
         sprite.position['set' + axes[axis].realAxis].call(sprite.position, 4.3);
         sprite.scale.set(0.3, 0.3, 0.3);
 
