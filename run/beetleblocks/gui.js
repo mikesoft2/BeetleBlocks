@@ -379,7 +379,7 @@ IDE_Morph.prototype.settingsMenu = function () {
             'Flat line ends',
             function () {
                 SpriteMorph.prototype.useFlatLineEnds =
-        !SpriteMorph.prototype.useFlatLineEnds;
+                    !SpriteMorph.prototype.useFlatLineEnds;
             },
             SpriteMorph.prototype.useFlatLineEnds,
             'uncheck for round ends of lines',
@@ -389,10 +389,10 @@ IDE_Morph.prototype.settingsMenu = function () {
             'Codification support',
             function () {
                 StageMorph.prototype.enableCodeMapping =
-        !StageMorph.prototype.enableCodeMapping;
-    myself.currentSprite.blocksCache.variables = null;
-    myself.currentSprite.paletteCache.variables = null;
-    myself.refreshPalette();
+                    !StageMorph.prototype.enableCodeMapping;
+                myself.currentSprite.blocksCache.variables = null;
+                myself.currentSprite.paletteCache.variables = null;
+                myself.refreshPalette();
             },
             StageMorph.prototype.enableCodeMapping,
             'uncheck to disable\nblock to text mapping features',
@@ -404,7 +404,9 @@ IDE_Morph.prototype.settingsMenu = function () {
             'Set background color', 
             function(){ 
                 this.pickColor(null, function(color) { 
-                    stage.renderer.setClearColor('rgb(' + color.r + ',' + color.g + ',' + color.b + ')', 1);
+                    colorString = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+                    myself.saveSetting('bgcolor', colorString);
+                    stage.renderer.setClearColor(colorString, 1);
                         stage.reRender();
                         })
                     });
