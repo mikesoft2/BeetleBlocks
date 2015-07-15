@@ -1088,11 +1088,11 @@ StageMorph.prototype.initRenderer = function() {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(480 / dpr, 360 / dpr); // ugly! this.width(), this.height() is not set yet!
 
+    this.renderer.setClearColor(0xe6e6e6, 1);
+
     if (localStorage) {
         // ide is not set yet, we're accessing its prototype to circumvent this
         this.renderer.setClearColor(IDE_Morph.prototype.getSetting('bgcolor'), 1);
-    } else {
-        this.renderer.setClearColor(0xe6e6e6, 1);
     }
 
     this.renderer.changed = false;
