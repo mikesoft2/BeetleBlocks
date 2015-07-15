@@ -170,9 +170,9 @@ Process.prototype.pointTowards = function(x, y, z) {
     // We're losing precision here
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-        x = Number(x);
-    y = Number(y);
-    z = Number(z);
+        x = Number(x),
+        y = Number(y),
+        z = Number(z);
     beetle.lookAt(new THREE.Vector3(y, z, x));
     stage.reRender();
 };
@@ -193,16 +193,15 @@ Process.prototype.addLineGeom = function(startPoint, endPoint) {
 }
 
 Process.prototype.move = function(dist) {
-    var beetle = this.homeContext.receiver.beetle;
-    stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+    var beetle = this.homeContext.receiver.beetle,
+        stage = this.homeContext.receiver.parentThatIsA(StageMorph);
 
     if (beetle.drawing) {
         var p = new THREE.Vector3();
         var startPoint =  p.copy(beetle.position);
     }
 
-    dist = Number(dist) * beetle.multiplierScale;
-    beetle.translateZ(dist);
+    beetle.translateZ(Number(dist) * beetle.multiplierScale);
 
     if (beetle.extruding) {
         this.addPointToExtrusion();
@@ -280,13 +279,10 @@ Process.prototype.sphere = function(diam) {
     this.addSphereGeom(diam);
 };
 
-Process.prototype.addSphereGeom = function(diam, isExtrusionCap) {
+Process.prototype.addSphereGeom = function(diam) {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-        sphereGeometry = new THREE.SphereGeometry(
-                Math.abs(diam/2), 
-                isExtrusionCap ?  12: 16,
-                isExtrusionCap ?  6: 12);
+        sphereGeometry = new THREE.SphereGeometry(Math.abs(diam/2), 12, 12);
 
     var sphere = new THREE.Mesh(sphereGeometry, beetle.newLambertMaterial());
     sphere.position.copy(beetle.position);
@@ -295,19 +291,16 @@ Process.prototype.addSphereGeom = function(diam, isExtrusionCap) {
     // If the diameter is negative, we carve a negative sphere
     stage.myObjects.add(sphere, diam < 0);
     stage.reRender();
-
-    return sphere;
 }
 
 Process.prototype.tube = function(length, outer, inner) {
-    var beetle = this.homeContext.receiver.beetle;
-    stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+    var beetle = this.homeContext.receiver.beetle,
+        stage = this.homeContext.receiver.parentThatIsA(StageMorph),
+        length = Number(length) * beetle.multiplierScale,
+        outer = Number(outer) * beetle.multiplierScale,
+        inner = Number(inner) * beetle.multiplierScale;
 
-    length = Number(length) * beetle.multiplierScale;
-    outer = Number(outer) * beetle.multiplierScale;
-    inner = Number(inner) * beetle.multiplierScale;
     this.addTubeGeom(length, outer, inner);
-
     stage.reRender();
 };
 
@@ -339,10 +332,9 @@ Process.prototype.addTubeGeom = function(length, outer, inner) {
     var hole = new THREE.Shape(pts);
     shape.holes.push(hole);
 
-    var options = { amount: length, bevelEnabled: false };
-
-    var tubeGeom = new THREE.ExtrudeGeometry(shape, options);
-    var tube = new THREE.Mesh(tubeGeom, beetle.newLambertMaterial());
+    var options = { amount: length, bevelEnabled: false },
+        tubeGeom = new THREE.ExtrudeGeometry(shape, options),
+        tube = new THREE.Mesh(tubeGeom, beetle.newLambertMaterial());
 
     tube.position.copy(beetle.position);
     tube.rotation.copy(beetle.rotation);	
@@ -395,10 +387,10 @@ Process.prototype.startExtrusion = function() {
 
     beetle.extruding = true;
 
-    this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true);
     beetle.lastExtrusionPoint = p.copy(beetle.position);
+    //this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale); // start cap
 
-    this.addPointToExtrusion();
+    stage.reRender();
 };
 
 Process.prototype.stopExtrusion = function() {
@@ -408,6 +400,7 @@ Process.prototype.stopExtrusion = function() {
     if (beetle.extruding) {
         beetle.extruding = false;
         beetle.lastExtrusionPoint = null;
+        beetle.extrusion = null;
     }
 
     stage.reRender();
@@ -418,80 +411,32 @@ Process.prototype.addPointToExtrusion = function() {
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
         p = new THREE.Vector3(),
         distanceToLast = beetle.lastExtrusionPoint.distanceTo(beetle.position),
-        circleGeometry = new THREE.CircleGeometry(beetle.extrusionDiameter / 2 * beetle.multiplierScale, 12),
-        circleGeometry2 = new THREE.CircleGeometry(beetle.extrusionDiameter / 2 * beetle.multiplierScale, 12);
-
-    // Each time we move we add a circle at the previous position that matches the beetle's rotation
-    // Then, we stitch the vertices of the two circles that share position
-
-    if (beetle.endSphere) {
-        stage.myObjects.remove(beetle.endSphere);
-    }
-
-    beetle.endSphere = this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true);
-
-    if (beetle.endCap) {
-        beetle.jointCap = new THREE.Mesh(circleGeometry, beetle.newLambertMaterial());
-        beetle.jointCap.material.color = new THREE.Color();
-        beetle.jointCap.position.copy(beetle.lastExtrusionPoint);
-        beetle.jointCap.rotation.copy(beetle.rotation);
-        beetle.jointCap.updateMatrix();
-        beetle.jointCap.geometry.applyMatrix(beetle.jointCap.matrix);
-        beetle.jointCap.position.set(0,0,0);
-        beetle.jointCap.rotation.set(0,0,0);
-        beetle.jointCap.updateMatrix();
-
-        var geometry = new THREE.CylinderGeometry(
+        geometry = new THREE.CylinderGeometry(
             (beetle.extrusionDiameter / 2) * beetle.multiplierScale, //radiusTop
             (beetle.extrusionDiameter / 2) * beetle.multiplierScale, //radiusBottom
             distanceToLast, //height
-            12, // radiusSegments
-            1, // heightSegments
-            true // openEnded
-            ),
-        cylinder = new THREE.Mesh(geometry, beetle.newLambertMaterial());
+            12 // radiusSegments
+            );
 
-        cylinder.position.copy(beetle.position);
-        cylinder.rotation.copy(beetle.rotation);
-        cylinder.rotateX(Math.PI/2);
-        cylinder.translateY(-distanceToLast/2);
+    if (!beetle.extrusion) {
+        mesh = new THREE.Mesh(geometry, beetle.newLambertMaterial());
 
-        stage.myObjects.add(cylinder);
+        mesh.position.copy(beetle.position);
+        mesh.rotation.copy(beetle.rotation);
+        mesh.rotateX(Math.PI/2);
+        mesh.translateY(-distanceToLast/2);
+
+        beetle.extrusion = mesh;
+
+        stage.myObjects.add(mesh);
+    } else {
+        beetle.extrusion.updateMatrix();
+        beetle.extrusion.geometry.merge(geometry, beetle.extrusion.matrix);
     }
-
-    if (beetle.jointCap) {
-        // stitch botch circles together
-        var jointGeometry = new THREE.Geometry();
-
-        for (i = 0; i < circleGeometry.vertices.length; i ++) {
-            jointGeometry.vertices.push(beetle.jointCap.geometry.vertices[i]);
-            jointGeometry.vertices.push(beetle.endCap.geometry.vertices[i]);
-
-            if (i > 0) {
-                jointGeometry.faces.push(new THREE.Face3(i * 2, i * 2 + 1, i * 2 - 1));
-                jointGeometry.faces.push(new THREE.Face3(i * 2, i * 2 - 1, i * 2 - 2));
-            }
-        }
-
-        jointGeometry.mergeVertices();
-        jointGeometry.computeFaceNormals();
-        jointGeometry.computeVertexNormals();
-
-        beetle.joint = new THREE.Mesh(jointGeometry, beetle.newLambertMaterial());
-        stage.myObjects.add(beetle.joint);
-    }
-
-    beetle.endCap = new THREE.Mesh(circleGeometry2, beetle.newLambertMaterial());
-    beetle.endCap.position.copy(beetle.position);
-    beetle.endCap.rotation.copy(beetle.rotation);
-    beetle.endCap.updateMatrix();
-    beetle.endCap.geometry.applyMatrix(beetle.endCap.matrix);
-    beetle.endCap.position.set(0,0,0);
-    beetle.endCap.rotation.set(0,0,0);
-    beetle.endCap.updateMatrix();
 
     beetle.lastExtrusionPoint = p.copy(beetle.position);
 
+    //this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale); // joint
     stage.reRender();
 }
 
