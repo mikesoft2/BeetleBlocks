@@ -2,12 +2,14 @@ Process.prototype.clear = function() {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph);
 
+    this.stopDrawing();
+    this.stopExtrusion();
+    beetle.extrusionDiameter = 1;
+
     stage.scene.remove(stage.myObjects);
     stage.myObjects = new THREE.Object3D();
     stage.scene.add(stage.myObjects);
 
-    beetle.drawing = false;
-    beetle.extruding = false; 
     beetle.multiplierScale = 1;
 
     beetle.reset();
@@ -394,11 +396,12 @@ Process.prototype.startExtrusion = function() {
     if (beetle.extruding) { return }
 
     beetle.extruding = true;
-
-    this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true);
+    beetle.firstExtrusion = true;
     beetle.lastExtrusionPoint = p.copy(beetle.position);
 
     this.addPointToExtrusion();
+
+    beetle.startSphere = this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true);
 };
 
 Process.prototype.stopExtrusion = function() {
@@ -407,7 +410,12 @@ Process.prototype.stopExtrusion = function() {
 
     if (beetle.extruding) {
         beetle.extruding = false;
+        beetle.firstExtrusion = false;
         beetle.lastExtrusionPoint = null;
+        beetle.endSphere = null;
+        beetle.startSphere = null;
+        beetle.endCap = null;
+        beetle.jointCap = null;
     }
 
     stage.reRender();
@@ -421,12 +429,13 @@ Process.prototype.addPointToExtrusion = function() {
         circleGeometry = new THREE.CircleGeometry(beetle.extrusionDiameter / 2 * beetle.multiplierScale, 12),
         circleGeometry2 = new THREE.CircleGeometry(beetle.extrusionDiameter / 2 * beetle.multiplierScale, 12);
 
-    // Each time we move we add a circle at the previous position that matches the beetle's rotation
-    // Then, we stitch the vertices of the two circles that share position
-
     if (beetle.endSphere) {
         stage.myObjects.remove(beetle.endSphere);
     }
+
+    // Each time we move we create a circle at the previous position that matches the beetle's current rotation.
+    // Then, we stitch the vertices of these two circles that share position, and we only add the stitched faces
+    // to the scene, as we don't actually need the two circular caps.
 
     beetle.endSphere = this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true);
 
@@ -447,7 +456,7 @@ Process.prototype.addPointToExtrusion = function() {
             distanceToLast, //height
             12, // radiusSegments
             1, // heightSegments
-            true // openEnded
+            true // openEnded to save faces
             ),
         cylinder = new THREE.Mesh(geometry, beetle.newLambertMaterial());
 
@@ -457,9 +466,9 @@ Process.prototype.addPointToExtrusion = function() {
         cylinder.translateY(-distanceToLast/2);
 
         stage.myObjects.add(cylinder);
-    }
+    } 
 
-    if (beetle.jointCap) {
+    if (beetle.jointCap && !beetle.firstExtrusion) {
         // stitch botch circles together
         var jointGeometry = new THREE.Geometry();
 
@@ -479,6 +488,11 @@ Process.prototype.addPointToExtrusion = function() {
 
         beetle.joint = new THREE.Mesh(jointGeometry, beetle.newLambertMaterial());
         stage.myObjects.add(beetle.joint);
+    } 
+
+    if (beetle.firstExtrusion && beetle.startSphere) {
+        beetle.startSphere.rotation.copy(beetle.rotation);
+        beetle.firstExtrusion = false;
     }
 
     beetle.endCap = new THREE.Mesh(circleGeometry2, beetle.newLambertMaterial());
