@@ -313,42 +313,37 @@ Process.prototype.tube = function(length, outer, inner) {
     stage.reRender();
 };
 
-// this needs to be cleaned up
-// remove redundant code and make a function to generate the circle points
 Process.prototype.addTubeGeom = function(length, outer, inner) {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-        pts = [],
-        numPoints = 24,
-        innerRadius = inner/2,
-        outerRadius = outer/2;
+        outerRadius = outer/2, 
+        innerRadius = inner/2;
 
-    for (i = 0; i < numPoints; i ++) {
-        var a = 2 * Math.PI * i / numPoints;
-        pts.push(new THREE.Vector2(Math.cos(a) * outerRadius, Math.sin(a) * outerRadius));
-    }
+    var arcShape = new THREE.Shape();
+    arcShape.absarc(0, 0, outerRadius, 0, Math.PI * 2, 0, false);
 
-    var shape = new THREE.Shape(pts);
+    var holePath = new THREE.Path();
+    holePath.absarc(0, 0, innerRadius, 0, Math.PI * 2, true);
+    arcShape.holes.push(holePath);
 
-    pts = [];
-    innerRadius = inner/2;
+    var tubeGeom = new THREE.ExtrudeGeometry(
+            arcShape, 
+            { 
+                amount: length, 
+                steps: 1, 
+                bevelEnabled: true, 
+                bevelThickness: 0, 
+                bevelSize: 0 
+            });
 
-    for (i = 0; i < numPoints; i ++) {
-        var a = 2 * Math.PI * i / numPoints;
-        pts.push(new THREE.Vector2(Math.cos(a) * innerRadius, Math.sin(a) * innerRadius));
-    }
+    tubeGeom.computeFaceNormals();
+    tubeGeom.computeVertexNormals();
 
-    var hole = new THREE.Shape(pts);
-    shape.holes.push(hole);
-
-    var options = { amount: length, bevelEnabled: false };
-
-    var tubeGeom = new THREE.ExtrudeGeometry(shape, options);
     var tube = new THREE.Mesh(tubeGeom, beetle.newLambertMaterial());
-
     tube.position.copy(beetle.position);
     tube.rotation.copy(beetle.rotation);	
     tube.translateZ(-length/2);		
+
     stage.myObjects.add(tube);
 }
 
