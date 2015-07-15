@@ -65,8 +65,8 @@ SpriteMorph.prototype.initBeetle = function() {
         this.setHSL(hsl.h/360, hsl.s/100, hsl.l/100);
         myself.beetle.shape.material.color = this;
     }
-
-    var material = new THREE.MeshLambertMaterial( { color: this.beetle.color, transparent: true } );
+    
+    var material = new THREE.MeshLambertMaterial( { color: 0xeeeeee, transparent: true } );
     var geometry = new THREE.CylinderGeometry( 0, 0.25, 0.7, 32);
 
     this.beetle.shape = new THREE.Mesh(geometry, material);
@@ -96,19 +96,19 @@ SpriteMorph.prototype.initBeetle = function() {
 
     // visibility
     this.beetle.toggleVisibility = function() {
-        this.shape.visible = this.shape.visible ? 0 : 1;
+        this.shape.visible = !this.shape.visible;
         myself.parentThatIsA(StageMorph).reRender();
     }
 
     // material "factory"
     this.beetle.newLambertMaterial = function() {
         return new THREE.MeshLambertMaterial({
-            color: this.color,
-               transparent: true,
-               opacity: this.shape.material.opacity,
-               wireframe: myself.parentThatIsA(StageMorph).renderer.isWireframeMode,
-               side: THREE.DoubleSide
-        });
+                color: this.color,
+                transparent: true,
+                opacity: this.shape.material.opacity,
+                wireframe: myself.parentThatIsA(StageMorph).renderer.isWireframeMode,
+                side: THREE.DoubleSide
+            });
     }
 
     this.beetle.add(this.beetle.shape);
@@ -1067,7 +1067,7 @@ StageMorph.prototype.initScene = function() {
         z: { realAxis: 'Y', color: 0x0000FF }};
 
     Object.keys(axes).forEach(function(axis) {
-        var map = THREE.ImageUtils.loadTexture( 'beetleblocks/axes/' + axis + '.png' ),
+        var map = THREE.ImageUtils.loadTexture( 'beetleblocks/assets/' + axis + '.png' ),
             material = new THREE.SpriteMaterial( { map: map, color: axes[axis].color } ),
             sprite = new THREE.Sprite( material );
 
@@ -1131,8 +1131,8 @@ StageMorph.prototype.initRenderer = function() {
 
 
 StageMorph.prototype.render = function() {
-    this.pointLight.position = this.camera.position; // lights move with the camera
-    this.directionalLight.position = this.camera.position;
+    this.pointLight.position.copy(this.camera.position); // lights move with the camera
+    this.directionalLight.position.copy(this.camera.position);
     this.renderer.render(this.scene, this.camera);
 };
 
@@ -1242,7 +1242,7 @@ StageMorph.prototype.initLights = function() {
     this.directionalLight.position.set(this.camera.position);
     this.scene.add(this.directionalLight);
 
-    this.pointLight = new THREE.PointLight(0xffffff, 1, 200);
+    this.pointLight = new THREE.PointLight(0xffffff, 1, 2000);
     this.pointLight.position.set(this.camera.position);
     this.scene.add(this.pointLight);
 }
