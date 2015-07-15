@@ -40,6 +40,47 @@ SpriteMorph.prototype.initBeetle = function() {
     this.beetle = new THREE.Object3D();
     this.beetle.name = 'beetle';
     this.beetle.color = new THREE.Color();
+    var material = new THREE.MeshLambertMaterial( { color: myself.color, transparent: true } );
+
+    this.beetle.shape = new THREE.Mesh(new THREE.Geometry(), material);
+    this.beetle.shape.material = material;
+
+    var loader = new THREE.OBJLoader();
+    loader.load('beetleblocks/assets/beetle.obj', function(object) {
+            myself.beetle.shape.add(object);
+
+            object.traverse(function(child) { if (child instanceof THREE.Mesh) { child.material = material }});
+
+            object.rotation.set(3 * Math.PI / 2, 0, 0);
+            object.scale.set(0.7, 0.7, 0.7);
+    });
+
+    loader.load('beetleblocks/assets/beetle-parts.obj', function(object) {
+            myself.beetle.shape.add(object);
+            object.traverse(function(child) { 
+                    if (child instanceof THREE.Mesh) { 
+                        child.geometry.computeFaceNormals();
+                        child.geometry.computeVertexNormals();
+                        child.material = new THREE.MeshLambertMaterial({ 
+                            color: 0xDDDDDD, 
+                            shading: THREE.SmoothShading, 
+                            transparent: true }) 
+                    }
+                });
+            object.rotation.set(3 * Math.PI / 2, 0, 0);
+            object.scale.set(0.7, 0.7, 0.7);
+    });
+
+    loader.load('beetleblocks/assets/beetle-eyes.obj', function(object) {
+            myself.beetle.shape.add(object);
+            object.traverse(function(child) { 
+                    if (child instanceof THREE.Mesh) { 
+                        child.material = new THREE.MeshBasicMaterial({ color: 0x222222, transparent: true }) 
+                    }
+                });
+            object.rotation.set(3 * Math.PI / 2, 0, 0);
+            object.scale.set(0.7, 0.7, 0.7);
+    });
 
     // To avoid precision loss, we keep state here and perform transformations on 
     // the beetle's actual properties by using these values
@@ -66,14 +107,6 @@ SpriteMorph.prototype.initBeetle = function() {
         myself.beetle.shape.material.color = this;
     }
     
-    var material = new THREE.MeshLambertMaterial( { color: 0xeeeeee, transparent: true } );
-    var geometry = new THREE.CylinderGeometry( 0, 0.25, 0.7, 32);
-
-    this.beetle.shape = new THREE.Mesh(geometry, material);
-    this.beetle.shape.rotation.x = radians(90);
-    this.beetle.shape.position.z = 0.35;
-    this.beetle.shape.name = 'beetleShape';
-
     this.beetle.posAndRotStack = new Array();
 
     this.beetle.multiplierScale = 1;
@@ -111,19 +144,23 @@ SpriteMorph.prototype.initBeetle = function() {
             });
     }
 
-    this.beetle.add(this.beetle.shape);
+    myself.beetle.shape.rotation.x = radians(90);
+    myself.beetle.shape.name = 'beetleShape';
 
-    this.beetle.reset();
-    this.beetle.color.reset();
+    myself.beetle.add(myself.beetle.shape);
 
-    this.beetle.axes = [];
+    myself.beetle.reset();
+    myself.beetle.color.reset();
+
+    myself.beetle.axes = [];
     // beetle's local axis lines
     p = new THREE.Vector3(1,0,0);
-    this.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0x00E11E));
+    myself.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0x00E11E));
     p = new THREE.Vector3(0,1,0);
-    this.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0x0000FF));
+    myself.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0x0000FF));
     p = new THREE.Vector3(0,0,1);
-    this.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0xFF0000));
+    myself.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0xFF0000));
+
 }
 
 SpriteMorph.prototype.originalInit = SpriteMorph.prototype.init;
