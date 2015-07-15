@@ -1113,6 +1113,7 @@ StageMorph.prototype.initRenderer = function() {
         var myInnerSelf = this;
         this.showingAxes = !this.showingAxes;
 
+        myself.scene.labels.forEach(function(label){ label.visible = myInnerSelf.showingAxes });
         myself.scene.axes.forEach(function(line){ line.visible = myInnerSelf.showingAxes });
         myself.children.forEach(function(morph) {
             if (morph instanceof SpriteMorph) {
