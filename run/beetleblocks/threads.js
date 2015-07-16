@@ -420,6 +420,7 @@ Process.prototype.addPointToExtrusion = function() {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
         p = new THREE.Vector3(),
+        q = new THREE.Vector3(),
         distanceToLast = beetle.lastExtrusionPoint.distanceTo(beetle.position),
         circleGeometry = new THREE.CircleGeometry(beetle.extrusionDiameter / 2 * beetle.multiplierScale, 12),
         circleGeometry2 = new THREE.CircleGeometry(beetle.extrusionDiameter / 2 * beetle.multiplierScale, 12);
@@ -434,11 +435,13 @@ Process.prototype.addPointToExtrusion = function() {
 
     beetle.endSphere = this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true);
 
+    console.log(beetle.rotation);
+
     if (beetle.endCap) {
         beetle.jointCap = new THREE.Mesh(circleGeometry, beetle.newLambertMaterial());
         beetle.jointCap.material.color = new THREE.Color();
         beetle.jointCap.position.copy(beetle.lastExtrusionPoint);
-        beetle.jointCap.rotation.copy(beetle.rotation);
+        beetle.jointCap.lookAt(beetle.position);
         beetle.jointCap.updateMatrix();
         beetle.jointCap.geometry.applyMatrix(beetle.jointCap.matrix);
         beetle.jointCap.position.set(0,0,0);
@@ -456,9 +459,9 @@ Process.prototype.addPointToExtrusion = function() {
         cylinder = new THREE.Mesh(geometry, beetle.newLambertMaterial());
 
         cylinder.position.copy(beetle.position);
-        cylinder.rotation.copy(beetle.rotation);
+        cylinder.lookAt(beetle.lastExtrusionPoint);
         cylinder.rotateX(Math.PI/2);
-        cylinder.translateY(-distanceToLast/2);
+        cylinder.translateY(distanceToLast/2);
 
         stage.myObjects.add(cylinder);
     } 
