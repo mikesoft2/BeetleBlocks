@@ -493,8 +493,13 @@ IDE_Morph.prototype.saveAndShare = function() {
 // STL export
 IDE_Morph.prototype.downloadSTL = function() {
     var exporter = new THREE.STLExporter(),
-        stlString = exporter.exportScene(this.stage.scene),
-        blob = new Blob([stlString], {type: 'text/plain;charset=utf-8'});
+        scene = copy(this.stage.scene),
+        stlString,
+        blob;
+
+    scene.children = scene.children.filter(function(each) { return each.name != 'beetle' });
+    stlString = exporter.parse(scene);
+    blob = new Blob([stlString], {type: 'text/plain;charset=utf-8'});
 
     saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_export') + '.stl'); 
 }
