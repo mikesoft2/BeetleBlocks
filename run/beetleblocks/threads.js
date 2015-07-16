@@ -63,13 +63,14 @@ Process.prototype.setPosition = function(x, y, z) {
 
     if (beetle.drawing) {
         var p = new THREE.Vector3();
-        var startPoint =  p.copy(beetle.position);
+        var startPoint = p.copy(beetle.position);
     }
 
     x = Number(x);
     y = Number(y);
     z = Number(z);
-    beetle.position = new THREE.Vector3(y, z, x); 	
+
+    beetle.position.set(y, z, x); 
 
     if (beetle.extruding) {
         this.addPointToExtrusion();
@@ -95,13 +96,13 @@ Process.prototype.setPositionOnAxis = function(axis, pos) {
 
     pos = Number(pos);
     if (axis == 'x') {
-        beetle.position.z = pos;
+        beetle.position.setZ(pos);
     }
     if (axis == 'y') {
-        beetle.position.x = pos;
+        beetle.position.setX(pos);
     }
     if (axis == 'z') {
-        beetle.position.y = pos;
+        beetle.position.setY(pos);
     }		
     if (beetle.extruding) {
         this.addPointToExtrusion();
