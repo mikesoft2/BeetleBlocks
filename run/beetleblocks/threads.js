@@ -435,8 +435,6 @@ Process.prototype.addPointToExtrusion = function() {
 
     beetle.endSphere = this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true);
 
-    console.log(beetle.rotation);
-
     if (beetle.endCap) {
         beetle.jointCap = new THREE.Mesh(circleGeometry, beetle.newLambertMaterial());
         beetle.jointCap.material.color = new THREE.Color();
@@ -446,7 +444,7 @@ Process.prototype.addPointToExtrusion = function() {
         beetle.jointCap.geometry.applyMatrix(beetle.jointCap.matrix);
         beetle.jointCap.position.set(0,0,0);
         beetle.jointCap.rotation.set(0,0,0);
-        beetle.jointCap.updateMatrix();
+        beetle.jointCap.updateMatrix(); 
 
         var geometry = new THREE.CylinderGeometry(
             (beetle.extrusionDiameter / 2) * beetle.multiplierScale, //radiusTop
@@ -475,8 +473,8 @@ Process.prototype.addPointToExtrusion = function() {
             jointGeometry.vertices.push(beetle.endCap.geometry.vertices[i]);
 
             if (i > 0) {
-                jointGeometry.faces.push(new THREE.Face3(i * 2, i * 2 + 1, i * 2 - 1));
-                jointGeometry.faces.push(new THREE.Face3(i * 2, i * 2 - 1, i * 2 - 2));
+                jointGeometry.faces.push(new THREE.Face3(i * 2, i * 2 - 1, i * 2 + 1));
+                jointGeometry.faces.push(new THREE.Face3(i * 2, i * 2 - 2, i * 2 - 1));
             }
         }
 
@@ -489,13 +487,17 @@ Process.prototype.addPointToExtrusion = function() {
     } 
 
     if (beetle.firstExtrusion && beetle.startSphere) {
-        beetle.startSphere.rotation.copy(beetle.rotation);
+        beetle.startSphere.lookAt(beetle.position);
         beetle.firstExtrusion = false;
     }
 
     beetle.endCap = new THREE.Mesh(circleGeometry2, beetle.newLambertMaterial());
     beetle.endCap.position.copy(beetle.position);
-    beetle.endCap.rotation.copy(beetle.rotation);
+    if (cylinder) { 
+        beetle.endCap.rotation.copy(cylinder.rotation);
+        beetle.endCap.rotateX(-Math.PI/2);
+        beetle.endCap.rotateY(Math.PI);
+    };
     beetle.endCap.updateMatrix();
     beetle.endCap.geometry.applyMatrix(beetle.endCap.matrix);
     beetle.endCap.position.set(0,0,0);
