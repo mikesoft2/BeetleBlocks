@@ -1123,7 +1123,6 @@ StageMorph.prototype.initRenderer = function() {
         dpr = window.devicePixelRatio;
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.setSize(480 / dpr, 360 / dpr); // ugly! this.width(), this.height() is not set yet!
 
     this.renderer.setClearColor(0xe6e6e6, 1);
 
@@ -1395,9 +1394,7 @@ StageMorph.prototype.drawOn = function (aCanvas, aRect) {
         if (this.scaleChanged) {
             w = this.width();
             h = this.height();
-            var dpr = window.devicePixelRatio;
             this.scaleChanged = false;
-            this.renderer.setSize(w / dpr, h / dpr);
             this.reRender();
         }
 

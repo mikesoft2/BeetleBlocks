@@ -382,6 +382,22 @@ IDE_Morph.prototype.settingsMenu = function () {
             'uncheck to run scripts\nat normal speed',
             'check to prioritize\nscript execution'
             );
+    addPreference(
+        'Keyboard Editing',
+        function () {
+            ScriptsMorph.prototype.enableKeyboard =
+                !ScriptsMorph.prototype.enableKeyboard;
+            if (ScriptsMorph.prototype.enableKeyboard) {
+                myself.saveSetting('keyboard', true);
+            } else {
+                myself.removeSetting('keyboard');
+            }
+        },
+        ScriptsMorph.prototype.enableKeyboard,
+        'uncheck to disable\nkeyboard editing support',
+        'check to enable\nkeyboard editing support',
+        false
+    );
     menu.addLine(); // everything below this line is stored in the project
     addPreference(
             'Thread safe scripts',
@@ -700,26 +716,7 @@ IDE_Morph.prototype.setSmallStageSize = function () {
 }
 
 IDE_Morph.prototype.setStageSize = function (ratio) {
-    /*    var myself = this,
-          world = this.world(),
-          shiftClicked = (world.currentKey === 16);*/
-
     this.setStageExtent(new Point(480 * ratio, 360 * ratio))
-
-        /*
-           myself.step = function () {
-           myself.stageRatio = ratio;
-           myself.setExtent(world.extent());
-           myself.controlBar.stageSizeButton.refresh();
-           delete myself.step;
-           }
-
-        // not working yet
-        if (shiftClicked) {
-        ratio = SpriteIconMorph.prototype.thumbSize.x * 3 / 
-        this.stage.dimensions.x;
-        }
-         */
 };
 
 
@@ -1057,8 +1054,8 @@ IDE_Morph.prototype.resetBlocksScale = function() {
 }
 
 IDE_Morph.prototype.originalCreatePalette = IDE_Morph.prototype.createPalette;
-IDE_Morph.prototype.createPalette = function(){
-    this.originalCreatePalette();
+IDE_Morph.prototype.createPalette = function(forSearching){
+    this.originalCreatePalette(forSearching);
     this.palette.color = new Color(230, 230, 230);
 }
 
