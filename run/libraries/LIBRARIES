@@ -4,3 +4,5 @@ stream-tools	Streams (lazy lists)
 variadic-reporters	Variadic reporters
 word-sentence	Words, sentences
 reduce	Reduce block
+cases	Multi-branched conditional (switch)
+leap-library LEAP Motion controller
