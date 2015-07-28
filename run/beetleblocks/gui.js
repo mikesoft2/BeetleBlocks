@@ -1,3 +1,25 @@
+// Old setExtent function, as the newer one relies on tabBar, which we don't have
+IDE_Morph.prototype.setExtent = function (point) {
+    var padding = new Point(430, 110),
+        minExt,
+        ext;
+
+    // determine the minimum dimensions making sense for the current mode
+    if (this.isAppMode) {
+        minExt = StageMorph.prototype.dimensions.add(
+            this.controlBar.height() + 10
+        );
+    } else {
+        minExt = this.isSmallStage ?
+                padding.add(StageMorph.prototype.dimensions.divideBy(2))
+                      : padding.add(StageMorph.prototype.dimensions);
+    }
+    ext = point.max(minExt);
+    IDE_Morph.uber.setExtent.call(this, ext);
+    this.fixLayout();
+};
+
+
 IDE_Morph.prototype.originalCreateLogo = IDE_Morph.prototype.createLogo;
 IDE_Morph.prototype.createLogo = function () {
     this.originalCreateLogo();
