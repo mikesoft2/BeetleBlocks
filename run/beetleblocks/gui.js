@@ -1349,6 +1349,7 @@ IDE_Morph.prototype.selectSprite = function (sprite) {
 
 IDE_Morph.prototype.toggleAppMode = function (appMode) {
     var world = this.world(),
+        myself = this,
         elements = [
             this.logo,
             this.controlBar.projectButton,
@@ -1361,54 +1362,99 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
             this.statusDisplay,
             this.categories ];
 
+    // The wonderful world of the web
+    document.removeEventListener('fullscreenchange', doToggleAppMode);
+    document.removeEventListener('mozfullscreenchange', doToggleAppMode);
+    document.removeEventListener('webkitfullscreenchange', doToggleAppMode);
+    document.removeEventListener('msfullscreenchange', doToggleAppMode);
+
+    document.addEventListener('fullscreenchange', doToggleAppMode, false);
+    document.addEventListener('mozfullscreenchange', doToggleAppMode, false);
+    document.addEventListener('webkitfullscreenchange', doToggleAppMode, false);
+    document.addEventListener('msfullscreenchange', doToggleAppMode, false);
+    
+    Morph.prototype.trackChanges = false;
+
     this.isAppMode = isNil(appMode) ? !this.isAppMode : appMode;
 
-    Morph.prototype.trackChanges = false;
     if (this.isAppMode) {
-        ext = this.world().extent();
-        this.setExtent(ext);
-
-        this.stage.renderer.setSize(ext.x, ext.y);
-        this.stage.camera.aspect = ext.x / ext.y;
-        this.stage.camera.updateProjectionMatrix();
-        this.stage.setExtent(ext);
-        this.stage.setLeft(0);
-        this.stage.setTop(0);
-
-        this.stage.add(this.controlBar);
-        this.controlBar.alpha = 0;
-        this.controlBar.setColor()
-
-        elements.forEach(function (e) {
-            e.hide();
-        });
-        world.children.forEach(function (morph) {
-            if (morph instanceof DialogBoxMorph) {
-                morph.hide();
-            }
-        });
+        var elem = world.worldCanvas;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+            elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        }
     } else {
-        this.add(this.controlBar);
-        this.controlBar.setColor(this.frameColor);
-        elements.forEach(function (e) {
-            e.show();
-        });
-        this.setStageSize(1);
-        this.stage.camera.aspect = 4/3;
-        this.stage.camera.updateProjectionMatrix();
-        // show all hidden dialogs
-        world.children.forEach(function (morph) {
-            if (morph instanceof DialogBoxMorph) {
-                morph.show();
-            }
-        });
-        // prevent scrollbars from showing when morph appears
-        world.allChildren().filter(function (c) {
-            return c instanceof ScrollFrameMorph;
-        }).forEach(function (s) {
-            s.adjustScrollBars();
-        });
-        this.setExtent(this.world().extent());
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+    }
+
+    function doToggleAppMode() {
+        var isFullsceen = document.fullscreen 
+            || document.mozFullScreen 
+            || document.webkitIsFullScreen 
+            || document.msFullscreenElement;
+
+        if (isFullsceen) {
+            var ext = new Point(window.innerWidth, window.innerHeight);
+
+            myself.isAppMode = true;
+
+            myself.setExtent(ext);
+            myself.stage.renderer.setSize(ext.x, ext.y);
+            myself.stage.camera.aspect = ext.x / ext.y;
+            myself.stage.camera.updateProjectionMatrix();
+            myself.stage.setExtent(ext);
+            myself.stage.setLeft(0);
+            myself.stage.setTop(0);
+
+            myself.stage.add(myself.controlBar);
+            myself.controlBar.alpha = 0;
+
+            elements.forEach(function (e) {
+                e.hide();
+            });
+
+            world.children.forEach(function (morph) {
+                if (morph instanceof DialogBoxMorph) {
+                    morph.hide();
+                }
+            });
+
+        } else {
+            myself.isAppMode = false;
+
+            myself.add(myself.controlBar);
+            myself.controlBar.setColor(myself.frameColor);
+            elements.forEach(function (e) {
+                e.show();
+            });
+            myself.setStageSize(1);
+            myself.stage.camera.aspect = 4/3;
+            myself.stage.camera.updateProjectionMatrix();
+            // show all hidden dialogs
+            world.children.forEach(function (morph) {
+                if (morph instanceof DialogBoxMorph) {
+                    morph.show();
+                }
+            });
+            // prevent scrollbars from showing when morph appears
+            world.allChildren().filter(function (c) {
+                return c instanceof ScrollFrameMorph;
+            }).forEach(function (s) {
+                s.adjustScrollBars();
+            });
+            myself.setExtent(world.extent());
+        }
     }
 };
 
