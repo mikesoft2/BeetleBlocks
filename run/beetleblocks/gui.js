@@ -906,12 +906,14 @@ IDE_Morph.prototype.originalRawOpenProjectString = IDE_Morph.prototype.rawOpenPr
 IDE_Morph.prototype.rawOpenProjectString = function (str) {
     this.originalRawOpenProjectString(str);
     this.createStatusDisplay();
+    this.setStageSize(1);
 }
 
 IDE_Morph.prototype.originalRawOpenCloudDataString = IDE_Morph.prototype.rawOpenCloudDataString;
 IDE_Morph.prototype.rawOpenCloudDataString = function (str) {
     this.originalRawOpenCloudDataString(str);
     this.createStatusDisplay();
+    this.setStageSize(1);
 }
 
 // Single Morph mode, no corral and no tabs in the scripting area
@@ -1039,7 +1041,6 @@ IDE_Morph.prototype.createPalette = function(forSearching){
     this.originalCreatePalette(forSearching);
     this.palette.color = new Color(230, 230, 230);
 }
-
 
 IDE_Morph.prototype.createStatusDisplay = function () {
     var frame,
@@ -1426,20 +1427,20 @@ IDE_Morph.prototype.setLanguage = function(lang, callback) {
 
     myself.originalSetLanguage(lang, function() {
         var translation = document.getElementById('bb-language'),
-        src = 'beetleblocks/lang-' + lang + '.js',
-        myInnerSelf = this;
-    if (translation) {
-        document.head.removeChild(translation);
-    }
-    if (lang === 'en') {
-        return this.reflectLanguage('en', callback);
-    }
-    translation = document.createElement('script');
-    translation.id = 'bb-language';
-    translation.onload = function () {
-        myInnerSelf.reflectLanguage(lang, callback);
-    };
-    document.head.appendChild(translation);
-    translation.src = src; 
+            src = 'beetleblocks/lang-' + lang + '.js',
+            myInnerSelf = this;
+        if (translation) {
+            document.head.removeChild(translation);
+        }
+        if (lang === 'en') {
+            return this.reflectLanguage('en', callback);
+        }
+        translation = document.createElement('script');
+        translation.id = 'bb-language';
+        translation.onload = function () {
+            myInnerSelf.reflectLanguage(lang, callback);
+        };
+        document.head.appendChild(translation);
+        translation.src = src; 
     });
 };
