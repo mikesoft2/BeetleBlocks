@@ -41,6 +41,12 @@ IDE_Morph.prototype.removeSprite = function (sprite) {
     this.originalRemoveSprite(sprite);
 }
 
+IDE_Morph.prototype.originalCreateStage = IDE_Morph.prototype.createStage;
+IDE_Morph.prototype.createStage = function() {
+    this.originalCreateStage();
+    this.setStageSize(1);
+}
+
 // Force flat design
 IDE_Morph.prototype.setDefaultDesign = IDE_Morph.prototype.setFlatDesign; 
 
@@ -719,40 +725,15 @@ IDE_Morph.prototype.setStageSize = function (ratio) {
     this.setStageExtent(new Point(480 * ratio, 360 * ratio))
 };
 
-
 IDE_Morph.prototype.setStageExtent = function (ext) {
     var myself = this,
         world = this.world();
 
-    function zoom() {
-        myself.step = function () {
-            var delta = ext.subtract(
-                    StageMorph.prototype.dimensions
-                    ).divideBy(2);
-            if (delta.abs().lt(new Point(5, 5))) {
-                StageMorph.prototype.dimensions = ext;
-                delete myself.step;
-            } else {
-                StageMorph.prototype.dimensions =
-                    StageMorph.prototype.dimensions.add(delta);
-            }
-            myself.stage.setExtent(StageMorph.prototype.dimensions);
-            myself.stage.clearPenTrails();
-            myself.fixLayout();
-            this.setExtent(world.extent());
-        };
-    }
-
-    this.stageRatio = 1;
-    this.isSmallStage = false;
-    this.controlBar.stageSizeButton.refresh();
-    this.setExtent(world.extent());
-    if (this.isAnimating) {
-        zoom();
-    } else {
+    if (world) { 
+        this.controlBar.stageSizeButton.refresh();
+    
         StageMorph.prototype.dimensions = ext;
-        this.stage.setExtent(StageMorph.prototype.dimensions);
-        this.stage.clearPenTrails();
+        this.stage.setExtent(ext);
         this.fixLayout();
         this.setExtent(world.extent());
     }
@@ -1369,23 +1350,34 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
     var world = this.world(),
         elements = [
             this.logo,
-        this.controlBar.projectButton,
-        this.controlBar.settingsButton,
-        this.controlBar.stageSizeButton,
-        this.controlBar.normalStageSizeButton,
-        this.controlBar.largeStageSizeButton,
-        this.spriteEditor,
-        this.palette,
-        this.statusDisplay,
-        this.categories ];
+            this.controlBar.projectButton,
+            this.controlBar.settingsButton,
+            this.controlBar.stageSizeButton,
+            this.controlBar.normalStageSizeButton,
+            this.controlBar.largeStageSizeButton,
+            this.spriteEditor,
+            this.palette,
+            this.statusDisplay,
+            this.categories ];
 
     this.isAppMode = isNil(appMode) ? !this.isAppMode : appMode;
 
     Morph.prototype.trackChanges = false;
     if (this.isAppMode) {
-        this.setColor(this.appModeColor);
-        this.controlBar.setColor(this.color);
-        this.controlBar.appModeButton.refresh();
+        ext = this.world().extent();
+        this.setExtent(ext);
+
+        this.stage.renderer.setSize(ext.x, ext.y);
+        this.stage.camera.aspect = ext.x / ext.y;
+        this.stage.camera.updateProjectionMatrix();
+        this.stage.setExtent(ext);
+        this.stage.setLeft(0);
+        this.stage.setTop(0);
+
+        this.stage.add(this.controlBar);
+        this.controlBar.alpha = 0;
+        this.controlBar.setColor()
+
         elements.forEach(function (e) {
             e.hide();
         });
@@ -1395,12 +1387,14 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
             }
         });
     } else {
-        this.setColor(this.backgroundColor);
+        this.add(this.controlBar);
         this.controlBar.setColor(this.frameColor);
         elements.forEach(function (e) {
             e.show();
         });
-        this.stage.setScale(1);
+        this.setStageSize(1);
+        this.stage.camera.aspect = 4/3;
+        this.stage.camera.updateProjectionMatrix();
         // show all hidden dialogs
         world.children.forEach(function (morph) {
             if (morph instanceof DialogBoxMorph) {
@@ -1413,8 +1407,8 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
         }).forEach(function (s) {
             s.adjustScrollBars();
         });
+        this.setExtent(this.world().extent());
     }
-    this.setExtent(this.world().extent()); // resume trackChanges
 };
 
 // Addressing #54: Stage occasionally goes blank

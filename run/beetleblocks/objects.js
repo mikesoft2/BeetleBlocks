@@ -1119,11 +1119,9 @@ StageMorph.prototype.initScene = function() {
 }
 
 StageMorph.prototype.initRenderer = function() {
-    var myself = this,
-        dpr = window.devicePixelRatio;
+    var myself = this;
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
-
     this.renderer.setClearColor(0xe6e6e6, 1);
 
     if (localStorage) {
@@ -1352,10 +1350,8 @@ StageMorph.prototype.add = function(morph) {
     }
 }
 
-StageMorph.prototype.clearPenTrails = function() {
-    // We'll never need to clear the pen trails in BeetleBlocks, it only causes the renderer to disappear
-    nop(); 
-};
+// We'll never need to clear the pen trails in BeetleBlocks, it only causes the renderer to disappear
+StageMorph.prototype.clearPenTrails = nop;
 
 // StageMorph drawing
 StageMorph.prototype.originalDrawOn = StageMorph.prototype.drawOn;
