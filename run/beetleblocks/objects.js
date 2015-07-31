@@ -46,46 +46,58 @@ SpriteMorph.prototype.initBeetle = function() {
     this.beetle.shape.material = material;
 
     var loader = new THREE.OBJLoader();
-    loader.load('beetleblocks/assets/beetle.obj', function(object) {
+    loader.load('beetleblocks/assets/beetle-orange.obj', function(object) {
             myself.beetle.shape.add(object);
 
-            object.traverse(function(child) { if (child instanceof THREE.Mesh) { child.material = material }});
+            object.traverse(function(child) { 
+                if (child instanceof THREE.Mesh) { 
+                    child.geometry.computeFaceNormals();
+                    child.geometry.computeVertexNormals();
+                    child.material = material;
+                }
+            });
 
-            object.rotation.set(3 * Math.PI / 2, 0, 0);
-            object.scale.set(0.7, 0.7, 0.7);
+            object.rotation.set(Math.PI, 0, -Math.PI / 2);
     });
 
-    loader.load('beetleblocks/assets/beetle-parts.obj', function(object) {
+    loader.load('beetleblocks/assets/beetle-grey.obj', function(object) {
             myself.beetle.shape.add(object);
             object.traverse(function(child) { 
                     if (child instanceof THREE.Mesh) { 
                         child.geometry.computeFaceNormals();
                         child.geometry.computeVertexNormals();
                         child.material = new THREE.MeshLambertMaterial({ 
-                            color: 0xDDDDDD, 
-                            shading: THREE.SmoothShading, 
-                            transparent: true }) 
+                            color: 0x888888,
+                            shading: THREE.SmoothShading }) 
                     }
                 });
-            object.rotation.set(3 * Math.PI / 2, 0, 0);
-            object.scale.set(0.7, 0.7, 0.7);
+            object.rotation.set(Math.PI, 0, -Math.PI / 2);
     });
 
-    loader.load('beetleblocks/assets/beetle-eyes.obj', function(object) {
+    loader.load('beetleblocks/assets/beetle-white.obj', function(object) {
             myself.beetle.shape.add(object);
             object.traverse(function(child) { 
                     if (child instanceof THREE.Mesh) { 
-                        child.material = new THREE.MeshBasicMaterial({ color: 0x222222, transparent: true }) 
+                        child.material = new THREE.MeshBasicMaterial({ color: 0xEEEEEE }) 
                     }
                 });
-            object.rotation.set(3 * Math.PI / 2, 0, 0);
-            object.scale.set(0.7, 0.7, 0.7);
+            object.rotation.set(Math.PI, 0, -Math.PI / 2);
+    });
+
+    loader.load('beetleblocks/assets/beetle-black.obj', function(object) {
+            myself.beetle.shape.add(object);
+            object.traverse(function(child) { 
+                    if (child instanceof THREE.Mesh) { 
+                        child.material = new THREE.MeshBasicMaterial({ color: 0x111111 }) 
+                    }
+                });
+            object.rotation.set(Math.PI, 0, -Math.PI / 2);
     });
 
     // To avoid precision loss, we keep state here and perform transformations on 
     // the beetle's actual properties by using these values
     this.beetle.color.state = {
-        h: 180,
+        h: 30,
         s: 50,
         l: 50,
         set: function(h, s, l) {
@@ -96,7 +108,7 @@ SpriteMorph.prototype.initBeetle = function() {
     }
 
     this.beetle.color.reset = function () {
-        this.state.set(180, 50, 50);
+        this.state.set(30, 50, 50);
         this.update();
         myself.beetle.shape.material.opacity = 1;
     }
@@ -1109,6 +1121,7 @@ StageMorph.prototype.initScene = function() {
             sprite = new THREE.Sprite( material );
 
         map.needsUpdate = true;
+        map.minFilter = THREE.NearestFilter;
 
         sprite.position['set' + axes[axis].realAxis].call(sprite.position, 4.3);
         sprite.scale.set(0.3, 0.3, 0.3);
