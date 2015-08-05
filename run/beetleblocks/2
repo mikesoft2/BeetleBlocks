@@ -40,7 +40,7 @@ SpriteMorph.prototype.initBeetle = function() {
     this.beetle = new THREE.Object3D();
     this.beetle.name = 'beetle';
     this.beetle.color = new THREE.Color();
-    var material = new THREE.MeshLambertMaterial( { color: myself.color, transparent: true, shading: THREE.SmoothShading } );
+    var material = new THREE.MeshPhongMaterial( { color: myself.color, transparent: true, shading: THREE.SmoothShading, side: THREE.BackSide } );
 
     this.beetle.shape = new THREE.Mesh(new THREE.Geometry(), material);
     this.beetle.shape.material = material;
@@ -51,8 +51,8 @@ SpriteMorph.prototype.initBeetle = function() {
 
             object.traverse(function(child) { 
                 if (child instanceof THREE.Mesh) { 
-                    child.geometry.computeFaceNormals();
-                    child.geometry.computeVertexNormals();
+//                    child.geometry.computeFaceNormals();
+//                    child.geometry.computeVertexNormals();
                     child.material = material;
                 }
             });
