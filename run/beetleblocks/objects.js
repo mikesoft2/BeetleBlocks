@@ -138,6 +138,11 @@ SpriteMorph.prototype.initBeetle = function() {
         }
     }
 
+    this.beetle.setCostume = function(name) {
+        this.shape.remove(this.shape.children[0]);
+        this.shape.add(this[name + 'Shape']);
+    }
+
     // To avoid precision loss, we keep state here and perform transformations on 
     // the beetle's actual properties by using these values
     this.beetle.color.state = {
@@ -181,6 +186,8 @@ SpriteMorph.prototype.initBeetle = function() {
     this.beetle.reset = function() {	
         this.position.set(0, 0, 0);
         this.rotation.set(0, 0, 0);
+        this.flying = false;
+        this.setCostume('standing');
     }
 
     // visibility
