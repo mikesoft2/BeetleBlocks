@@ -1491,6 +1491,7 @@ StageMorph.prototype.userMenu = function () {
         myself = this;
 
     if (ide && ide.isAppMode) {
+        menu.hide();
         return menu;
     }
     menu.addItem(
@@ -1500,22 +1501,6 @@ StageMorph.prototype.userMenu = function () {
             },
             'open a new window\nwith a picture of the scene'
             );
-    menu.addLine();
-    menu.addItem(
-            'export as STL',
-            function () {
-                ide.downloadSTL()
-            },
-            'export scene as an STL\nfile ready to be printed'
-            );
-    menu.addItem(
-            'export as OBJ',
-            function () {
-                ide.downloadOBJ()
-            },
-            'export scene as an OBJ\nfile'
-            );
-
     return menu;
 };
 
