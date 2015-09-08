@@ -1073,8 +1073,8 @@ IDE_Morph.prototype.createStatusDisplay = function () {
         this.setWidth(myself.stage.width());
         this.setHeight(myself.height() - myself.stage.height() - myself.controlBar.height() - padding);
         this.frame.setExtent(this.extent());
-        this.arrangeContents()
-            this.refresh();
+        this.arrangeContents();
+        this.refresh();
     };
 
     this.statusDisplay.arrangeContents = function () {
@@ -1085,6 +1085,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
             middle = (max - start) / 2 + start;
 
         this.frame.contents.children.forEach(function (element) {
+            if (element.flush) { x -= padding };
             element.setPosition(new Point(x, y));
             x += element.width();
 
@@ -1110,7 +1111,16 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     this.statusDisplay.addElement = function (element) {
 
         if (typeof element == 'string') {
-            element = new StringMorph(localize(element), 12, null, true);
+            if (element == '-') {
+                element = new Morph();
+                element.setHeight(1);
+                element.setWidth(this.width());
+                element.setColor(new Color(255,255,255));
+                element.newLines = 1;
+                element.flush = true;
+            } else {
+                element = new StringMorph(localize(element), 12, null, true);
+            }
         };
 
         this.frame.contents.add(element);
@@ -1274,6 +1284,8 @@ IDE_Morph.prototype.createStatusDisplay = function () {
             });
     toggleGridButton.newLines = 2;
     elements.push(toggleGridButton);
+
+    elements.push('-');
 
     // Status watchers
 
