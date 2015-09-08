@@ -82,6 +82,7 @@ Process.prototype.setPosition = function(x, y, z) {
         this.addLineGeom(startPoint, endPoint);
     }
 
+    beetle.applyCostume();
     stage.reRender();
 };
 
@@ -103,6 +104,7 @@ Process.prototype.setPositionOnAxis = function(axis, pos) {
     }
     if (axis == 'z') {
         beetle.position.setY(pos);
+        beetle.applyCostume();
     }		
     if (beetle.extruding) {
         this.addPointToExtrusion();
@@ -134,6 +136,7 @@ Process.prototype.changePositionBy = function(axis, dist) {
     }
     if (axis == 'z') {
         beetle.position.y += dist;
+        beetle.applyCostume();
     }	
     if (beetle.extruding) {
         this.addPointToExtrusion();
@@ -206,6 +209,7 @@ Process.prototype.move = function(dist) {
 
     dist = Number(dist) * beetle.multiplierScale;
     beetle.translateZ(dist);
+    beetle.applyCostume();
 
     if (beetle.extruding) {
         this.addPointToExtrusion();

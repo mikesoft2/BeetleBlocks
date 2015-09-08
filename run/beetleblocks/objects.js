@@ -42,53 +42,101 @@ SpriteMorph.prototype.initBeetle = function() {
     this.beetle.color = new THREE.Color();
     var material = new THREE.MeshLambertMaterial( { color: myself.color, transparent: true, shading: THREE.SmoothShading } );
 
+    this.beetle.flying = false;
+
     this.beetle.shape = new THREE.Mesh(new THREE.Geometry(), material);
+    this.beetle.standingShape = new THREE.Object3D();
+    this.beetle.flyingShape = new THREE.Object3D();
+    this.beetle.shape.add(this.beetle.standingShape);
     this.beetle.shape.material = material;
 
     var loader = new THREE.OBJLoader();
     loader.load('beetleblocks/assets/meshes/beetle-color-standing.obj', function(object) {
-            myself.beetle.shape.add(object);
-
+            myself.beetle.standingShape.add(object);
             object.traverse(function(child) { 
                 if (child instanceof THREE.Mesh) { 
                     child.material = material;
                 }
             });
+            object.rotation.set(Math.PI, 0, -Math.PI / 2);
+    });
 
+    loader.load('beetleblocks/assets/meshes/beetle-color-flying.obj', function(object) {
+            myself.beetle.flyingShape.add(object);
+            object.traverse(function(child) { 
+                if (child instanceof THREE.Mesh) { 
+                    child.material = material;
+                }
+            });
             object.rotation.set(Math.PI, 0, -Math.PI / 2);
     });
 
     loader.load('beetleblocks/assets/meshes/beetle-body-standing.obj', function(object) {
-            myself.beetle.shape.add(object);
+            myself.beetle.standingShape.add(object);
             object.traverse(function(child) { 
-                    if (child instanceof THREE.Mesh) { 
-                        child.material = new THREE.MeshLambertMaterial({ 
-                            color: 0x888888,
-                            shading: THREE.SmoothShading }) 
-                    }
-                });
+                if (child instanceof THREE.Mesh) { 
+                    child.material = new THREE.MeshLambertMaterial({ 
+                        color: 0x888888,
+                        shading: THREE.SmoothShading }) 
+                }
+            });
+            object.rotation.set(Math.PI, 0, -Math.PI / 2);
+    });
+
+    loader.load('beetleblocks/assets/meshes/beetle-body-flying.obj', function(object) {
+            myself.beetle.flyingShape.add(object);
+            object.traverse(function(child) { 
+                if (child instanceof THREE.Mesh) { 
+                    child.material = new THREE.MeshLambertMaterial({ 
+                        color: 0x888888,
+                        shading: THREE.SmoothShading }) 
+                }
+            });
             object.rotation.set(Math.PI, 0, -Math.PI / 2);
     });
 
     loader.load('beetleblocks/assets/meshes/beetle-white.obj', function(object) {
-            myself.beetle.shape.add(object);
             object.traverse(function(child) { 
-                    if (child instanceof THREE.Mesh) { 
-                        child.material = new THREE.MeshBasicMaterial({ color: 0xEEEEEE }) 
-                    }
-                });
+                if (child instanceof THREE.Mesh) { 
+                    child.material = new THREE.MeshBasicMaterial({ color: 0xEEEEEE }) 
+                }
+            });
             object.rotation.set(Math.PI, 0, -Math.PI / 2);
+            myself.beetle.standingShape.add(object);
+            myself.beetle.flyingShape.add(object.clone());
     });
 
     loader.load('beetleblocks/assets/meshes/beetle-black-standing.obj', function(object) {
-            myself.beetle.shape.add(object);
+            myself.beetle.standingShape.add(object);
             object.traverse(function(child) { 
-                    if (child instanceof THREE.Mesh) { 
-                        child.material = new THREE.MeshBasicMaterial({ color: 0x111111 }) 
-                    }
-                });
+                if (child instanceof THREE.Mesh) { 
+                    child.material = new THREE.MeshBasicMaterial({ color: 0x111111 }) 
+                }
+            });
             object.rotation.set(Math.PI, 0, -Math.PI / 2);
     });
+
+    loader.load('beetleblocks/assets/meshes/beetle-black-flying.obj', function(object) {
+            myself.beetle.flyingShape.add(object);
+            object.traverse(function(child) { 
+                if (child instanceof THREE.Mesh) { 
+                    child.material = new THREE.MeshBasicMaterial({ color: 0x111111 }) 
+                }
+            });
+            object.rotation.set(Math.PI, 0, -Math.PI / 2);
+    });
+
+    this.beetle.applyCostume = function() {
+        if (this.position.y > 0 && !this.flying) {
+            this.flying = true;
+            this.shape.remove(this.standingShape);
+            this.shape.add(this.flyingShape);
+        } else if (this.position.y <= 0 && this.flying) {
+            this.flying = false;
+            this.shape.remove(this.flyingShape);
+            this.shape.add(this.standingShape);
+        }
+    }
 
     // To avoid precision loss, we keep state here and perform transformations on 
     // the beetle's actual properties by using these values
