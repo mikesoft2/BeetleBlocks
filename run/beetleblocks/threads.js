@@ -595,8 +595,7 @@ Process.prototype.changeHSLA = function(channel, value) {
 };
 
 Process.prototype.getHSLA = function(channel) {
-    var beetle = this.homeContext.receiver.beetle,
-        stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+    var beetle = this.homeContext.receiver.beetle;
 
     if (channel == 'hue') {
         return(beetle.color.state.h);
@@ -611,7 +610,7 @@ Process.prototype.getHSLA = function(channel) {
         return(beetle.shape.material.opacity * 100);
     }
 
-    stage.reRender();
+    return null;
 };
 
 Process.prototype.getPosition = function(axis) {
