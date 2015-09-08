@@ -51,8 +51,8 @@ SpriteMorph.prototype.initBeetle = function() {
 
             object.traverse(function(child) { 
                 if (child instanceof THREE.Mesh) { 
-                    //child.geometry.computeFaceNormals();
-                    //child.geometry.computeVertexNormals();
+                    child.geometry.computeFaceNormals();
+                    child.geometry.computeVertexNormals();
                     child.material = material;
                 }
             });
@@ -64,8 +64,8 @@ SpriteMorph.prototype.initBeetle = function() {
             myself.beetle.shape.add(object);
             object.traverse(function(child) { 
                     if (child instanceof THREE.Mesh) { 
-                      //  child.geometry.computeFaceNormals();
-                      //  child.geometry.computeVertexNormals();
+                        child.geometry.computeFaceNormals();
+                        child.geometry.computeVertexNormals();
                         child.material = new THREE.MeshLambertMaterial({ 
                             color: 0x888888,
                             shading: THREE.SmoothShading }) 
@@ -1208,7 +1208,8 @@ StageMorph.prototype.initCamera = function() {
         if (myself.renderer.isParallelProjection) { 
             var zoom = myself.camera ? myself.camera.zoomFactor : 82,
                 width = Math.max(myself.width(), 480),
-                      height = Math.max(myself.height(), 360);
+                height = Math.max(myself.height(), 360);
+
             myself.camera = new THREE.OrthographicCamera(
                     width / - zoom,
                     width / zoom,
@@ -1217,7 +1218,7 @@ StageMorph.prototype.initCamera = function() {
                     0.1, 
                     1000);
         } else {
-            myself.camera = new THREE.PerspectiveCamera(60, 480/360, 1, 1000);
+            myself.camera = new THREE.PerspectiveCamera(60, 480/360, 0.1, 1000);
         }
 
         // We need to implement zooming ourselves for parallel projection
