@@ -1116,10 +1116,13 @@ IDE_Morph.prototype.createStatusDisplay = function () {
                 element.setHeight(1);
                 element.setWidth(this.width());
                 element.setColor(new Color(255,255,255));
-                element.newLines = 1;
+                element.newLines = 0.5;
                 element.flush = true;
             } else {
                 element = new StringMorph(localize(element), 12, null, true);
+            }
+            if (element.hidden) {
+                element.setColor(new Color(0,0,0,0));
             }
         };
 
@@ -1176,6 +1179,11 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     this.statusDisplay.watcherUpdateFrequency = 250;
 
     // Buttons and toggles
+
+    var space = new Morph();
+    space.alpha = 0;
+    space.newLines = 0.5;
+    elements.push(space);
 
     var resetCameraButton = new PushButtonMorph(
             null,
@@ -1282,7 +1290,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
             function () {
                 return stage.scene.grid.visible
             });
-    toggleGridButton.newLines = 2;
+    toggleGridButton.newLines = 1.5;
     elements.push(toggleGridButton);
 
     elements.push('-');
@@ -1290,43 +1298,73 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     // Status watchers
 
     elements.push('Position: ');
+
+    var space = new Morph();
+    space.alpha = 0;
+    space.columns = 8;
+    space.newColumn = 1;
+    elements.push(space);
+
     element = new StringMorph();
-    element.update = function() {
-        this.text = 'x: ' + beetle.position.z.toFixed(2).toString().replace('.00','') 
-            + ', y: ' + beetle.position.x.toFixed(2).toString().replace('.00','') 
-            + ', z: ' + beetle.position.y.toFixed(2).toString().replace('.00','')
-    };
+    element.update = function() { this.text = 'x: ' + beetle.position.z.toFixed(2).toString().replace('.00','') }; 
     element.newColumn = true;
     elements.push(element);
-
-    elements.push('Color: ');
-    element = new Morph();
-    element.update = function() {
-        this.setColor(new Color(beetle.color.r * 255, beetle.color.g * 255, beetle.color.b * 255));
-    }
-    element.setWidth(30);
-    element.setHeight(12);
-    element.newLines = 1.5;
-    elements.push(element);
-
+    
     elements.push('Rotation: ');
+
+    var space = new Morph();
+    space.alpha = 0;
+    space.columns = 8;
+    space.newColumn = 5;
+    elements.push(space);
+
     element = new StringMorph();
-    element.update = function() {
-        this.text = 'x:' + degrees(beetle.rotation.z * -1).toFixed(2).toString().replace('.00','')
-            + ', y: ' + degrees(beetle.rotation.x * -1).toFixed(2).toString().replace('.00','')
-            + ', z: ' + degrees(beetle.rotation.y).toFixed(2).toString().replace('.00','')
-    };
+    element.update = function() { this.text = 'x:' + degrees(beetle.rotation.z * -1).toFixed(2).toString().replace('.00','') };
+    element.newLines = 1;
+    elements.push(element);
+
+    var space = new Morph();
+    space.alpha = 0;
+    space.columns = 8;
+    space.newColumn = 1;
+    elements.push(space);
+
+    element = new StringMorph();
+    element.update = function() { this.text = 'y: ' + beetle.position.x.toFixed(2).toString().replace('.00','') }; 
     element.newColumn = true;
     elements.push(element);
 
-    elements.push('HSL: ');
+    var space = new Morph();
+    space.alpha = 0;
+    space.columns = 8;
+    space.newColumn = 5;
+    elements.push(space);
+
     element = new StringMorph();
-    element.update = function() {
-        this.text = beetle.color.state.h.toFixed(2).toString().replace('.00','') + ', ' 
-            + beetle.color.state.s.toFixed(2).toString().replace('.00','') + ', ' 
-            + beetle.color.state.l.toFixed(2).toString().replace('.00','')
-    };
-    element.newLines = 1.5;
+    element.update = function() { this.text = 'y:' + degrees(beetle.rotation.x * -1).toFixed(2).toString().replace('.00','') };
+    element.newLines = 1;
+    elements.push(element);
+
+    var space = new Morph();
+    space.alpha = 0;
+    space.columns = 8;
+    space.newColumn = 1;
+    elements.push(space);
+
+    element = new StringMorph();
+    element.update = function() { this.text = 'z: ' + beetle.position.y.toFixed(2).toString().replace('.00','') }; 
+    element.newColumn = true;
+    elements.push(element);
+
+    var space = new Morph();
+    space.alpha = 0;
+    space.columns = 8;
+    space.newColumn = 5;
+    elements.push(space);
+
+    element = new StringMorph();
+    element.update = function() { this.text = 'z:' + degrees(beetle.rotation.y).toFixed(2).toString().replace('.00','') };
+    element.newLines = 2;
     elements.push(element);
 
     elements.push('Scale: ');
@@ -1335,6 +1373,26 @@ IDE_Morph.prototype.createStatusDisplay = function () {
         this.text = beetle.multiplierScale.toString() 
             + ' (' + (beetle.multiplierScale * 100).toString() + '%)'
     }
+    element.newLines = 1.5;
+    elements.push(element);
+
+    elements.push('-');
+    
+    elements.push('HSL: ');
+    element = new StringMorph();
+    element.update = function() {
+        this.text = beetle.color.state.h.toFixed(2).toString().replace('.00','') + ', ' 
+            + beetle.color.state.s.toFixed(2).toString().replace('.00','') + ', ' 
+            + beetle.color.state.l.toFixed(2).toString().replace('.00','') + ' '
+    };
+    elements.push(element);
+
+    element = new Morph();
+    element.update = function() {
+        this.setColor(new Color(beetle.color.r * 255, beetle.color.g * 255, beetle.color.b * 255));
+    }
+    element.setWidth(30);
+    element.setHeight(12);
     element.newColumn = true;
     elements.push(element);
 
@@ -1343,7 +1401,6 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     element.update = function() {
         this.text = (beetle.shape.material.opacity * 100).toFixed(2).toString().replace('.00','') + '%'
     }
-    element.newLines = 1.5;
     elements.push(element);
 
     // Add all contents
