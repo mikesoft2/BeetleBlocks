@@ -75,9 +75,9 @@ IDE_Morph.prototype.projectMenu = function () {
     menu.addItem('New', 'createNewProject');
     menu.addItem('Open...', 'openProjectsBrowser');
     menu.addItem('Save', 'save');
-    menu.addItem('Save to disk', 'saveProjectToDisk');
     menu.addItem('Save As...', 'saveProjectsBrowser');
     menu.addItem('Save and share', 'saveAndShare');
+    menu.addItem('Export to disk', 'saveProjectToDisk');
     menu.addLine();
     menu.addItem(
             'Import...',
