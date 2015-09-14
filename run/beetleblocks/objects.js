@@ -1389,18 +1389,24 @@ StageMorph.prototype.mouseMove = function(pos, button) {
 
     if (this.referencePos === null) { return };
 
-    deltaX = pos.x - this.referencePos.x;
-    deltaY = pos.y - this.referencePos.y;
-    this.referencePos = pos
-        if (button === 'right' || this.world().currentKey === 16) { // shiftClicked
-            this.controls.panLeft(deltaX / this.dimensions.x / this.scale * 15);
-            this.controls.panUp(deltaY / this.dimensions.y / this.scale * 10);
-        } else {
-            horzAngle = deltaX / (this.dimensions.x * this.scale) * 360;
-            vertAngle = deltaY / (this.dimensions.y * this.scale) * 360;
-            this.controls.rotateLeft(radians(horzAngle));
-            this.controls.rotateUp(radians(vertAngle));
-        }
+    var factor = this.renderer.isParallelProjection ? 65 / this.camera.zoomFactor : this.controls.object.position.length() / 10,
+        deltaX = (pos.x - this.referencePos.x),
+        deltaY = (pos.y - this.referencePos.y);
+
+    console.log(factor);
+
+    this.referencePos = pos;
+
+    if (button === 'right' || this.world().currentKey === 16) { // shiftClicked
+        this.controls.panLeft(deltaX / this.dimensions.x / this.scale * 15 * factor);
+        this.controls.panUp(deltaY / this.dimensions.y / this.scale * 10 * factor);
+    } else {
+        var horzAngle = deltaX / (this.dimensions.x * this.scale) * 360;
+        var vertAngle = deltaY / (this.dimensions.y * this.scale) * 360;
+        this.controls.rotateLeft(radians(horzAngle));
+        this.controls.rotateUp(radians(vertAngle));
+    }
+
     this.controls.update();
     this.reRender();
 };
