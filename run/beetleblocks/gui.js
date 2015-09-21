@@ -567,9 +567,9 @@ IDE_Morph.prototype.downloadSVG = function() {
     var lines = [];
     stage.myObjects.children.forEach(
             function(el,index, ar){
-            if (el instanceof THREE.Line) {
-            lines.push(el);
-            } 
+                if (el instanceof THREE.Line) {
+                    lines.push(el);
+                } 
             }
             );
 
@@ -577,44 +577,44 @@ IDE_Morph.prototype.downloadSVG = function() {
 
     var minX=0, maxX=0, minZ=0, maxZ=0;
     var scaleMultiplier = 72; // one step is 72px, or 1 in at 72dpi
-    for (var i=0; i<lines.length; i++) {
 
-        var x1 = lines[i].geometry.vertices[0].x * scaleMultiplier * -1;
-        var z1 = lines[i].geometry.vertices[0].z * scaleMultiplier ;
-        var x2 = lines[i].geometry.vertices[1].x * scaleMultiplier  * -1;
-        var z2 = lines[i].geometry.vertices[1].z * scaleMultiplier ;
+    lines.forEach(function (line) {
 
-        if (x1<minX) minX = x1;
-        if (x2<minX) minX = x2;
-        if (x1>maxX) maxX = x1;
-        if (x2>maxX) maxX = x2;
+        var red = Math.round(line.material.color.r * 255); 
+        var green = Math.round(line.material.color.g * 255); 
+        var blue = Math.round(line.material.color.b * 255); 
 
-        if (z1<minZ) minZ = z1;
-        if (z2<minZ) minZ = z2;
-        if (z1>maxZ) maxZ = z1;
-        if (z2>maxZ) maxZ = z2;
+        if (line.type == 'polyline') {
 
-        var red = Math.round(lines[i].material.color.r * 255); 
-        var green = Math.round(lines[i].material.color.g * 255); 
-        var blue = Math.round(lines[i].material.color.b * 255); 
+            svgStr += '<polyline stroke="rgb(' + red + ',' + green + ',' + blue + ')" '
+                + 'fill="none" stroke-width="0.25" '
+                + 'stroke-linecap="round" stroke-linejoin="round" '
+                + 'points="';
 
-        svgStr += '<line stroke=\"rgb(' + red + ',' + green + ',' + blue + ')\" '; 
-            svgStr += 'fill=\"none\" stroke-width=\"0.25\" ';
-        svgStr += 'stroke-linecap=\"round\" stroke-linejoin=\"round\" ';
+            line.geometry.vertices.forEach(function(vertex) {
+                svgStr += (vertex.x * scaleMultiplier * -1)
+                    + ','
+                    + (vertex.z * scaleMultiplier)
+                    + ' ';
 
-        svgStr += 'x1=\"' + z1 + '\" y1=\"' + x1 + '\" ';
-        svgStr += 'x2=\"' + z2 + '\" y2=\"' + x2 + '\" ';
-        svgStr += '/>\n';
-    }
+                if (vertex.x < minX) { minX = vertex.x };
+                if (vertex.x > maxX) { maxX = vertex.x };
+                if (vertex.z < minZ) { minZ = vertex.z };
+                if (vertex.z > maxZ) { maxZ = vertex.z };
+            });
+
+            svgStr += '"/>\n';
+
+        }
+    })
 
     svgStr += '</svg>';
 
-    svgHeader = '';
-    svgHeader += '<svg version=\"1.1\" id=\"Layer_1\" xmlns=\"http://www.w3.org/2000/svg\" ';
-    svgHeader += 'x=\" ' + minZ + 'px\" ';
-    svgHeader += 'y=\" ' + minX + 'px\" ';
-    svgHeader += 'width=\" ' + (maxZ-minZ) + 'px\" ';
-    svgHeader += 'height=\" ' + (maxX-minX) + 'px\" ';
+    svgHeader = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" ';
+    svgHeader += 'x=" ' + minZ * scaleMultiplier + 'px" ';
+    svgHeader += 'y=" ' + minX * scaleMultiplier + 'px" ';
+    svgHeader += 'width=" ' + (maxZ - minZ) * scaleMultiplier + 'px" ';
+    svgHeader += 'height=" ' + (maxX - minX) * scaleMultiplier + 'px" ';
     svgHeader += '>\n';
 
     svgStr = svgHeader.concat(svgStr);

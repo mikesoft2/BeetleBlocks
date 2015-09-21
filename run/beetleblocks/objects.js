@@ -180,6 +180,7 @@ SpriteMorph.prototype.initBeetle = function() {
     this.beetle.drawing = false;
     this.beetle.drawStyle = null;
     this.beetle.spline = null;
+    this.beetle.polyline = null;
 
     // negative geometry
     this.beetle.negative = false;

@@ -190,12 +190,22 @@ Process.prototype.addLineGeom = function(startPoint, endPoint) {
 
     if (beetle.drawStyle == 'lines') {
 
-        var geometry = new THREE.Geometry();
-        geometry.vertices.push(startPoint);
-        geometry.vertices.push(endPoint);
+        // If this is the first segment, let's create an object and add the first point
+        if (beetle.polyline == null) {
+            beetle.polyline = {};
+            beetle.polyline.points = [startPoint];
+        }
 
-        line = new THREE.Line(geometry, lineMaterial);
-        stage.myObjects.add(line);
+        beetle.polyline.points.push(endPoint);
+
+        beetle.polyline.geometry = new THREE.Geometry();
+        beetle.polyline.geometry.vertices = beetle.polyline.points;
+        beetle.polyline.geometry.verticesNeedUpdate = true;
+
+        stage.myObjects.remove(beetle.polyline.line);
+        beetle.polyline.line = new THREE.Line(beetle.polyline.geometry, lineMaterial);
+        beetle.polyline.line.type = 'polyline';
+        stage.myObjects.add(beetle.polyline.line);
 
     } else if (beetle.drawStyle == 'splines') {
 
@@ -213,6 +223,7 @@ Process.prototype.addLineGeom = function(startPoint, endPoint) {
 
         stage.myObjects.remove(beetle.spline.line);
         beetle.spline.line = new THREE.Line(beetle.spline.geometry, lineMaterial);
+        beetle.spline.line.type = 'spline';
         stage.myObjects.add(beetle.spline.line);
     }
 
@@ -568,6 +579,7 @@ Process.prototype.stopDrawing = function() {
     beetle.drawing = false;
     beetle.drawStyle = null;
     beetle.spline = null;
+    beetle.polyline = null;
 };
 
 // Negative Geometry
