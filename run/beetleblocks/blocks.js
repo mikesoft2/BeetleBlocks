@@ -3,6 +3,17 @@ SyntaxElementMorph.prototype.originalLabelPart = SyntaxElementMorph.prototype.la
 SyntaxElementMorph.prototype.labelPart = function(spec) {
     var part;
     switch (spec) {
+        case '%drawStyle':
+            part = new InputSlotMorph(
+                null,
+                false,
+                {
+                    'lines' : ['lines'],
+                    'splines' : ['splines'], 
+                },
+                true
+        );
+        break;
         case '%axes':
             part = new InputSlotMorph(
                 null,

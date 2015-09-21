@@ -178,6 +178,8 @@ SpriteMorph.prototype.initBeetle = function() {
 
     // drawing
     this.beetle.drawing = false;
+    this.beetle.drawStyle = null;
+    this.beetle.spline = null;
 
     // negative geometry
     this.beetle.negative = false;
@@ -521,8 +523,9 @@ SpriteMorph.prototype.initBlocks = function() {
     this.blocks.startDrawing =
     {
         type: 'command',
-        spec: 'start drawing',
-        category: 'shapes'
+        spec: 'start drawing %drawStyle',
+        category: 'shapes',
+        defaults: ['lines']
     };		 
     this.blocks.stopDrawing =
     {
@@ -1392,8 +1395,6 @@ StageMorph.prototype.mouseMove = function(pos, button) {
     var factor = this.renderer.isParallelProjection ? 65 / this.camera.zoomFactor : this.controls.object.position.length() / 10,
         deltaX = (pos.x - this.referencePos.x),
         deltaY = (pos.y - this.referencePos.y);
-
-    console.log(factor);
 
     this.referencePos = pos;
 

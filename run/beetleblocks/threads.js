@@ -186,15 +186,36 @@ Process.prototype.pointTowards = function(x, y, z) {
 Process.prototype.addLineGeom = function(startPoint, endPoint) {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-        geometry = new THREE.Geometry();
+        lineMaterial = new THREE.LineBasicMaterial({ color: beetle.color });
 
-    geometry.vertices.push(startPoint);
-    geometry.vertices.push(endPoint);
+    if (beetle.drawStyle == 'lines') {
 
-    var lineMaterial = new THREE.LineBasicMaterial({ color: beetle.color }),
+        var geometry = new THREE.Geometry();
+        geometry.vertices.push(startPoint);
+        geometry.vertices.push(endPoint);
+
         line = new THREE.Line(geometry, lineMaterial);
+        stage.myObjects.add(line);
 
-    stage.myObjects.add(line);		
+    } else if (beetle.drawStyle == 'splines') {
+
+        // If this is the first segment, let's create an object and add the first point
+        if (beetle.spline == null) {
+            beetle.spline = {};
+            beetle.spline.points = [startPoint];
+        }
+
+        beetle.spline.points.push(endPoint);
+        beetle.spline.curve = new THREE.SplineCurve3(beetle.spline.points);
+
+        beetle.spline.geometry = new THREE.Geometry();
+        beetle.spline.geometry.vertices = beetle.spline.curve.getPoints(beetle.spline.curve.points.length * 3);
+
+        stage.myObjects.remove(beetle.spline.line);
+        beetle.spline.line = new THREE.Line(beetle.spline.geometry, lineMaterial);
+        stage.myObjects.add(beetle.spline.line);
+    }
+
     stage.reRender();
 }
 
@@ -498,11 +519,13 @@ Process.prototype.addPointToExtrusion = function() {
 
     beetle.endCap = new THREE.Mesh(circleGeometry2, beetle.newLambertMaterial());
     beetle.endCap.position.copy(beetle.position);
+
     if (cylinder) { 
         beetle.endCap.rotation.copy(cylinder.rotation);
         beetle.endCap.rotateX(-Math.PI/2);
         beetle.endCap.rotateY(Math.PI);
     };
+
     beetle.endCap.updateMatrix();
     beetle.endCap.geometry.applyMatrix(beetle.endCap.matrix);
     beetle.endCap.position.set(0,0,0);
@@ -519,7 +542,6 @@ Process.prototype.setExtrusionDiameter = function(diameter) {
     if (!beetle.extruding) {
         this.homeContext.receiver.beetle.extrusionDiameter = diameter;
     }
-    // should we fire an error otherwise?
 }
 
 Process.prototype.changeExtrusionDiameter = function(delta) {
@@ -527,17 +549,25 @@ Process.prototype.changeExtrusionDiameter = function(delta) {
     if (!beetle.extruding) {
         this.homeContext.receiver.beetle.extrusionDiameter += delta;
     }
-    // should we fire an error otherwise?
 }
 
-Process.prototype.startDrawing = function() {
+Process.prototype.startDrawing = function(drawStyle) {
     var beetle = this.homeContext.receiver.beetle;
-    beetle.drawing = true;
+
+    if (!beetle.drawing) {
+        beetle.drawing = true;
+        beetle.drawStyle = drawStyle;
+    } else if (beetle.drawStyle != drawStyle) {
+        this.stopDrawing();
+        this.startDrawing(drawStyle)
+    }
 };
 
 Process.prototype.stopDrawing = function() {
     var beetle = this.homeContext.receiver.beetle;
     beetle.drawing = false;
+    beetle.drawStyle = null;
+    beetle.spline = null;
 };
 
 // Negative Geometry
