@@ -145,10 +145,14 @@ tempDict = {
 		'hola',
 	'2D text %s size: %n':
 		'text 2D %s mida: %n',
-	'start drawing':
-		'comença a dibuixar',
+	'start drawing %drawStyle':
+		'comença a dibuixar %drawStyle',
 	'stop drawing':
 		'deixa de dibuixar',
+        'lines':
+                'línies',
+        'splines':
+                'corbes',
 	'start extruding':
 		'comença a extrudir',
 	'stop extruding':
