@@ -587,12 +587,12 @@ IDE_Morph.prototype.downloadSVG = function() {
         if (line.type == 'polyline') {
 
             svgStr += '<polyline stroke="rgb(' + red + ',' + green + ',' + blue + ')" '
-                + 'fill="none" stroke-width="0.25" '
+                + 'fill="none" stroke-width="1" '
                 + 'stroke-linecap="round" stroke-linejoin="round" '
                 + 'points="';
 
             line.geometry.vertices.forEach(function(vertex) {
-                svgStr += (vertex.x * scaleMultiplier * -1)
+                svgStr += (vertex.x * scaleMultiplier)
                     + ','
                     + (vertex.z * scaleMultiplier)
                     + ' ';
@@ -605,6 +605,82 @@ IDE_Morph.prototype.downloadSVG = function() {
 
             svgStr += '"/>\n';
 
+        } else if (line.type == 'spline') {
+
+            svgStr += '<path stroke="rgb(' + red + ',' + green + ',' + blue + ')" '
+                + 'fill="none" stroke-width="1" '
+                + 'stroke-linecap="round" stroke-linejoin="round" '
+                + 'd="M' + (line.anchorPoints[0].x * scaleMultiplier)
+                + ',' + (line.anchorPoints[0].z * scaleMultiplier) + ' ';
+
+            function catmullRomToBezier(points) {
+
+                // taken from https://advancedweb.hu/2014/10/28/plotting_charts_with_svg/
+
+                var result = [];
+                for (var i = 0; i < points.length - 1; i++) {
+                    var p = [];
+
+                    p.push({
+                        x: points[Math.max(i - 1, 0)].x,
+                        z: points[Math.max(i - 1, 0)].z
+                    });
+                    p.push({
+                        x: points[i].x,
+                        z: points[i].z
+                    });
+                    p.push({
+                        x: points[i + 1].x,
+                        z: points[i + 1].z
+                    });
+                    p.push({
+                        x: points[Math.min(i + 2, points.length - 1)].x,
+                        z: points[Math.min(i + 2, points.length - 1)].z
+                    });
+
+                    var bp = [];
+                    bp.push({
+                        x: ((-p[0].x + 6 * p[1].x + p[2].x) / 6),
+                        z: ((-p[0].z + 6 * p[1].z + p[2].z) / 6)
+                    });
+                    bp.push({
+                        x: ((p[1].x + 6 * p[2].x - p[3].x) / 6),
+                        z: ((p[1].z + 6 * p[2].z - p[3].z) / 6)
+                    });
+                    bp.push({
+                        x: p[2].x,
+                        z: p[2].z
+                    });
+                    result.push(bp);
+                }
+
+                return result;
+            }
+
+            catmullRomToBezier(line.anchorPoints).forEach(function(catmull) {
+                svgStr += 'C' + catmull[0].x * scaleMultiplier
+                    + ',' + catmull[0].z * scaleMultiplier
+                    + ' ' + catmull[1].x * scaleMultiplier
+                    + "," + catmull[1].z * scaleMultiplier
+                    + " " + catmull[2].x * scaleMultiplier
+                    + "," + catmull[2].z * scaleMultiplier
+                    + " ";
+
+                if (catmull[0].x < minX) { minX = catmull[0].x };
+                if (catmull[0].x > maxX) { maxX = catmull[0].x };
+                if (catmull[0].z < minZ) { minZ = catmull[0].z };
+                if (catmull[0].z > maxZ) { maxZ = catmull[0].z };
+                if (catmull[1].x < minX) { minX = catmull[1].x };
+                if (catmull[1].x > maxX) { maxX = catmull[1].x };
+                if (catmull[1].z < minZ) { minZ = catmull[1].z };
+                if (catmull[1].z > maxZ) { maxZ = catmull[1].z };
+                if (catmull[2].x < minX) { minX = catmull[2].x };
+                if (catmull[2].x > maxX) { maxX = catmull[2].x };
+                if (catmull[2].z < minZ) { minZ = catmull[2].z };
+                if (catmull[2].z > maxZ) { maxZ = catmull[2].z };
+            });
+ 
+            svgStr += '"/>\n';
         }
     })
 

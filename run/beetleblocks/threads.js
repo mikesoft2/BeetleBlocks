@@ -216,13 +216,14 @@ Process.prototype.addLineGeom = function(startPoint, endPoint) {
         }
 
         beetle.spline.points.push(endPoint);
-        beetle.spline.curve = new THREE.SplineCurve3(beetle.spline.points);
+        beetle.spline.curve = new THREE.CatmullRomCurve3(beetle.spline.points);
 
         beetle.spline.geometry = new THREE.Geometry();
         beetle.spline.geometry.vertices = beetle.spline.curve.getPoints(beetle.spline.curve.points.length * 3);
 
         stage.myObjects.remove(beetle.spline.line);
         beetle.spline.line = new THREE.Line(beetle.spline.geometry, lineMaterial);
+        beetle.spline.line.anchorPoints = beetle.spline.curve.points;
         beetle.spline.line.type = 'spline';
         stage.myObjects.add(beetle.spline.line);
     }

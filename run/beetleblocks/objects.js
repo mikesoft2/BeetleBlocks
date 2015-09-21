@@ -40,7 +40,7 @@ SpriteMorph.prototype.initBeetle = function() {
     this.beetle = new THREE.Object3D();
     this.beetle.name = 'beetle';
     this.beetle.color = new THREE.Color();
-    var material = new THREE.MeshLambertMaterial( { color: myself.color, transparent: true, shading: THREE.SmoothShading } );
+    var material = new THREE.MeshLambertMaterial( { color: myself.color, transparent: true } );
 
     this.beetle.flying = false;
 
@@ -75,9 +75,7 @@ SpriteMorph.prototype.initBeetle = function() {
             myself.beetle.standingShape.add(object);
             object.traverse(function(child) { 
                 if (child instanceof THREE.Mesh) { 
-                    child.material = new THREE.MeshLambertMaterial({ 
-                        color: 0x888888,
-                        shading: THREE.SmoothShading }) 
+                    child.material = new THREE.MeshLambertMaterial({ color: 0x888888 })
                 }
             });
             object.rotation.set(Math.PI, 0, -Math.PI / 2);
@@ -87,9 +85,7 @@ SpriteMorph.prototype.initBeetle = function() {
             myself.beetle.flyingShape.add(object);
             object.traverse(function(child) { 
                 if (child instanceof THREE.Mesh) { 
-                    child.material = new THREE.MeshLambertMaterial({ 
-                        color: 0x888888,
-                        shading: THREE.SmoothShading }) 
+                    child.material = new THREE.MeshLambertMaterial({ color: 0x888888 }) 
                 }
             });
             object.rotation.set(Math.PI, 0, -Math.PI / 2);
