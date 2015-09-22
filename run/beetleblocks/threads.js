@@ -219,7 +219,7 @@ Process.prototype.addLineGeom = function(startPoint, endPoint) {
         beetle.spline.curve = new THREE.CatmullRomCurve3(beetle.spline.points);
 
         beetle.spline.geometry = new THREE.Geometry();
-        beetle.spline.geometry.vertices = beetle.spline.curve.getPoints(beetle.spline.curve.points.length * 3);
+        beetle.spline.geometry.vertices = beetle.spline.curve.getPoints(beetle.spline.curve.points.length * 12);
 
         stage.myObjects.remove(beetle.spline.line);
         beetle.spline.line = new THREE.Line(beetle.spline.geometry, lineMaterial);
