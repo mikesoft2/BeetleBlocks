@@ -477,7 +477,7 @@ Process.prototype.addPointToExtrusion = function() {
     extrudeBend.type = 'catmullrom';
     extrudeBend.tension = 0.0000001;
 
-    var segments = Math.floor(extrudeBend.getLength() + 1) * 2,
+    var segments = Math.max(Math.floor((extrudeBend.getLength()) * 2), 12),
         path = new THREE.TubeGeometry(extrudeBend, segments, (beetle.extrusionDiameter / 2) * beetle.multiplierScale, 12, false);
 
     beetle.extrusion = new THREE.Mesh(path, beetle.newLambertMaterial());
