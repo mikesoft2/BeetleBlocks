@@ -188,26 +188,7 @@ Process.prototype.addLineGeom = function(startPoint, endPoint) {
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
         lineMaterial = new THREE.LineBasicMaterial({ color: beetle.color });
 
-    if (beetle.drawStyle == 'lines') {
-
-        // If this is the first segment, let's create an object and add the first point
-        if (beetle.polyline == null) {
-            beetle.polyline = {};
-            beetle.polyline.points = [startPoint];
-        }
-
-        beetle.polyline.points.push(endPoint);
-
-        beetle.polyline.geometry = new THREE.Geometry();
-        beetle.polyline.geometry.vertices = beetle.polyline.points;
-        beetle.polyline.geometry.verticesNeedUpdate = true;
-
-        stage.myObjects.remove(beetle.polyline.line);
-        beetle.polyline.line = new THREE.Line(beetle.polyline.geometry, lineMaterial);
-        beetle.polyline.line.type = 'polyline';
-        stage.myObjects.add(beetle.polyline.line);
-
-    } else if (beetle.drawStyle == 'splines') {
+ if (beetle.drawStyle == 'splines') {
 
         // If this is the first segment, let's create an object and add the first point
         if (beetle.spline == null) {
@@ -226,6 +207,27 @@ Process.prototype.addLineGeom = function(startPoint, endPoint) {
         beetle.spline.line.anchorPoints = beetle.spline.curve.points;
         beetle.spline.line.type = 'spline';
         stage.myObjects.add(beetle.spline.line);
+        
+    } else {
+        
+        // We don't care if there is no option selected, we start drawing lines by default
+        // If this is the first segment, let's create an object and add the first point
+        if (beetle.polyline == null) {
+            beetle.polyline = {};
+            beetle.polyline.points = [startPoint];
+        }
+
+        beetle.polyline.points.push(endPoint);
+
+        beetle.polyline.geometry = new THREE.Geometry();
+        beetle.polyline.geometry.vertices = beetle.polyline.points;
+        beetle.polyline.geometry.verticesNeedUpdate = true;
+
+        stage.myObjects.remove(beetle.polyline.line);
+        beetle.polyline.line = new THREE.Line(beetle.polyline.geometry, lineMaterial);
+        beetle.polyline.line.type = 'polyline';
+        stage.myObjects.add(beetle.polyline.line);
+
     }
 
     stage.reRender();
