@@ -550,6 +550,13 @@ Process.prototype.setHSLA = function(channel, value) {
     }
 
     beetle.color.update();
+
+    if (beetle.drawing) {
+        var style = beetle.drawStyle;
+        this.stopDrawing();
+        this.startDrawing(style);
+    }
+
     stage.reRender();
 };
 
@@ -571,6 +578,13 @@ Process.prototype.changeHSLA = function(channel, value) {
     }
 
     beetle.color.update();
+
+    if (beetle.drawing) {
+        var style = beetle.drawStyle;
+        this.stopDrawing();
+        this.startDrawing(style);
+    }
+
     stage.reRender();
 };
 
