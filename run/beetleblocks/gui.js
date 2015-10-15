@@ -258,6 +258,16 @@ IDE_Morph.prototype.projectMenu = function () {
                 new Color(100, 0, 0)
                     );
     }
+
+    menu.addLine();
+
+    menu.addItem(
+            'Tutorial',
+            function() {
+                myself.startTutorial(world);
+            }
+            );
+
     menu.popup(world, pos);
 }
 
@@ -1635,3 +1645,4 @@ IDE_Morph.prototype.setLanguage = function(lang, callback) {
         translation.src = src; 
     });
 };
+
