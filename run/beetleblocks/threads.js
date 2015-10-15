@@ -104,7 +104,6 @@ Process.prototype.setPositionOnAxis = function(axis, pos) {
     }
     if (axis == 'z') {
         beetle.position.setY(pos);
-        beetle.applyCostume();
     }		
     if (beetle.extruding) {
         this.addPointToExtrusion();
@@ -115,6 +114,7 @@ Process.prototype.setPositionOnAxis = function(axis, pos) {
         this.addLineGeom(startPoint, endPoint);
     }
 
+    beetle.applyCostume();
     stage.reRender();
 };
 
@@ -136,7 +136,6 @@ Process.prototype.changePositionBy = function(axis, dist) {
     }
     if (axis == 'z') {
         beetle.position.y += dist;
-        beetle.applyCostume();
     }	
     if (beetle.extruding) {
         this.addPointToExtrusion();
@@ -147,6 +146,7 @@ Process.prototype.changePositionBy = function(axis, dist) {
         this.addLineGeom(startPoint, endPoint);
     }	
 
+    beetle.applyCostume();
     stage.reRender();
 };
 
@@ -188,7 +188,7 @@ Process.prototype.addLineGeom = function(startPoint, endPoint) {
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
         lineMaterial = new THREE.LineBasicMaterial({ color: beetle.color });
 
- if (beetle.drawStyle == 'splines') {
+    if (beetle.drawStyle == 'curves') {
 
         // If this is the first segment, let's create an object and add the first point
         if (beetle.spline == null) {
@@ -244,7 +244,6 @@ Process.prototype.move = function(dist) {
 
     dist = Number(dist) * beetle.multiplierScale;
     beetle.translateZ(dist);
-    beetle.applyCostume();
 
     if (beetle.extruding) {
         this.addPointToExtrusion();
@@ -255,6 +254,7 @@ Process.prototype.move = function(dist) {
         this.addLineGeom(startPoint, endPoint);
     }
 
+    beetle.applyCostume();
     stage.reRender();
 };
 
@@ -423,20 +423,21 @@ Process.prototype.text2D = function(textString, size) {
     stage.reRender();
 };
 
-Process.prototype.startExtrusion = function() {
+Process.prototype.startExtrusion = function(extrudeStyle) {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
         p = new THREE.Vector3();
 
-    if (beetle.extruding) { return }
-
-    beetle.extruding = true;
-    beetle.extrusionPoints = [];
-
-    this.addPointToExtrusion();
-
-    beetle.startSphere = this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true);
-
+    if (!beetle.extruding) {
+        beetle.extruding = true;
+        beetle.extrudeStyle = extrudeStyle;
+        beetle.extrusionPoints = [];
+        this.addPointToExtrusion();
+        beetle.startSphere = this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true);
+    } else if (beetle.extrudeStyle != extrudeStyle) {
+        this.stopExtrusion();
+        this.startExtrusion(extrudeStyle);
+    }
 };
 
 Process.prototype.stopExtrusion = function() {
@@ -445,6 +446,7 @@ Process.prototype.stopExtrusion = function() {
 
     if (beetle.extruding) {
         beetle.extruding = false;
+        beetle.extrudeStyle = null;
         beetle.extrusionPoints = [];
         beetle.extrusion = null;
         beetle.endSphere = null;
@@ -457,32 +459,56 @@ Process.prototype.stopExtrusion = function() {
 Process.prototype.addPointToExtrusion = function() {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-        p = new THREE.Vector3();
-
-    if (beetle.extrusion) { stage.myObjects.remove(beetle.extrusion) };
+        p = new THREE.Vector3(),
+        geometry;
 
     p.copy(beetle.position);
     beetle.extrusionPoints.push(p);
 
-    if (beetle.extrusionPoints.length < 2) { return };
+    if (beetle.extrudeStyle == 'curves') {
 
-    if (beetle.endSphere) {
-        stage.myObjects.remove(beetle.endSphere);
+        if (beetle.extrusion) { stage.myObjects.remove(beetle.extrusion) };
+        if (beetle.extrusionPoints.length < 2) { return };
+        if (beetle.endSphere) { stage.myObjects.remove(beetle.endSphere) };
+
+        beetle.endSphere = this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true);
+
+        var extrudeBend = new THREE.CatmullRomCurve3(beetle.extrusionPoints);
+
+        extrudeBend.type = 'catmullrom';
+        extrudeBend.tension = 0.2;
+
+        var segments = Math.max(Math.floor((extrudeBend.getLength()) * 2), 12),
+            geometry = new THREE.TubeGeometry(extrudeBend, segments, (beetle.extrusionDiameter / 2) * beetle.multiplierScale, 12, false);
+
+        beetle.extrusion = new THREE.Mesh(geometry, beetle.newLambertMaterial());
+        stage.myObjects.add(beetle.extrusion);
+
+    } else {
+        // Cylinder and sphere strategy
+
+        var distanceToLast = beetle.extrusionPoints[0].distanceTo(beetle.position);
+
+        geometry = new THREE.CylinderGeometry(
+            (beetle.extrusionDiameter / 2) * beetle.multiplierScale, //radiusTop
+            (beetle.extrusionDiameter / 2) * beetle.multiplierScale, //radiusBottom
+            distanceToLast, //height
+            12 // radiusSegments
+            );
+        
+        var cylinder = new THREE.Mesh(geometry, beetle.newLambertMaterial());
+
+        cylinder.position.copy(beetle.position);
+        cylinder.rotation.copy(beetle.rotation);
+        cylinder.rotateX(Math.PI/2);
+        cylinder.translateY(-distanceToLast/2);
+
+        beetle.extrusionPoints[0] = p.copy(beetle.position);
+
+        this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true); // joint
+        stage.myObjects.add(cylinder); 
     }
 
-    beetle.endSphere = this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true);
-
-    var extrudeBend = new THREE.CatmullRomCurve3(beetle.extrusionPoints);
-    
-    extrudeBend.type = 'catmullrom';
-    extrudeBend.tension = 0.0000001;
-
-    var segments = Math.max(Math.floor((extrudeBend.getLength()) * 2), 12),
-        path = new THREE.TubeGeometry(extrudeBend, segments, (beetle.extrusionDiameter / 2) * beetle.multiplierScale, 12, false);
-
-    beetle.extrusion = new THREE.Mesh(path, beetle.newLambertMaterial());
-
-    stage.myObjects.add(beetle.extrusion);
     stage.reRender();
 }
 
@@ -508,7 +534,7 @@ Process.prototype.startDrawing = function(drawStyle) {
         beetle.drawStyle = drawStyle;
     } else if (beetle.drawStyle != drawStyle) {
         this.stopDrawing();
-        this.startDrawing(drawStyle)
+        this.startDrawing(drawStyle);
     }
 };
 

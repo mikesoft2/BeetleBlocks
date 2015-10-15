@@ -170,6 +170,11 @@ SpriteMorph.prototype.initBeetle = function() {
 
     // extrusion
     this.beetle.extruding = false;
+    this.beetle.extrudeStyle = null;
+    this.beetle.extrusionPoints = [];
+    this.beetle.extrusion = null;
+    this.beetle.endSphere = null;
+    this.beetle.startSphere = null;
     this.beetle.extrusionDiameter = 1;
 
     // drawing
@@ -534,8 +539,9 @@ SpriteMorph.prototype.initBlocks = function() {
     this.blocks.startExtrusion =
     {
         type: 'command',
-        spec: 'start extruding',
-        category: 'shapes'
+        spec: 'start extruding %drawStyle',
+        category: 'shapes',
+        defaults: ['curves']
     };
     this.blocks.stopExtrusion =
     {

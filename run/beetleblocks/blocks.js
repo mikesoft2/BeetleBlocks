@@ -9,7 +9,7 @@ SyntaxElementMorph.prototype.labelPart = function(spec) {
                 false,
                 {
                     'lines' : ['lines'],
-                    'splines' : ['splines'], 
+                    'curves' : ['curves']
                 },
                 true
         );
