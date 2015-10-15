@@ -583,6 +583,12 @@ Process.prototype.setHSLA = function(channel, value) {
         this.startDrawing(style);
     }
 
+    if (beetle.extruding) {
+        var style = beetle.extrudeStyle;
+        this.stopExtrusion();
+        this.startExtrusion(style);
+    }
+
     stage.reRender();
 };
 
@@ -609,6 +615,12 @@ Process.prototype.changeHSLA = function(channel, value) {
         var style = beetle.drawStyle;
         this.stopDrawing();
         this.startDrawing(style);
+    }
+
+    if (beetle.extruding) {
+        var style = beetle.extrudeStyle;
+        this.stopExtrusion();
+        this.startExtrusion(style);
     }
 
     stage.reRender();
