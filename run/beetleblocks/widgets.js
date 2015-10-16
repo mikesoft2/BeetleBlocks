@@ -7,21 +7,21 @@ PushButtonMorph.prototype.disable = function() {
 
 ToggleMorph.prototype.originalInit = ToggleMorph.prototype.init;
 ToggleMorph.prototype.init = function (
-	title,
-    purpose,
-    tosURL,
-    tosLabel,
-    prvURL,
-    prvLabel,
-    checkBoxLabel,
-    world,
-    pic,
-    msg
-) {
-	this.originalInit(title, purpose, tosURL, tosLabel, prvURL, prvLabel, checkBoxLabel, world, pic, msg);	
-	this.color = new Color(0,0,0);
-	this.highlightColor = new Color(100,100,100);
-	this.alpha = 0.25;
+        title,
+        purpose,
+        tosURL,
+        tosLabel,
+        prvURL,
+        prvLabel,
+        checkBoxLabel,
+        world,
+        pic,
+        msg
+        ) {
+    this.originalInit(title, purpose, tosURL, tosLabel, prvURL, prvLabel, checkBoxLabel, world, pic, msg);	
+    this.color = new Color(0,0,0);
+    this.highlightColor = new Color(100,100,100);
+    this.alpha = 0.25;
     this.refresh();
     this.drawNew();
 }
@@ -30,37 +30,35 @@ DialogBoxMorph.prototype.originalPopUp = DialogBoxMorph.prototype.popUp;
 DialogBoxMorph.prototype.popUp = function (world) {
     this.originalPopUp(world);
     this.show();
-    if (this.popUpPosition) { 
-        this.setPosition(this.popUpPosition);
-        if (this.arrow) { this.placeArrow(); }
-    }
+    if (this.popUpPosition) { this.setPosition(this.popUpPosition) };
+    if (this.arrow) { this.placeArrow() };
 };
 
 DialogBoxMorph.prototype.tutorialWindow = function (
-    title,
-    pic,
-    msg,
-    popUpPosition,
-    arrowOrientation,
-    previousWindow,
-    nextWindow,
-    cancelAction
-) {
+        title,
+        pic,
+        msg,
+        popUpPosition,
+        arrowOrientation,
+        previousWindow,
+        nextWindow,
+        cancelAction
+        ) {
     var bdy = new AlignmentMorph('column', this.padding);
 
     function labelText(string) {
         return new TextMorph(
-            localize(string),
-            12,
-            null, // style
-            false, // bold
-            null, // italic
-            null, // alignment
-            null, // width
-            null, // font name
-            MorphicPreferences.isFlat ? null : new Point(1, 1),
-            new Color(255, 255, 255) // shadowColor
-        );
+                localize(string),
+                12,
+                null, // style
+                false, // bold
+                null, // italic
+                null, // alignment
+                null, // width
+                null, // font name
+                MorphicPreferences.isFlat ? null : new Point(1, 1),
+                new Color(255, 255, 255) // shadowColor
+                );
     }
 
     this.popUpPosition = popUpPosition;
@@ -102,14 +100,19 @@ DialogBoxMorph.prototype.tutorialWindow = function (
 
     this.placeArrow = function() {
         if (this.arrow.orientation == 'left') {
-            this.arrow.setLeft(this.left() - 20);
+            this.arrow.setLeft(this.left() - 20) 
             this.moveBy(new Point(20, -14));
         } else if (this.arrow.orientation == 'right') {
             this.arrow.setRight(this.right() + 20);
             this.moveBy(new Point(- this.extent().x - 20, -14));
         } else if (this.arrow.orientation == 'top') {
-            this.arrow.setLeft(this.left() + 14);
-            this.moveBy(new Point(0, 20));
+            if (this.popUpPosition) {
+                this.arrow.setLeft(this.left());
+            } else {
+                this.arrow.setCenter(this.center());
+            }
+            this.arrow.setTop(this.top() - 28);
+            this.moveBy(new Point(0, 28));
         }
     }
 

@@ -16,10 +16,10 @@ Morph.fromImageURL = function(url) {
     m.drawCachedTexture = function () {
         var context = this.image.getContext('2d');
         context.drawImage(
-            this.cachedTexture,
-            0,
-            Math.round((this.height() - this.cachedTexture.height) / 2)
-        );
+                this.cachedTexture,
+                0,
+                Math.round((this.height() - this.cachedTexture.height) / 2)
+                );
         this.changed();
     };
 
@@ -79,11 +79,11 @@ TriangleBoxMorph.prototype.drawNew = function () {
         context.moveTo(0,  0);
         context.lineTo(20, 14);
         context.lineTo(0,  28);	
-    } else if (this.orientation == 'top') {
+    } else if (this.orientation == 'bottom') {
         context.moveTo(0,  0);
         context.lineTo(10, 28);
         context.lineTo(20,  0);	
-    } else if (this.orientation == 'bottom') {
+    } else if (this.orientation == 'top') {
         context.moveTo(0,  28);
         context.lineTo(10, 0);
         context.lineTo(20,  28);	
@@ -100,11 +100,13 @@ AnimationMorph.prototype = new Morph();
 AnimationMorph.prototype.constructor = AnimationMorph;
 AnimationMorph.uber = Morph.prototype;
 
-function AnimationMorph(path, frameCount, fps, callback) {
-    this.init(path, frameCount, fps, callback);
+function AnimationMorph(path, frameCount, frameDuration, extent) {
+    this.init(path, frameCount, frameDuration, extent);
 }
 
-AnimationMorph.prototype.init = function(path, frameCount, frameDuration, callback) {
+AnimationMorph.prototype.init = function(path, frameCount, frameDuration, extent) {
+    var myself = this;
+
     this.path = path;
     this.frameCount = frameCount;
     this.frameDuration = frameDuration || 1; // frames per rendering cycle
@@ -112,24 +114,24 @@ AnimationMorph.prototype.init = function(path, frameCount, frameDuration, callba
     this.lastFrameTime = Date.now();
     this.currentFrameIndex = 0;
 
-    this.loadImages(callback);
-    this.stepFrame();
+    this.loadImages(function() { myself.stepFrame() });
+
+    this.setExtent(extent);
+    this.image.width = extent.x;
+    this.image.height = extent.y;
 }
 
 AnimationMorph.prototype.loadImages = function(callback) {
-    var myself = this;
+    var myself = this,
+        img;
 
     for (i = 0; i < this.frameCount; i++ ) {
         img = new Image();
         img.src = this.path + 'Frame (' + i + ').jpg';
         myself.frames.push(img);
-        img.onload = function() { 
-            myself.setExtent(new Point(this.width, this.height));
-            myself.image.width = this.width;
-            myself.image.height = this.height;
-            if (callback) { callback() };
-        };
-    };
+    }
+
+    img.onload = callback;
 }
 
 AnimationMorph.prototype.currentFrame = function() {
