@@ -80,7 +80,7 @@ IDE_Morph.prototype.startTutorial = function(world) {
                 'Viewport',
                 new AnimationMorph(
                     'beetleblocks/assets/tutorial/rotate/',
-                    63,
+                    296,
                     50,
                     new Point(400, 116) // extent
                     ),
