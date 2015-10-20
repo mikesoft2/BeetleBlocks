@@ -26,10 +26,25 @@ ToggleMorph.prototype.init = function (
     this.drawNew();
 }
 
-DialogBoxMorph.prototype.originalPopUp = DialogBoxMorph.prototype.popUp;
 DialogBoxMorph.prototype.popUp = function (world) {
-    this.originalPopUp(world);
-    this.show();
+     if (world) {
+        if (this.key) {
+            if (this.instances[world.stamp]) {
+                if (this.instances[world.stamp][this.key]) {
+                    this.instances[world.stamp][this.key].destroy();
+                }
+                this.instances[world.stamp][this.key] = this;
+            } else {
+                this.instances[world.stamp] = {};
+                this.instances[world.stamp][this.key] = this;
+            }
+        }
+        world.add(this);
+        world.keyboardReceiver = this;
+        this.setCenter(world.center());
+        this.edit();
+    }
+
     if (this.popUpPosition) { this.setPosition(this.popUpPosition) };
     if (this.arrow) { this.placeArrow() };
 };
@@ -60,6 +75,8 @@ DialogBoxMorph.prototype.tutorialWindow = function (
                 new Color(255, 255, 255) // shadowColor
                 );
     }
+
+    this.isTutorial = true;
 
     this.popUpPosition = popUpPosition;
     this.cancelAction = cancelAction;
