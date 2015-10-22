@@ -798,10 +798,6 @@ IDE_Morph.prototype.createControlBar = function () {
     };
 }
 
-IDE_Morph.prototype.toggleAppModeHandlingFullscreen = function () {
-    this.toggleAppMode(null, true);
-}
-
 IDE_Morph.prototype.setLargeStageSize = function () {
     this.setStageSize(1.5);
 }
@@ -1508,7 +1504,73 @@ IDE_Morph.prototype.selectSprite = function (sprite) {
     this.currentSprite.scripts.fixMultiArgs();
 };
 
-IDE_Morph.prototype.toggleAppMode = function (appMode, handleFullScreen) {
+IDE_Morph.prototype.toggleAppMode = function (appMode) {
+    var world = this.world(),
+        elements = [
+            this.logo,
+            this.controlBar.projectButton,
+            this.controlBar.settingsButton,
+            this.controlBar.stageSizeButton,
+            this.controlBar.normalStageSizeButton,
+            this.controlBar.largeStageSizeButton,
+            this.spriteEditor,
+            this.palette,
+            this.statusDisplay,
+            this.categories 
+        ];
+
+    this.isAppMode = isNil(appMode) ? !this.isAppMode : appMode;
+    this.forceNoFullscreen = true;
+
+    Morph.prototype.trackChanges = false;
+    if (this.isAppMode) {
+        this.setColor(this.appModeColor);
+        this.controlBar.setColor(this.color);
+        this.controlBar.appModeButton.refresh();
+        elements.forEach(function (e) {
+            e.hide();
+        });
+        world.children.forEach(function (morph) {
+            if (morph instanceof DialogBoxMorph) {
+                morph.hide();
+            }
+        });
+        if (world.keyboardReceiver instanceof ScriptFocusMorph) {
+            world.keyboardReceiver.stopEditing();
+        }
+    } else {
+        this.setColor(this.backgroundColor);
+        this.controlBar.setColor(this.frameColor);
+        elements.forEach(function (e) {
+            e.show();
+        });
+        this.stage.setScale(1);
+        // show all hidden dialogs
+        world.children.forEach(function (morph) {
+            if (morph instanceof DialogBoxMorph) {
+                morph.show();
+            }
+        });
+        // prevent scrollbars from showing when morph appears
+        world.allChildren().filter(function (c) {
+            return c instanceof ScrollFrameMorph;
+        }).forEach(function (s) {
+            s.adjustScrollBars();
+        });
+        // prevent rotation and draggability controls from
+        // showing for the stage
+        if (this.currentSprite === this.stage) {
+            this.spriteBar.children.forEach(function (child) {
+                if (child instanceof PushButtonMorph) {
+                    child.hide();
+                }
+            });
+        }
+    }
+    this.setExtent(this.world().extent()); // resume trackChanges
+};
+
+IDE_Morph.prototype.toggleAppModeHandlingFullscreen = function (appMode) {
     var world = this.world(),
         myself = this,
         elements = [
@@ -1535,10 +1597,9 @@ IDE_Morph.prototype.toggleAppMode = function (appMode, handleFullScreen) {
     document.addEventListener('msfullscreenchange', doToggleAppMode, false);
     
     Morph.prototype.trackChanges = false;
-
     this.isAppMode = isNil(appMode) ? !this.isAppMode : appMode;
 
-    if (this.isAppMode && handleFullScreen) {
+    if (this.isAppMode) {
         var elem = world.worldCanvas;
         if (elem.requestFullscreen) {
             elem.requestFullscreen();
@@ -1549,7 +1610,7 @@ IDE_Morph.prototype.toggleAppMode = function (appMode, handleFullScreen) {
         } else if (elem.webkitRequestFullscreen) {
             elem.webkitRequestFullscreen();
         }
-    } else if (handleFullScreen) {
+    } else {
         if (document.exitFullscreen) {
             document.exitFullscreen();
         } else if (document.mozCancelFullScreen) {
@@ -1559,11 +1620,14 @@ IDE_Morph.prototype.toggleAppMode = function (appMode, handleFullScreen) {
         }
     }
 
+    if (this.forceNoFullscreen) { doToggleAppMode() };
+
     function doToggleAppMode() {
-        var isFullscreen = document.fullscreen 
+        var isFullscreen = myself.forceNoFullscreen 
+            && (document.fullscreen 
             || document.mozFullScreen 
             || document.webkitIsFullScreen 
-            || document.msFullscreenElement;
+            || document.msFullscreenElement);
 
         if (isFullscreen || this.isAppMode) {
             var ext = new Point(window.outerWidth, window.outerHeight);
