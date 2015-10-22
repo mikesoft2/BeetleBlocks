@@ -1549,7 +1549,7 @@ IDE_Morph.prototype.toggleAppMode = function (appMode, handleFullScreen) {
         } else if (elem.webkitRequestFullscreen) {
             elem.webkitRequestFullscreen();
         }
-    } else {
+    } else if (handleFullScreen) {
         if (document.exitFullscreen) {
             document.exitFullscreen();
         } else if (document.mozCancelFullScreen) {
@@ -1560,13 +1560,12 @@ IDE_Morph.prototype.toggleAppMode = function (appMode, handleFullScreen) {
     }
 
     function doToggleAppMode() {
-        var isFullsceen = handleFullScreen 
-            && document.fullscreen 
+        var isFullscreen = document.fullscreen 
             || document.mozFullScreen 
             || document.webkitIsFullScreen 
             || document.msFullscreenElement;
 
-        if (isFullsceen || (this.isAppMode && !handleFullScreen)) {
+        if (isFullscreen || this.isAppMode) {
             var ext = new Point(window.outerWidth, window.outerHeight);
 
             myself.isAppMode = true;
@@ -1592,7 +1591,7 @@ IDE_Morph.prototype.toggleAppMode = function (appMode, handleFullScreen) {
                 }
             });
 
-        } else {
+        } else if (!isFullscreen || !this.isAppMode) {
             myself.isAppMode = false;
 
             myself.add(myself.controlBar);
