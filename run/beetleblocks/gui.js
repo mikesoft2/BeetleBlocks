@@ -1560,13 +1560,14 @@ IDE_Morph.prototype.toggleAppMode = function (appMode, handleFullScreen) {
     }
 
     function doToggleAppMode() {
-        var isFullsceen = document.fullscreen 
+        var isFullsceen = handleFullScreen 
+            && document.fullscreen 
             || document.mozFullScreen 
             || document.webkitIsFullScreen 
             || document.msFullscreenElement;
 
         if (isFullsceen || (this.isAppMode && !handleFullScreen)) {
-            var ext = new Point(window.innerWidth, window.innerHeight);
+            var ext = new Point(window.outerWidth, window.outerHeight);
 
             myself.isAppMode = true;
 
