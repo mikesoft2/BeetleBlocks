@@ -792,8 +792,14 @@ IDE_Morph.prototype.createControlBar = function () {
         this.stageSizeButton.setLeft(this.normalStageSizeButton.right() + 5);
         this.appModeButton.setLeft(this.stageSizeButton.right() + 5);
 
+        this.appModeButton.action = 'toggleAppModeHandlingFullscreen';
+
         this.updateLabel();
     };
+}
+
+IDE_Morph.prototype.toggleAppModeHandlingFullscreen = function () {
+    this.toggleAppMode(null, true);
 }
 
 IDE_Morph.prototype.setLargeStageSize = function () {
@@ -1502,7 +1508,7 @@ IDE_Morph.prototype.selectSprite = function (sprite) {
     this.currentSprite.scripts.fixMultiArgs();
 };
 
-IDE_Morph.prototype.toggleAppMode = function (appMode) {
+IDE_Morph.prototype.toggleAppMode = function (appMode, handleFullScreen) {
     var world = this.world(),
         myself = this,
         elements = [
@@ -1532,7 +1538,7 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
 
     this.isAppMode = isNil(appMode) ? !this.isAppMode : appMode;
 
-    if (this.isAppMode) {
+    if (this.isAppMode && handleFullScreen) {
         var elem = world.worldCanvas;
         if (elem.requestFullscreen) {
             elem.requestFullscreen();
@@ -1559,7 +1565,7 @@ IDE_Morph.prototype.toggleAppMode = function (appMode) {
             || document.webkitIsFullScreen 
             || document.msFullscreenElement;
 
-        if (isFullsceen) {
+        if (isFullsceen || (this.isAppMode && !handleFullScreen)) {
             var ext = new Point(window.innerWidth, window.innerHeight);
 
             myself.isAppMode = true;

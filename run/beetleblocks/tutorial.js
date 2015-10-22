@@ -1,8 +1,8 @@
 IDE_Morph.prototype.originalOpenIn = IDE_Morph.prototype.openIn;
 IDE_Morph.prototype.openIn = function(world) {
     this.originalOpenIn(world);
-    if (location.hash.substr(0, 9) === '#tutorial' && ! world.tutorialWasShown) {
-        world.tutorialWasShown = true;
+    if (location.hash.substr(0, 9) === '#tutorial' || !this.getSetting('alreadyVisited'))  {
+        this.saveSetting('alreadyVisited', true);
         this.startTutorial(world);
     }
 }
