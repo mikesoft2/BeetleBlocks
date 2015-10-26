@@ -515,7 +515,6 @@ Process.prototype.addPointToExtrusion = function() {
         stage.myObjects.add(cylinder); 
     }
 
-    this.isAtomic = true;
     stage.reRender();
 }
 
