@@ -508,7 +508,10 @@ Process.prototype.addPointToExtrusion = function() {
 
         beetle.extrusionPoints[0] = p.copy(beetle.position);
 
-        var joint = this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true, beetle.startSphere.material); // joint
+        var joint = new THREE.Mesh(beetle.startSphere.geometry, beetle.startSphere.material);
+        joint.position.copy(beetle.position);
+        joint.rotation.copy(beetle.rotation);
+        stage.myObjects.add(joint); 
         stage.myObjects.add(cylinder); 
     }
 
