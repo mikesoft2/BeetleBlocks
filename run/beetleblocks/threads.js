@@ -59,12 +59,10 @@ Process.prototype.reportScale = function() {
 
 Process.prototype.setPosition = function(x, y, z) {	
     var beetle = this.homeContext.receiver.beetle,
+        p = new THREE.Vector3(),
+        startPoint = p.copy(beetle.position),
         stage = this.homeContext.receiver.parentThatIsA(StageMorph);
 
-    if (beetle.drawing) {
-        var p = new THREE.Vector3();
-        var startPoint = p.copy(beetle.position);
-    }
 
     x = Number(x);
     y = Number(y);
@@ -82,18 +80,19 @@ Process.prototype.setPosition = function(x, y, z) {
         this.addLineGeom(startPoint, endPoint);
     }
 
-    beetle.applyCostume();
+    if (startPoint.x != beetle.position.x) {
+        beetle.applyCostume();
+    }
+
     stage.reRender();
 };
 
 Process.prototype.setPositionOnAxis = function(axis, pos) {
     var beetle = this.homeContext.receiver.beetle,
+        p = new THREE.Vector3(),
+        startPoint =  p.copy(beetle.position),
         stage = this.homeContext.receiver.parentThatIsA(StageMorph);
 
-    if (beetle.drawing) {
-        var p = new THREE.Vector3();
-        var startPoint =  p.copy(beetle.position);
-    }
 
     pos = Number(pos);
     if (axis == 'x') {
@@ -114,18 +113,18 @@ Process.prototype.setPositionOnAxis = function(axis, pos) {
         this.addLineGeom(startPoint, endPoint);
     }
 
-    beetle.applyCostume();
+    if (startPoint.x != beetle.position.x) {
+        beetle.applyCostume();
+    }
+
     stage.reRender();
 };
 
 Process.prototype.changePositionBy = function(axis, dist) {
     var beetle = this.homeContext.receiver.beetle,
+        p = new THREE.Vector3(),
+        startPoint =  p.copy(beetle.position),
         stage = this.homeContext.receiver.parentThatIsA(StageMorph);
-
-    if (beetle.drawing) {
-        var p = new THREE.Vector3();
-        var startPoint =  p.copy(beetle.position);
-    }
 
     dist = Number(dist) * beetle.multiplierScale;
     if (axis == 'x') {
@@ -146,7 +145,10 @@ Process.prototype.changePositionBy = function(axis, dist) {
         this.addLineGeom(startPoint, endPoint);
     }	
 
-    beetle.applyCostume();
+    if (startPoint.x != beetle.position.x) {
+        beetle.applyCostume();
+    }
+    
     stage.reRender();
 };
 
@@ -322,7 +324,7 @@ Process.prototype.sphere = function(diam) {
     this.addSphereGeom(diam);
 };
 
-Process.prototype.addSphereGeom = function(diam, isExtrusionCap) {
+Process.prototype.addSphereGeom = function(diam, isExtrusionCap, material) {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
         sphereGeometry = new THREE.SphereGeometry(
@@ -330,7 +332,7 @@ Process.prototype.addSphereGeom = function(diam, isExtrusionCap) {
                 isExtrusionCap ?  12: 16,
                 isExtrusionCap ?  6: 12);
 
-    var sphere = new THREE.Mesh(sphereGeometry, beetle.newLambertMaterial());
+    var sphere = new THREE.Mesh(sphereGeometry, material ? material : beetle.newLambertMaterial());
     sphere.position.copy(beetle.position);
     sphere.rotation.copy(beetle.rotation);
     
@@ -432,8 +434,8 @@ Process.prototype.startExtrusion = function(extrudeStyle) {
         beetle.extruding = true;
         beetle.extrudeStyle = extrudeStyle;
         beetle.extrusionPoints = [];
-        this.addPointToExtrusion();
         beetle.startSphere = this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true);
+        this.addPointToExtrusion();
     } else if (beetle.extrudeStyle != extrudeStyle) {
         this.stopExtrusion();
         this.startExtrusion(extrudeStyle);
@@ -466,6 +468,7 @@ Process.prototype.addPointToExtrusion = function() {
     beetle.extrusionPoints.push(p);
 
     if (beetle.extrudeStyle == 'curves') {
+        // Catmull-Rom strategy
 
         if (beetle.extrusion) { stage.myObjects.remove(beetle.extrusion) };
         if (beetle.extrusionPoints.length < 2) { return };
@@ -496,7 +499,7 @@ Process.prototype.addPointToExtrusion = function() {
             12 // radiusSegments
             );
         
-        var cylinder = new THREE.Mesh(geometry, beetle.newLambertMaterial());
+        var cylinder = new THREE.Mesh(geometry, beetle.startSphere.material); // reusing the same material speeds things up
 
         cylinder.position.copy(beetle.position);
         cylinder.rotation.copy(beetle.rotation);
@@ -505,10 +508,11 @@ Process.prototype.addPointToExtrusion = function() {
 
         beetle.extrusionPoints[0] = p.copy(beetle.position);
 
-        this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true); // joint
+        var joint = this.addSphereGeom(beetle.extrusionDiameter * beetle.multiplierScale, true, beetle.startSphere.material); // joint
         stage.myObjects.add(cylinder); 
     }
 
+    this.isAtomic = true;
     stage.reRender();
 }
 

@@ -15,6 +15,7 @@ THREE.Object3D.prototype.addLineFromPointToPointWithColor = function(originPoint
 
 THREE.Object3D.prototype.originalAdd = THREE.Object3D.prototype.add;
 THREE.Object3D.prototype.add = function(object, negative, scene) {
+
     if (!negative) {
         this.originalAdd(object);
     }
@@ -202,31 +203,41 @@ SpriteMorph.prototype.initBeetle = function() {
 
     // material "factory"
     this.beetle.newLambertMaterial = function() {
-        return new THREE.MeshLambertMaterial({
+
+        if (!this.materialCache || this.color != this.materialCache.color) { 
+
+            var stage = myself.parentThatIsA(StageMorph);
+
+            this.materialCache = new THREE.MeshLambertMaterial({
                 color: this.color,
-                transparent: true,
+                transparent: this.shape.material.opacity < 1,
                 opacity: this.shape.material.opacity,
-                wireframe: myself.parentThatIsA(StageMorph).renderer.isWireframeMode,
-                side: THREE.DoubleSide
+                wireframe: stage ? stage.renderer.isWireframeMode : false,
+                side: THREE.FrontSide
             });
+        }
+
+        return this.materialCache;
     }
 
-    myself.beetle.shape.rotation.x = radians(90);
-    myself.beetle.shape.name = 'beetleShape';
+    this.beetle.materialCache = this.beetle.newLambertMaterial();
 
-    myself.beetle.add(myself.beetle.shape);
+    this.beetle.shape.rotation.x = radians(90);
+    this.beetle.shape.name = 'beetleShape';
 
-    myself.beetle.reset();
-    myself.beetle.color.reset();
+    this.beetle.add(this.beetle.shape);
 
-    myself.beetle.axes = [];
+    this.beetle.reset();
+    this.beetle.color.reset();
+
+    this.beetle.axes = [];
     // beetle's local axis lines
     p = new THREE.Vector3(1,0,0);
-    myself.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0x00E11E));
+    this.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0x00E11E));
     p = new THREE.Vector3(0,1,0);
-    myself.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0x0000FF));
+    this.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0x0000FF));
     p = new THREE.Vector3(0,0,1);
-    myself.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0xFF0000));
+    this.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0xFF0000));
 
 }
 
