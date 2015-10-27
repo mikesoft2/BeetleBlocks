@@ -62,7 +62,6 @@ Process.prototype.setPosition = function(x, y, z) {
         startPoint = p.copy(beetle.position),
         stage = this.homeContext.receiver.parentThatIsA(StageMorph);
 
-
     x = Number(x);
     y = Number(y);
     z = Number(z);
@@ -79,7 +78,7 @@ Process.prototype.setPosition = function(x, y, z) {
         this.addLineGeom(startPoint, endPoint);
     }
 
-    if (startPoint.x != beetle.position.x) {
+    if (startPoint.y != beetle.position.y) {
         beetle.applyCostume();
     }
 
@@ -527,7 +526,8 @@ Process.prototype.addPointToExtrusion = function() {
 
         cylinder.position.copy(beetle.position);
         cylinder.rotation.copy(beetle.rotation);
-        cylinder.rotateX(Math.PI/2);
+        cylinder.lookAt(beetle.extrusionPoints[0]);
+        cylinder.rotateX(-Math.PI/2);
         cylinder.translateY(-distanceToLast/2);
 
         beetle.extrusionPoints[0] = p.copy(beetle.position);
