@@ -546,7 +546,7 @@ IDE_Morph.prototype.saveAndShare = function() {
 
 // STL export
 IDE_Morph.prototype.downloadSTL = function() {
-    var exporter = new THREE.STLExporter(),
+    var exporter = new THREE.STLBinaryExporter(),
         scene = copy(this.stage.scene),
         stlString,
         blob;

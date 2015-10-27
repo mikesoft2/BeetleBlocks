@@ -37,8 +37,7 @@ THREE.Object3D.prototype.add = function(object, negative, scene) {
 
 // Caches
 
-var MaterialCache;
-
+var Cache;
 
 Cache.prototype = {};
 Cache.prototype.constructor = Cache;
