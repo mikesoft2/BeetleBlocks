@@ -1,4 +1,5 @@
 // THREE additions
+
 THREE.Object3D.prototype.addLineToPointWithColor = function(point, color, thickness) {
     return this.addLineFromPointToPointWithColor(new THREE.Vector3(), point, color, thickness)
 }
@@ -31,6 +32,62 @@ THREE.Object3D.prototype.add = function(object, negative, scene) {
             } 
             for (i = 0; i < totalObjects; i++) { this.remove(this.children[0]) }
         }
+    }
+}
+
+// Caches
+
+var MaterialCache;
+
+
+Cache.prototype = {};
+Cache.prototype.constructor = Cache;
+Cache.uber = Object.prototype;
+
+function Cache() {
+    this.init();
+}
+
+Cache.prototype.init = function() {
+    this.materials = [];
+    this.geometries = { box: [], sphere: [], tube: [], text: [] };
+}
+
+Cache.prototype.clear = function() {
+    this.init();
+}
+
+Cache.prototype.addMaterial = function(material) {
+    this.materials.push(material);
+}
+
+Cache.prototype.findMaterial = function (color, opacity) {
+    return detect(
+            this.materials, 
+            function(each) { 
+                return each.color.equals(color) && each.opacity === opacity;
+            });
+}
+
+Cache.prototype.addGeometry = function(type, geometry, params) {
+    this.geometries[type].push({ params: params, geometry: geometry });
+}
+
+Cache.prototype.findGeometry = function (type, params) {
+
+    var geometry = detect(
+            this.geometries[type], 
+            function(each) { 
+                return (each.params.length === params.length) 
+                    && each.params.every(function(element, index) {
+                        return element === params[index]; 
+                    })
+            });
+
+    if (geometry) { 
+        return geometry.geometry;
+    } else { 
+        return null;
     }
 }
 
@@ -193,6 +250,7 @@ SpriteMorph.prototype.initBeetle = function() {
         this.rotation.set(0, 0, 0);
         this.flying = false;
         this.setCostume('standing');
+        this.cache.clear();
     }
 
     // visibility
@@ -201,26 +259,30 @@ SpriteMorph.prototype.initBeetle = function() {
         myself.parentThatIsA(StageMorph).reRender();
     }
 
-    // material "factory"
-    this.beetle.newLambertMaterial = function() {
+    this.beetle.cache = new Cache();
 
-        if (!this.materialCache || this.color != this.materialCache.color) { 
+    // material "factory"
+    this.beetle.makeMaterial = function() {
+
+        var material = this.cache.findMaterial(this.color, this.shape.material.opacity);
+         
+        if (!material) { 
 
             var stage = myself.parentThatIsA(StageMorph);
 
-            this.materialCache = new THREE.MeshLambertMaterial({
+            material = new THREE.MeshLambertMaterial({
                 color: this.color,
                 transparent: this.shape.material.opacity < 1,
                 opacity: this.shape.material.opacity,
                 wireframe: stage ? stage.renderer.isWireframeMode : false,
                 side: THREE.FrontSide
             });
+
+            this.cache.addMaterial(material);
         }
 
-        return this.materialCache;
+        return material;
     }
-
-    this.beetle.materialCache = this.beetle.newLambertMaterial();
 
     this.beetle.shape.rotation.x = radians(90);
     this.beetle.shape.name = 'beetleShape';
@@ -1086,7 +1148,7 @@ SpriteMorph.prototype.drawNew = function () { this.hide() }
 StageMorph.prototype.originalDestroy = StageMorph.prototype.destroy;
 StageMorph.prototype.destroy = function() {
     var myself = this;
-    this.scene.remove(this.myObjects);
+    this.clearAll();
     this.children.forEach(function(eachSprite) {
         myself.removeChild(eachSprite);
     });
@@ -1200,6 +1262,14 @@ StageMorph.prototype.initScene = function() {
         myself.scene.labels.push(sprite);
         myself.scene.add(sprite);
     })
+
+}
+
+StageMorph.prototype.clearAll = function() {
+    for (var i = this.myObjects.children.length - 1; i >= 0; i--) {
+        this.myObjects.remove(this.myObjects.children[i]);
+    }
+    this.renderer.clear();
 }
 
 StageMorph.prototype.initRenderer = function() {

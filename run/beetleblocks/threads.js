@@ -6,15 +6,14 @@ Process.prototype.clear = function() {
     this.stopExtrusion();
     beetle.extrusionDiameter = 1;
 
-    stage.scene.remove(stage.myObjects);
-    stage.myObjects = new THREE.Object3D();
-    stage.scene.add(stage.myObjects);
+    stage.clearAll();
 
     beetle.multiplierScale = 1;
 
     beetle.reset();
     beetle.color.reset();
-    beetle.posAndRotStack = new Array();
+    beetle.posAndRotStack = [];
+    beetle.materialCache = [];
     stage.reRender();
 };
 
@@ -305,9 +304,14 @@ Process.prototype.cuboid = function(length, width, height) {
 Process.prototype.addBoxGeom = function(length, width, height) {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-        boxGeometry = new THREE.BoxGeometry(Math.abs(length), Math.abs(width), Math.abs(height));
+        boxGeometry = beetle.cache.findGeometry('box', [length, width, height]);
 
-    var box = new THREE.Mesh(boxGeometry, beetle.newLambertMaterial());
+    if (!boxGeometry) {
+        boxGeometry = new THREE.BoxGeometry(Math.abs(length), Math.abs(width), Math.abs(height));
+        beetle.cache.addGeometry('box', boxGeometry, [length, width, height]);
+    }
+
+    var box = new THREE.Mesh(boxGeometry, beetle.makeMaterial());
     box.position.copy(beetle.position);
     box.rotation.copy(beetle.rotation);	
 
@@ -327,12 +331,18 @@ Process.prototype.sphere = function(diam) {
 Process.prototype.addSphereGeom = function(diam, isExtrusionCap, material) {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
+        sphereGeometry = beetle.cache.findGeometry('sphere', [diam, isExtrusionCap]);
+
+    if (!sphereGeometry) {
         sphereGeometry = new THREE.SphereGeometry(
                 Math.abs(diam/2), 
                 isExtrusionCap ?  12: 16,
                 isExtrusionCap ?  6: 12);
 
-    var sphere = new THREE.Mesh(sphereGeometry, material ? material : beetle.newLambertMaterial());
+        beetle.cache.addGeometry('sphere', sphereGeometry, [diam, isExtrusionCap]);
+    }
+
+    var sphere = new THREE.Mesh(sphereGeometry, material ? material : beetle.makeMaterial());
     sphere.position.copy(beetle.position);
     sphere.rotation.copy(beetle.rotation);
     
@@ -357,31 +367,37 @@ Process.prototype.tube = function(length, outer, inner) {
 
 Process.prototype.addTubeGeom = function(length, outer, inner) {
     var beetle = this.homeContext.receiver.beetle,
-        stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-        outerRadius = outer/2, 
-        innerRadius = inner/2;
+        stage = this.homeContext.receiver.parentThatIsA(StageMorph), 
+        tubeGeom = beetle.cache.findGeometry('tube', [length, outer, inner]);
 
-    var arcShape = new THREE.Shape();
-    arcShape.absarc(0, 0, outerRadius, 0, Math.PI * 2, 0, false);
+    if (!tubeGeom) {
+        var outerRadius = outer/2, 
+            innerRadius = inner/2;
 
-    var holePath = new THREE.Path();
-    holePath.absarc(0, 0, innerRadius, 0, Math.PI * 2, true);
-    arcShape.holes.push(holePath);
+        var arcShape = new THREE.Shape();
+        arcShape.absarc(0, 0, outerRadius, 0, Math.PI * 2, 0, false);
 
-    var tubeGeom = new THREE.ExtrudeGeometry(
-            arcShape, 
-            { 
-                amount: length, 
-                steps: 1, 
-                bevelEnabled: true, 
-                bevelThickness: 0, 
-                bevelSize: 0 
-            });
+        var holePath = new THREE.Path();
+        holePath.absarc(0, 0, innerRadius, 0, Math.PI * 2, true);
+        arcShape.holes.push(holePath);
 
-    tubeGeom.computeFaceNormals();
-    tubeGeom.computeVertexNormals();
+        tubeGeom = new THREE.ExtrudeGeometry(
+                arcShape, 
+                { 
+                    amount: length, 
+                    steps: 1, 
+                    bevelEnabled: true, 
+                    bevelThickness: 0, 
+                    bevelSize: 0 
+                }); 
 
-    var tube = new THREE.Mesh(tubeGeom, beetle.newLambertMaterial());
+        tubeGeom.computeFaceNormals();
+        tubeGeom.computeVertexNormals();
+
+        beetle.cache.addGeometry('tube', tubeGeom, [length, outer, inner]);
+    }
+
+    var tube = new THREE.Mesh(tubeGeom, beetle.makeMaterial());
     tube.position.copy(beetle.position);
     tube.rotation.copy(beetle.rotation);	
     tube.translateZ(-length/2);		
@@ -392,15 +408,23 @@ Process.prototype.addTubeGeom = function(length, outer, inner) {
 Process.prototype.text = function(textString, height, depth) {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph), 
-        height = Number(height) * beetle.multiplierScale,
-        depth = Number(depth) * beetle.multiplierScale,
+        textGeometry = beetle.cache.findGeometry('text', [textString, height, depth]);
+
+    if (!textGeometry) {
+
+        var height = Number(height) * beetle.multiplierScale,
+            depth = Number(depth) * beetle.multiplierScale;
+            
         textGeometry = new THREE.TextGeometry(textString, { font: 'helvetiker', size: height, height: depth });
 
-    var mesh = new THREE.Mesh(textGeometry, beetle.newLambertMaterial());
+        beetle.cache.addGeometry('text', textGeometry, [textString, height, depth]);
+    }
+
+    var mesh = new THREE.Mesh(textGeometry, beetle.makeMaterial());
 
     mesh.position.copy(beetle.position);
     mesh.rotation.copy(beetle.rotation);	
-    THREE.GeometryUtils.center(mesh.geometry);
+    mesh.geometry.center();
     mesh.rotateY(-Math.PI/2);
     stage.myObjects.add(mesh);
 
@@ -414,11 +438,11 @@ Process.prototype.text2D = function(textString, size) {
         fontShapes = THREE.FontUtils.generateShapes(textString, { size: scaledSize }),
         geometry = new THREE.ShapeGeometry(fontShapes, { curveSegments: 20 });
 
-    var mesh = new THREE.Mesh(geometry, beetle.newLambertMaterial());
+    var mesh = new THREE.Mesh(geometry, beetle.makeMaterial());
 
     mesh.position.copy(beetle.position);
     mesh.rotation.copy(beetle.rotation);	
-    THREE.GeometryUtils.center(mesh.geometry);
+    mesh.geometry.center();
     mesh.rotateY(-Math.PI/2);
     stage.myObjects.add(mesh);
 
@@ -484,7 +508,7 @@ Process.prototype.addPointToExtrusion = function() {
         var segments = Math.max(Math.floor((extrudeBend.getLength()) * 2), 12),
             geometry = new THREE.TubeGeometry(extrudeBend, segments, (beetle.extrusionDiameter / 2) * beetle.multiplierScale, 12, false);
 
-        beetle.extrusion = new THREE.Mesh(geometry, beetle.newLambertMaterial());
+        beetle.extrusion = new THREE.Mesh(geometry, beetle.makeMaterial());
         stage.myObjects.add(beetle.extrusion);
 
     } else {
