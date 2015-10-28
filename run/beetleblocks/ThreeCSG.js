@@ -45,7 +45,7 @@ window.ThreeBSP = (function() {
 				
 				vertex = geometry.vertices[ face.b ];
                                 uvs = faceVertexUvs ? new THREE.Vector2( faceVertexUvs[1].x, faceVertexUvs[1].y ) : null;
-                                vertex = new ThreeBSP.Vertex( vertex.x, vertex.y, vertex.z, face.vertexNormals[2], uvs );
+                                vertex = new ThreeBSP.Vertex( vertex.x, vertex.y, vertex.z, face.vertexNormals[1], uvs );
 				vertex.applyMatrix4(this.matrix);
 				polygon.vertices.push( vertex );
 				
@@ -90,7 +90,7 @@ window.ThreeBSP = (function() {
 	};
 	ThreeBSP.prototype.subtract = function( other_tree ) {
 		var a = this.tree.clone(),
-			b = other_tree.tree.clone();
+		    b = other_tree.tree.clone();
 		
 		a.invert();
 		a.clipTo( b );
@@ -106,7 +106,7 @@ window.ThreeBSP = (function() {
 	};
 	ThreeBSP.prototype.union = function( other_tree ) {
 		var a = this.tree.clone(),
-			b = other_tree.tree.clone();
+		    b = other_tree.tree.clone();
 		
 		a.clipTo( b );
 		b.clipTo( a );
@@ -120,7 +120,7 @@ window.ThreeBSP = (function() {
 	};
 	ThreeBSP.prototype.intersect = function( other_tree ) {
 		var a = this.tree.clone(),
-			b = other_tree.tree.clone();
+		    b = other_tree.tree.clone();
 		
 		a.invert();
 		b.clipTo( a );
@@ -202,7 +202,7 @@ window.ThreeBSP = (function() {
 	};
 	ThreeBSP.prototype.toMesh = function( material ) {
 		var geometry = this.toGeometry(),
-			mesh = new THREE.Mesh( geometry, material );
+		    mesh = new THREE.Mesh( geometry, material );
 		
 		mesh.position.setFromMatrixPosition( this.matrix );
 		mesh.rotation.setFromRotationMatrix( this.matrix );
@@ -225,8 +225,8 @@ window.ThreeBSP = (function() {
 	};
 	ThreeBSP.Polygon.prototype.calculateProperties = function() {
 		var a = this.vertices[0],
-			b = this.vertices[1],
-			c = this.vertices[2];
+		    b = this.vertices[1],
+		    c = this.vertices[2];
 			
 		this.normal = b.clone().subtract( a ).cross(
 			c.clone().subtract( a )

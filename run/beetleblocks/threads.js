@@ -316,7 +316,6 @@ Process.prototype.addBoxGeom = function(length, width, height) {
 
     // If any of the sides is negative, we carve a negative cuboid
     stage.myObjects.add(box, (length < 0 || width < 0 || height < 0));
-    box.bsp = new ThreeBSP(box);
     stage.reRender();
 }
 
@@ -348,7 +347,6 @@ Process.prototype.addSphereGeom = function(diam, isExtrusionCap, material) {
     
     // If the diameter is negative, we carve a negative sphere
     stage.myObjects.add(sphere, diam < 0);
-    sphere.bsp = new ThreeBSP(sphere);
     stage.reRender();
 
     return sphere;
@@ -404,7 +402,6 @@ Process.prototype.addTubeGeom = function(length, outer, inner) {
     tube.translateZ(-length/2);		
 
     stage.myObjects.add(tube);
-    tube.bsp = new ThreeBSP(tube);
 }
 
 Process.prototype.text = function(textString, height, depth) {
@@ -429,7 +426,6 @@ Process.prototype.text = function(textString, height, depth) {
     mesh.geometry.center();
     mesh.rotateY(-Math.PI/2);
     stage.myObjects.add(mesh);
-    mesh.bsp = new ThreeBSP(mesh);
 
     stage.reRender();
 };
@@ -448,7 +444,6 @@ Process.prototype.text2D = function(textString, size) {
     mesh.geometry.center();
     mesh.rotateY(-Math.PI/2);
     stage.myObjects.add(mesh);
-    mesh.bsp = new ThreeBSP(mesh);
 
     stage.reRender();
 };
@@ -476,11 +471,7 @@ Process.prototype.stopExtrusion = function() {
 
     if (beetle.extruding) {
 
-        if (beetle.extrusion) { 
-            beetle.extrusion.bsp = new ThreeBSP(beetle.extrusion);
-            beetle.extrusion = null;
-        }
-
+        beetle.extrusion = null;
         beetle.extruding = false;
         beetle.extrudeStyle = null;
         beetle.extrusionPoints = [];
@@ -539,14 +530,12 @@ Process.prototype.addPointToExtrusion = function() {
         cylinder.lookAt(beetle.extrusionPoints[0]);
         cylinder.rotateX(-Math.PI/2);
         cylinder.translateY(-distanceToLast/2);
-        cylinder.bsp = new ThreeBSP(cylinder);
 
         beetle.extrusionPoints[0] = p.copy(beetle.position);
 
         var joint = new THREE.Mesh(beetle.startSphere.geometry, beetle.startSphere.material);
         joint.position.copy(beetle.position);
         joint.rotation.copy(beetle.rotation);
-        joint.bsp = new ThreeBSP(joint);
 
         stage.myObjects.add(joint); 
         stage.myObjects.add(cylinder); 

@@ -56,11 +56,10 @@ THREE.Object3D.prototype.add = function(object, negative, scene) {
                 victimBox = new THREE.Box3(victimMin, victimMax);
 
             if (victimBox.isIntersectionBox(objectBox)) {
+                if (!victim.bsp) { victim.bsp = new ThreeBSP(victim) };
                 result = victim.bsp.subtract(object.bsp);
                 mesh = result.toMesh(victim.material);
-                mesh.bsp = new ThreeBSP(mesh);
-                mesh.geometry.computeFaceNormals();
-                mesh.geometry.computeVertexNormals();
+                mesh.bsp = result;
                 this.add(mesh, false);
                 this.remove(victim);
             }
