@@ -14,23 +14,58 @@ THREE.Object3D.prototype.addLineFromPointToPointWithColor = function(originPoint
     return line;
 }
 
+// Negative geometry
+
 THREE.Object3D.prototype.originalAdd = THREE.Object3D.prototype.add;
 THREE.Object3D.prototype.add = function(object, negative, scene) {
-
     if (!negative) {
         this.originalAdd(object);
-    }
+    } else {
+        
+        object.geometry.computeBoundingBox();
+        object.bsp = new ThreeBSP(object);
 
-    if (object instanceof THREE.Mesh) {
-        if (negative) {
-            var totalObjects = this.children.length,
-                myself = this;
-            for (i = 0; i < totalObjects; i++) { 
-                result = new ThreeBSP(this.children[i]).subtract(new ThreeBSP(object));
-                mesh = result.toMesh(this.children[i].material);
-                myself.add(mesh, false);
-            } 
-            for (i = 0; i < totalObjects; i++) { this.remove(this.children[0]) }
+        var objectMin = new THREE.Vector3(
+                object.position.x + object.geometry.boundingBox.min.x, 
+                object.position.y + object.geometry.boundingBox.min.y, 
+                object.position.z + object.geometry.boundingBox.min.z
+                ),
+            objectMax = new THREE.Vector3(
+                object.position.x + object.geometry.boundingBox.max.x, 
+                object.position.y + object.geometry.boundingBox.max.y, 
+                object.position.z + object.geometry.boundingBox.max.z
+                ),
+            objectBox = new THREE.Box3(objectMin, objectMax); 
+
+        for (i = this.children.length - 1; i >= 0; i --) { 
+
+            var victim = this.children[i];
+
+            victim.geometry.computeBoundingBox();
+
+            var victimMin = new THREE.Vector3(
+                    victim.position.x + victim.geometry.boundingBox.min.x, 
+                    victim.position.y + victim.geometry.boundingBox.min.y, 
+                    victim.position.z + victim.geometry.boundingBox.min.z
+                    ),
+                victimMax = new THREE.Vector3(
+                        victim.position.x + victim.geometry.boundingBox.max.x, 
+                        victim.position.y + victim.geometry.boundingBox.max.y, 
+                        victim.position.z + victim.geometry.boundingBox.max.z
+                        ),
+                victimBox = new THREE.Box3(victimMin, victimMax);
+
+            if (victimBox.isIntersectionBox(objectBox)) {
+                result = victim.bsp.subtract(object.bsp);
+                mesh = result.toMesh(victim.material);
+                mesh.bsp = new ThreeBSP(mesh);
+                mesh.geometry.computeFaceNormals();
+                mesh.geometry.computeVertexNormals();
+                this.add(mesh, false);
+                this.remove(victim);
+            }
+
+            if (i == 0) { break };
         }
     }
 }
