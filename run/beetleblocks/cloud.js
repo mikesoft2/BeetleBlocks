@@ -7,16 +7,18 @@ Cloud.prototype.callService = function (
 ) {
     this.originalCallService(serviceName, callBack, errorCall, args);
     if (serviceName === 'publishProject') {
+
         var request = new XMLHttpRequest();
+
         request.open(
-            "POST",
+            'POST',
             'http://snapp.citilab.eu:9999/project',
             true
         ); 
+        request.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
         request.send(JSON.stringify({
             projectName: args[0],
             username: this.username,
-            projectUrl: this.urlForMyProject(args[0]),
             thumbnail: args[1] // all publishProject calls need to send us the project thumbnail now
         }));
     }
