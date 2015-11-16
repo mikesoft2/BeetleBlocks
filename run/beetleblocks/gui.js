@@ -532,7 +532,10 @@ IDE_Morph.prototype.saveAndShare = function() {
                                 myself.showMessage('shared.', 2);
                             },
                             myself.cloudError(),
-                            [projectName]
+                            [
+                                projectName,
+                                myself.stage.thumbnail(SnapSerializer.prototype.thumbnailSize).toDataURL('image/png')
+                            ]
                         );
                     },
                     myself.cloudError()
@@ -543,6 +546,56 @@ IDE_Morph.prototype.saveAndShare = function() {
         )
     }
 }
+
+ProjectDialogMorph.prototype.shareProject = function () {
+    var myself = this,
+        ide = this.ide,
+        proj = this.listField.selected,
+        entry = this.listField.active;
+
+    if (proj) {
+        this.ide.confirm(
+            localize(
+                'Are you sure you want to publish'
+            ) + '\n"' + proj.ProjectName + '"?',
+            'Share Project',
+            function () {
+                myself.ide.showMessage('sharing\nproject...');
+                SnapCloud.reconnect(
+                    function () {
+                        SnapCloud.callService(
+                            'publishProject',
+                            function () {
+                                SnapCloud.disconnect();
+                                proj.Public = 'true';
+                                myself.unshareButton.show();
+                                myself.shareButton.hide();
+                                entry.label.isBold = true;
+                                entry.label.drawNew();
+                                entry.label.changed();
+                                myself.buttons.fixLayout();
+                                myself.drawNew();
+                                myself.ide.showMessage('shared.', 2);
+                            },
+                            myself.ide.cloudError(),
+                            [proj.ProjectName, proj.Thumbnail]
+                        );
+                        // Set the Shared URL if the project is currently open
+                        if (proj.ProjectName === ide.projectName) {
+                            var usr = SnapCloud.username,
+                                projectId = 'Username=' +
+                                    encodeURIComponent(usr.toLowerCase()) +
+                                    '&ProjectName=' +
+                                    encodeURIComponent(proj.ProjectName);
+                            location.hash = 'present:' + projectId;
+                        }
+                    },
+                    myself.ide.cloudError()
+                );
+            }
+        );
+    }
+};
 
 // STL export
 IDE_Morph.prototype.downloadSTL = function() {
