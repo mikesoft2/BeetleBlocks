@@ -8,7 +8,7 @@ Cloud.prototype.callService = function (
     this.originalCallService(serviceName, callBack, errorCall, args);
     switch (serviceName) {
         case 'publishProject':
-            postRequest(
+            this.postRequest(
                     'project', 
                     {
                         projectName: args[0],
@@ -18,7 +18,7 @@ Cloud.prototype.callService = function (
             return;
         case 'deleteProject':
         case 'unpublishProject':
-            postRequest(
+            this.postRequest(
                     'delete-project',
                     {
                         projectName: args[0],
@@ -28,19 +28,18 @@ Cloud.prototype.callService = function (
             return;
     };
 
-    postRequest = function(entryPoint, data) {
-        var request = new XMLHttpRequest();
-        request.open(
-                'POST',
-                'http://snapp.citilab.eu:9999/' + entryPoint,
-                true
-                ); 
-        request.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-        request.send(JSON.stringify(data));  
-    };
-
 };
 
+Cloud.prototype.postRequest = function(entryPoint, data) {
+    var request = new XMLHttpRequest();
+    request.open(
+            'POST',
+            'http://snapp.citilab.eu:9999/' + entryPoint,
+            true
+            ); 
+    request.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+    request.send(JSON.stringify(data));  
+};
 
 Cloud.prototype.urlForMyProject = function (projectName) {
     if (!this.username) {
