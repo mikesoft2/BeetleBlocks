@@ -636,9 +636,9 @@ IDE_Morph.prototype.downloadOBJ = function() {
 IDE_Morph.prototype.downloadSVG = function() {
     var lines = [];
     stage.myObjects.children.forEach(
-            function(el,index, ar){
-                if (el instanceof THREE.Line) {
-                    lines.push(el);
+            function(element, index, ar){
+                if (element instanceof THREE.Line) {
+                    lines.push(element);
                 } 
             }
             );
@@ -656,7 +656,7 @@ IDE_Morph.prototype.downloadSVG = function() {
 
         if (line.type == 'polyline') {
 
-            svgStr += '<polyline stroke="rgb(' + red + ',' + green + ',' + blue + ')" '
+            svgStr += '    <polyline stroke="rgb(' + red + ',' + green + ',' + blue + ')" '
                 + 'fill="none" stroke-width="1" '
                 + 'stroke-linecap="round" stroke-linejoin="round" '
                 + 'points="';
@@ -677,7 +677,7 @@ IDE_Morph.prototype.downloadSVG = function() {
 
         } else if (line.type == 'spline') {
 
-            svgStr += '<path stroke="rgb(' + red + ',' + green + ',' + blue + ')" '
+            svgStr += '    <path stroke="rgb(' + red + ',' + green + ',' + blue + ')" '
                 + 'fill="none" stroke-width="1" '
                 + 'stroke-linecap="round" stroke-linejoin="round" '
                 + 'd="M' + (line.anchorPoints[0].x * scaleMultiplier)
@@ -754,14 +754,13 @@ IDE_Morph.prototype.downloadSVG = function() {
         }
     })
 
-    svgStr += '</svg>';
+    svgStr += '  </g>\n</svg>';
 
-    svgHeader = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" ';
-    svgHeader += 'x=" ' + minZ * scaleMultiplier + 'px" ';
-    svgHeader += 'y=" ' + minX * scaleMultiplier + 'px" ';
-    svgHeader += 'width=" ' + (maxZ - minZ) * scaleMultiplier + 'px" ';
-    svgHeader += 'height=" ' + (maxX - minX) * scaleMultiplier + 'px" ';
-    svgHeader += '>\n';
+    svgHeader = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" '
+        + 'viewBox="' + minZ * scaleMultiplier + ' ' + minX * scaleMultiplier + ' '
+        + (maxZ - minZ) * scaleMultiplier + ' ' + (maxX - minX) * scaleMultiplier
+        + '" transform = "rotate(-90 0 0)" width="' + (maxZ - minZ) * scaleMultiplier
+        + 'px" height="' + (maxX - minX) * scaleMultiplier + 'px">\n  <g transform = "rotate(-90 0 0)">\n';
 
     svgStr = svgHeader.concat(svgStr);
 
