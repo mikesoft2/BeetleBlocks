@@ -456,42 +456,49 @@ IDE_Morph.prototype.settingsMenu = function () {
     menu.addLine();
     menu.addItem(
             'Set background color', 
-            function(){ 
+            function() { 
                 this.pickColor(null, function(color) { 
                     colorString = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
-                    myself.saveSetting('bgcolor', colorString);
-                    stage.renderer.setClearColor(colorString, 1);
-                        stage.reRender();
-                        })
-                    });
-                menu.addLine();
-                menu.addItem(
-                    'Set grid interval',
-                    function(){
-                        new DialogBoxMorph(
-                            this,
-                            function(point) { stage.scene.grid.setInterval(point) },
-                            this
-                            ).promptVector(
-                                'Grid intervals',
-                                stage.scene.grid.interval, // current
-                                new Point(1, 1), // default
-                                'x interval',
-                                'y interval',
-                                this.world(),
-                                null, // pic
-                                null // msg
-                                );
-                    });
-                menu.addItem(
-                        'Set grid color', 
-                        function(){ 
-                            this.pickColor(null, function(color) { 
-                                stage.scene.grid.setColor('0x' + color.r.toString(16) + color.g.toString(16) + color.b.toString(16));
-                                stage.reRender();
+                            myself.saveSetting('bgcolor', colorString);
+                            stage.renderer.setClearColor(colorString, 1);
+                            stage.reRender();
                             })
-                        });
-                menu.popup(world, pos);
+                    });
+    menu.addItem(
+            'Reset background color', 
+            function() { 
+                myself.saveSetting('bgcolor', 0xe6e6e6);
+                stage.renderer.setClearColor(0xe6e6e6, 1);
+                stage.reRender();
+            });
+    menu.addLine();
+    menu.addItem(
+        'Set grid interval',
+        function() {
+            new DialogBoxMorph(
+                    this,
+                    function(point) { stage.scene.grid.setInterval(point) },
+                    this
+                    ).promptVector(
+                        'Grid intervals',
+                        stage.scene.grid.interval, // current
+                        new Point(1, 1), // default
+                        'x interval',
+                        'y interval',
+                        this.world(),
+                        null, // pic
+                        null // msg
+                        );
+        });
+    menu.addItem(
+            'Set grid color', 
+            function() { 
+                this.pickColor(null, function(color) { 
+                    stage.scene.grid.setColor('0x' + color.r.toString(16) + color.g.toString(16) + color.b.toString(16));
+                    stage.reRender();
+                })
+            });
+    menu.popup(world, pos);
 };
 
 IDE_Morph.prototype.saveProjectToDisk = function() {

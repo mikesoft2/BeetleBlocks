@@ -52,7 +52,7 @@ IDE_Morph.prototype.startTutorial = function(world) {
                     'beetleblocks/assets/tutorial/move/', // path
                     93, // frameCount
                     50, // frameDuration
-                    new Point(400, 116) // extent
+                    new Point(707, 205) // extent
                     ), 
                 'Drag the move block into the scripting area and click on it to move the Beetle.',// msg
                 new Point(188, 159), // popUpPosition
@@ -67,7 +67,7 @@ IDE_Morph.prototype.startTutorial = function(world) {
                     'beetleblocks/assets/tutorial/movesphere/',
                     63,
                     50,
-                    new Point(400, 116) // extent
+                    new Point(707, 205) // extent
                     ),
                 'You can select blocks from different categories and snap them together.',
                 null,
@@ -82,7 +82,7 @@ IDE_Morph.prototype.startTutorial = function(world) {
                     'beetleblocks/assets/tutorial/rotate/',
                     296,
                     50,
-                    new Point(400, 116) // extent
+                    new Point(707, 205) // extent
                     ),
                 'The Beetle can rotate around its own X, Y and Z axes.',
                 myself.stage.leftCenter(),
