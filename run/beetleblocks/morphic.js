@@ -44,6 +44,14 @@ WorldMorph.prototype.init = function(aCanvas, fillPage) {
     aCanvas.onmouseout = function() { myself.flushKeyboardState };
 }
 
+WorldMorph.prototype.originalSlide = WorldMorph.prototype.slide;
+WorldMorph.prototype.slide = function(aStringOrTextMorph) {
+    if (!aStringOrTextMorph.parentThatIsA(InputSlotMorph)) { return };
+    this.originalSlide(aStringOrTextMorph)
+}
+
+// Tutorial additions
+
 var TriangleBoxMorph;
 
 TriangleBoxMorph.prototype = new Morph();
