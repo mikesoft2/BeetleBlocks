@@ -845,7 +845,7 @@ IDE_Morph.prototype.createControlBar = function () {
         this.stageSizeButton.setLeft(this.normalStageSizeButton.right() + 5);
         this.appModeButton.setLeft(this.stageSizeButton.right() + 5);
 
-        this.appModeButton.action = 'toggleAppModeHandlingFullscreen';
+        this.appModeButton.action = 'toggleFullscreen';
 
         this.updateLabel();
     };
@@ -1590,73 +1590,9 @@ IDE_Morph.prototype.selectSprite = function (sprite) {
     this.currentSprite.scripts.fixMultiArgs();
 };
 
-IDE_Morph.prototype.toggleAppMode = function (appMode) {
-    var world = this.world(),
-        elements = [
-            this.logo,
-            this.controlBar.projectButton,
-            this.controlBar.settingsButton,
-            this.controlBar.stageSizeButton,
-            this.controlBar.normalStageSizeButton,
-            this.controlBar.largeStageSizeButton,
-            this.spriteEditor,
-            this.palette,
-            this.statusDisplay,
-            this.categories 
-        ];
+IDE_Morph.prototype.toggleAppMode = nop;
 
-    this.isAppMode = isNil(appMode) ? !this.isAppMode : appMode;
-    this.forceNoFullscreen = true;
-
-    Morph.prototype.trackChanges = false;
-    if (this.isAppMode) {
-        this.setColor(this.appModeColor);
-        this.controlBar.setColor(this.color);
-        this.controlBar.appModeButton.refresh();
-        elements.forEach(function (e) {
-            e.hide();
-        });
-        world.children.forEach(function (morph) {
-            if (morph instanceof DialogBoxMorph) {
-                morph.hide();
-            }
-        });
-        if (world.keyboardReceiver instanceof ScriptFocusMorph) {
-            world.keyboardReceiver.stopEditing();
-        }
-    } else {
-        this.setColor(this.backgroundColor);
-        this.controlBar.setColor(this.frameColor);
-        elements.forEach(function (e) {
-            e.show();
-        });
-        this.stage.setScale(1);
-        // show all hidden dialogs
-        world.children.forEach(function (morph) {
-            if (morph instanceof DialogBoxMorph) {
-                morph.show();
-            }
-        });
-        // prevent scrollbars from showing when morph appears
-        world.allChildren().filter(function (c) {
-            return c instanceof ScrollFrameMorph;
-        }).forEach(function (s) {
-            s.adjustScrollBars();
-        });
-        // prevent rotation and draggability controls from
-        // showing for the stage
-        if (this.currentSprite === this.stage) {
-            this.spriteBar.children.forEach(function (child) {
-                if (child instanceof PushButtonMorph) {
-                    child.hide();
-                }
-            });
-        }
-    }
-    this.setExtent(this.world().extent()); // resume trackChanges
-};
-
-IDE_Morph.prototype.toggleAppModeHandlingFullscreen = function (appMode) {
+IDE_Morph.prototype.toggleFullscreen = function (appMode) {
     var world = this.world(),
         myself = this,
         elements = [
