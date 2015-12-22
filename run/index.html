@@ -60,9 +60,11 @@
                 world.worldCanvas.focus();
                 ide = new IDE_Morph();
                 ide.openIn(world);
-                setInterval(loop, 1);
+                loop();
             };
+
             function loop() {
+                requestAnimationFrame(loop);
                 world.doOneCycle();
             }
         </script>
