@@ -70,17 +70,10 @@ IDE_Morph.prototype.projectMenu = function () {
         shiftClicked = (world.currentKey === 16);
 
     menu = new MenuMorph(this);
-    menu.addItem('Project notes...', 'editProjectNotes');
-    menu.addLine();
     menu.addItem('New', 'createNewProject');
     menu.addItem('Open...', 'openProjectsBrowser');
-    menu.addItem('Save', 'save');
-    menu.addItem('Save As...', 'saveProjectsBrowser');
-    menu.addItem('Save and share', 'saveAndShare');
-    menu.addItem('Export to disk', 'saveProjectToDisk');
-    menu.addLine();
     menu.addItem(
-            'Import...',
+            'Import project or blocks',
             function () {
                 var inp = document.createElement('input');
                 if (myself.filePicker) {
@@ -112,9 +105,13 @@ IDE_Morph.prototype.projectMenu = function () {
             },
             'file menu import hint' // looks up the actual text in the translator
                 );
-
+    menu.addItem('Save                                       Ctrl+S', 'save');
+    menu.addItem('Save As...', 'saveProjectsBrowser');
+    //menu.addItem('Save and share', 'saveAndShare');
+    menu.addLine();
+    menu.addItem('Download project as...', 'saveProjectToDisk');
     menu.addItem(
-            'Export blocks...',
+            'Download My Blocks as...',
             function () { myself.exportGlobalBlocks(); },
             'show global custom block definitions as XML\nin a new browser window'
             );
@@ -127,52 +124,58 @@ IDE_Morph.prototype.projectMenu = function () {
                 new Color(100, 0, 0)
                 );
     }
-
-    menu.addLine();
     menu.addItem(
-            'Export 3D model as STL',
-            function() { myself.downloadSTL() },
-            'download the currently rendered 3D model\ninto an STL file ready to be printed'
-            );
-    menu.addItem(
-            'Export 3D model as OBJ',
-            function() { myself.downloadOBJ() },
-            'download the currently rendered 3D model\ninto an OBJ file'
-            );
-    menu.addItem(
-            'Export 2D lines as SVG',
+            'Download 2D lines as...',
             function() { myself.downloadSVG() },
             'download the currently rendered 2D lines\ninto an SVG file'
             );
 
+    var submenu = new MenuMorph(myself);
+    submenu.addItem(
+            'STL',
+            function() { myself.downloadSTL() },
+            'download the currently rendered 3D model\ninto an STL file ready to be printed'
+            );
+    submenu.addItem(
+            'OBJ',
+            function() { myself.downloadOBJ() },
+            'download the currently rendered 3D model\ninto an OBJ file'
+            );
+
+    menu.addHoverItem(
+            'Download 3D model as...          ▶',
+            submenu
+            );
+
     menu.addLine();
+    menu.addItem('Project notes...', 'editProjectNotes');
     menu.addItem(
             'Libraries...',
             function () {
                 // read a list of libraries from an external file,
                 var libMenu = new MenuMorph(this, 'Import library'),
-        libUrl = 'libraries/LIBRARIES';
+                libUrl = 'libraries/LIBRARIES';
 
-    function loadLib(name) {
-        var url = 'libraries/'
-        + name
-        + '.xml';
-    myself.droppedText(myself.getURL(url), name);
-    }
+                function loadLib(name) {
+                    var url = 'libraries/'
+                        + name
+                        + '.xml';
+                    myself.droppedText(myself.getURL(url), name);
+                }
 
-    myself.getURL(libUrl).split('\n').forEach(function (line) {
-        if (line.length > 0) {
-            libMenu.addItem(
-                line.substring(line.indexOf('\t') + 1),
-                function () { loadLib(line.substring(0, line.indexOf('\t'))) }
-                );
-        }
-    });
+                myself.getURL(libUrl).split('\n').forEach(function (line) {
+                    if (line.length > 0) {
+                        libMenu.addItem(
+                                line.substring(line.indexOf('\t') + 1),
+                                function () { loadLib(line.substring(0, line.indexOf('\t'))) }
+                                );
+                    }
+                });
 
-    libMenu.popup(world, pos);
+                libMenu.popup(world, pos);
             },
             'Select categories of additional blocks to add to this project.'
-                );
+            );
 
     menu.addLine();
 
@@ -187,11 +190,11 @@ IDE_Morph.prototype.projectMenu = function () {
     }
     if (!SnapCloud.username) {
         menu.addItem(
-                'Login...',
+                'Login',
                 'initializeCloud'
                 );
         menu.addItem(
-                'Signup...',
+                'Create an account',
                 'createCloudAccount'
                 );
         menu.addItem(
@@ -200,14 +203,25 @@ IDE_Morph.prototype.projectMenu = function () {
                 );
     } else {
         menu.addItem(
-                localize('Logout') + ' ' + SnapCloud.username,
+                localize('Logout') + ' / ' + SnapCloud.username,
                 'logout'
+                );
+        menu.addItem(
+                'Create an account',
+                'createCloudAccount'
                 );
         menu.addItem(
                 'Change Password...',
                 'changeCloudPassword'
                 );
     }
+    menu.addItem(
+            'Start tutorial',
+            function() {
+                myself.startTutorial(world);
+            }
+            );
+
     if (shiftClicked) {
         menu.addLine();
         menu.addItem(
@@ -259,15 +273,7 @@ IDE_Morph.prototype.projectMenu = function () {
                     );
     }
 
-    menu.addLine();
-
-    menu.addItem(
-            'Tutorial',
-            function() {
-                myself.startTutorial(world);
-            }
-            );
-
+ 
     menu.popup(world, pos);
 }
 
@@ -635,7 +641,7 @@ IDE_Morph.prototype.downloadOBJ = function() {
 // SVG export
 IDE_Morph.prototype.downloadSVG = function() {
     var lines = [];
-    stage.myObjects.children.forEach(
+    this.stage.myObjects.children.forEach(
             function(element, index, ar){
                 if (element instanceof THREE.Line) {
                     lines.push(element);
