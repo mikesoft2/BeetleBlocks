@@ -75,7 +75,7 @@ function HueSlotMorph(clr) {
 
 HueSlotMorph.prototype.init = function (clr) {
     HueSlotMorph.uber.init.call(this, null, true); // silently
-    this.setColor(clr || new Color(255, 0, 0));
+    this.setColor(clr || new Color(127.5, 0, 0));
 };
 
 HueSlotMorph.prototype.getUserColor = function () {

@@ -350,9 +350,9 @@ HueWheelMorph.prototype.drawNew = function () {
     context.textAlign = 'center';
     context.textBaseline = 'middle';
 
-    for(var angle = 360; angle > 0; angle --){
+    for (var angle = 360; angle > 0; angle --) {
         var startAngle = (angle - 1) * Math.PI/180;
-        var endAngle = angle * Math.PI/180;
+        var endAngle = (angle + 1) * Math.PI/180;
         context.beginPath();
         context.moveTo(x, y);
         context.arc(x, y, radius, startAngle, endAngle, false);
