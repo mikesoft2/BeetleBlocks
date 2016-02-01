@@ -52,11 +52,18 @@ SyntaxElementMorph.prototype.labelPart = function(spec) {
         break;
         default:
             part = this.originalLabelPart(spec);
-        //part.fontSize = this.fontSize;
         break;
     }
     return part;
+};
+
+// Zebra coloring fix
+BlockMorph.prototype.originalAlternateBlockColor = BlockMorph.prototype.alternateBlockColor;
+BlockMorph.prototype.alternateBlockColor = function () {
+    this.originalAlternateBlockColor();
+    this.drawNew();
 }
+
 
 // Increase inter-block space
 
@@ -64,7 +71,7 @@ BlockMorph.prototype.originalSnap = BlockMorph.prototype.snap;
 BlockMorph.prototype.snap = function() {
     this.originalSnap()
     this.topBlock().fixLayout();
-}
+};
 
 SyntaxElementMorph.prototype.originalFixLayout = SyntaxElementMorph.prototype.fixLayout;
 SyntaxElementMorph.prototype.fixLayout = function () {
@@ -77,14 +84,14 @@ SyntaxElementMorph.prototype.fixLayout = function () {
             current = nb;
         }
     }
-}
+};
 
 CSlotMorph.prototype.originalInit = CSlotMorph.prototype.init;
 CSlotMorph.prototype.init = function() {
     this.originalInit();
     this.dent -= 1;
     this.inset += 2;
-}
+};
 
 CSlotMorph.prototype.fixLayout = function () {
     var nb = this.nestedBlock();
@@ -162,7 +169,7 @@ SymbolMorph.prototype.symbolCanvasColored = function (aColor) {
     } else {
         return this.originalSymbolCanvasColored(aColor)
     }
-}
+};
 
 SymbolMorph.prototype.drawSymbolFullScreen = function (canvas, color) {
     // answer a canvas showing two arrows pointing diagonally outwards
@@ -350,5 +357,4 @@ SymbolMorph.prototype.drawSymbolFile = function (canvas, color) {
     ctx.fill();
 
     return canvas;
-}
-;
+};
