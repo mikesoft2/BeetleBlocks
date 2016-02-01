@@ -26,17 +26,6 @@ SyntaxElementMorph.prototype.labelPart = function(spec) {
                 true
         );
         break;
-        case '%directions': // what is this? it looks like it's never used
-            part = new InputSlotMorph(
-                null,
-                false,
-                {
-                    'right' : ['right'],
-                    'up' : ['up']
-                },
-                true
-        );
-        break;
         case '%hsla':
             part = new InputSlotMorph(
                 null,
@@ -71,12 +60,22 @@ SyntaxElementMorph.prototype.labelPart = function(spec) {
 
 // Increase inter-block space
 
+BlockMorph.prototype.originalSnap = BlockMorph.prototype.snap;
+BlockMorph.prototype.snap = function() {
+    this.originalSnap()
+    this.topBlock().fixLayout();
+}
+
 SyntaxElementMorph.prototype.originalFixLayout = SyntaxElementMorph.prototype.fixLayout;
 SyntaxElementMorph.prototype.fixLayout = function () {
     this.originalFixLayout();
     if (this.nextBlock)	{
-        var nb = this.nextBlock();
-        if (nb) { nb.moveBy(new Point(0,1)) }
+        var current = this;
+        while (current.nextBlock()) {
+            var nb = current.nextBlock();
+            if (nb) { nb.setTop(current.bottom() - 2) }
+            current = nb;
+        }
     }
 }
 
@@ -96,6 +95,7 @@ CSlotMorph.prototype.fixLayout = function () {
                 this.top() + this.corner + 1 // inner top
             )
         );
+        nb.fixLayout();
         this.setHeight(nb.fullBounds().height() + this.corner + 2); // inner bottom
         this.setWidth(nb.fullBounds().width() + (this.cSlotPadding * 2));
     } else {
