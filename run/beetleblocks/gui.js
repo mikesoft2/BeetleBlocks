@@ -1483,11 +1483,11 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 
     // Status watchers
 
-    elements.push('Position: ');
+    elements.push('Position ');
 
     var space = new Morph();
     space.alpha = 0;
-    space.columns = 8;
+    space.columns = 9;
     space.newColumn = 1;
     elements.push(space);
 
@@ -1495,23 +1495,43 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     element.update = function() { this.text = 'x: ' + beetle.position.z.toFixed(2).toString().replace('.00','') }; 
     element.newColumn = true;
     elements.push(element);
-    
-    elements.push('Rotation: ');
 
     var space = new Morph();
     space.alpha = 0;
-    space.columns = 8;
-    space.newColumn = 5;
+    space.columns = 9;
+    space.newColumn = 3;
+    elements.push(space);
+ 
+    elements.push('Rotation ');
+
+    var space = new Morph();
+    space.alpha = 0;
+    space.columns = 9;
+    space.newColumn = 4;
     elements.push(space);
 
     element = new StringMorph();
     element.update = function() { this.text = 'x:' + degrees(beetle.rotation.z * -1).toFixed(2).toString().replace('.00','') };
+    elements.push(element);
+
+    var space = new Morph();
+    space.alpha = 0;
+    space.columns = 9;
+    space.newColumn = 6;
+    elements.push(space);
+
+    elements.push('Scale: ');
+    element = new StringMorph();
+    element.update = function() {
+        this.text = beetle.multiplierScale.toString() 
+            + ' (' + (beetle.multiplierScale * 100).toString() + '%)'
+    }
     element.newLines = 1;
     elements.push(element);
 
     var space = new Morph();
     space.alpha = 0;
-    space.columns = 8;
+    space.columns = 9;
     space.newColumn = 1;
     elements.push(space);
 
@@ -1522,8 +1542,8 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 
     var space = new Morph();
     space.alpha = 0;
-    space.columns = 8;
-    space.newColumn = 5;
+    space.columns = 9;
+    space.newColumn = 4;
     elements.push(space);
 
     element = new StringMorph();
@@ -1533,7 +1553,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 
     var space = new Morph();
     space.alpha = 0;
-    space.columns = 8;
+    space.columns = 9;
     space.newColumn = 1;
     elements.push(space);
 
@@ -1544,22 +1564,13 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 
     var space = new Morph();
     space.alpha = 0;
-    space.columns = 8;
-    space.newColumn = 5;
+    space.columns = 9;
+    space.newColumn = 4;
     elements.push(space);
 
     element = new StringMorph();
     element.update = function() { this.text = 'z:' + degrees(beetle.rotation.y).toFixed(2).toString().replace('.00','') };
     element.newLines = 2;
-    elements.push(element);
-
-    elements.push('Scale: ');
-    element = new StringMorph();
-    element.update = function() {
-        this.text = beetle.multiplierScale.toString() 
-            + ' (' + (beetle.multiplierScale * 100).toString() + '%)'
-    }
-    element.newLines = 1.5;
     elements.push(element);
 
     elements.push('-');
