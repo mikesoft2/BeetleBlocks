@@ -311,3 +311,70 @@ AnimationMorph.prototype.step = function() {
         this.drawNew();
     }
 }
+
+// Hue Wheel
+
+var HueWheelMorph;
+
+// ColorPaletteMorph inherits from Morph:
+
+HueWheelMorph.prototype = new ColorPaletteMorph();
+HueWheelMorph.prototype.constructor = HueWheelMorph;
+HueWheelMorph.uber = ColorPaletteMorph.prototype;
+
+// ColorPaletteMorph instance creation:
+
+function HueWheelMorph(target, sizePoint) {
+    this.init(
+        target || null,
+        sizePoint || new Point(80, 50)
+    );
+}
+
+HueWheelMorph.prototype.drawNew = function () {
+    var context, ext, x, y, radius;
+
+    ext = this.extent();
+    this.image = newCanvas(this.extent());
+    context = this.image.getContext('2d');
+    this.choice = new Color();
+    x = this.image.width / 2 + 2;
+    y = this.image.height / 2;
+    radius = this.image.width / 2 - 22;
+
+    context.font = '9px Arial';
+    context.fillStyle = 'rgb(200,200,200)';
+    context.fillRect(0, 0, this.image.width, this.image.height);
+    context.strokeRect(0, 0, this.image.width, this.image.height);
+
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+
+    for(var angle = 360; angle > 0; angle --){
+        var startAngle = (angle - 1) * Math.PI/180;
+        var endAngle = angle * Math.PI/180;
+        context.beginPath();
+        context.moveTo(x, y);
+        context.arc(x, y, radius, startAngle, endAngle, false);
+        context.closePath();
+        context.fillStyle = 'hsl(' + angle + ', 100%, 50%)';
+        context.fill();
+        
+        if (angle % 30 == 0) {
+            var tx = x + (radius + 12) * Math.cos(radians(angle)),
+                ty = y + (radius + 12) * Math.sin(radians(angle));
+
+            context.fillStyle = 'rgb(10,10,10)';
+
+            if (angle % 90 == 0) {
+                context.fillText(angle % 360 + '°', tx, ty);
+            } else {
+                context.beginPath()
+                context.moveTo(tx, ty);
+                context.lineTo(tx + 5 * Math.cos(radians(angle)), ty + 5 * Math.sin(radians(angle)));
+                context.stroke();
+            }
+        }
+    }
+};
+

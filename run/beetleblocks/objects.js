@@ -255,7 +255,7 @@ SpriteMorph.prototype.initBeetle = function() {
         myself.beetle.shape.material.color = this;
     }
     
-    this.beetle.posAndRotStack = new Array();
+    this.beetle.posAndRotStack = [];
 
     this.beetle.multiplierScale = 1;
 
@@ -370,98 +370,6 @@ SpriteMorph.prototype.categories =
         'my blocks': new Color(4, 158, 235),
     };
 
-/*
-// original 
-
-SpriteMorph.prototype.blockColor = {
-motion : new Color(74, 108, 212),
-shapes : new Color(143, 86, 227),
-colors : new Color(207, 74, 217),
-sound : new Color(207, 74, 217), // we need to keep this color for the zoom blocks dialog
-control : new Color(230, 168, 34),
-sensing : new Color(4, 148, 220),
-operators : new Color(98, 194, 19),
-variables : new Color(243, 118, 29),
-lists : new Color(217, 77, 17),
-other : new Color(150, 150, 150),
-'my blocks': new Color(150, 150, 60),
-};
-
-// blocks color scheme: blue, green, grays
-
-SpriteMorph.prototype.blockColor = {
-motion : new Color(60, 60, 60),
-shapes : new Color(75, 75, 75),
-sensing : new Color(90, 90, 90),
-variables : new Color(36, 172, 232),
-lists : new Color(31, 134, 179),
-control : new Color(0, 85, 122),
-colors : new Color(105, 105, 105),
-operators : new Color(135, 135, 135),
-'my blocks': new Color(10, 84, 63),
-
-other : new Color(50, 50, 50),
-sound : new Color(50, 50, 50), // we need to keep this color for the zoom blocks dialog
-};
-
-*/
-
-/*    
-// USA (red, blue, gray)
-
-SpriteMorph.prototype.blockColor = {
-motion : new Color(40, 40, 40),
-shapes : new Color(80, 80, 80),
-colors : new Color(120, 120, 120),
-sound : new Color(60, 60, 60), // we need to keep this color for the zoom blocks dialog
-control : new Color(10, 110, 140),
-sensing : new Color(120, 120, 120),
-operators : new Color(120, 120, 120),
-variables : new Color(160, 20, 20),
-lists : new Color(140, 20, 20),
-other : new Color(150, 150, 150),
-'my blocks': new Color(180, 180, 180),
-};
-*/
-
-/*
-
-// GOTH COLORS (all gray)
-
-SpriteMorph.prototype.blockColor = {
-motion : new Color(60, 60, 60),
-shapes : new Color(75, 75, 75),
-sensing : new Color(90, 90, 90),
-variables : new Color(135, 135, 135),
-lists : new Color(135, 135, 135),
-control : new Color(120, 120, 120),
-colors : new Color(105, 105, 105),
-operators : new Color(135, 135, 135),
-'my blocks': new Color(150, 150, 150),
-
-other : new Color(50, 50, 50),
-sound : new Color(50, 50, 50), // we need to keep this color for the zoom blocks dialog
-};
-*/
-
-/*
-
-// DARK RGB
-SpriteMorph.prototype.blockColor = {
-motion : new Color(60, 60, 60),
-shapes : new Color(80, 80, 80),
-sensing : new Color(90, 90, 90),
-variables : new Color(89, 0, 8),
-lists : new Color(89, 0, 8),
-control : new Color(5, 27, 71),
-colors : new Color(105, 105, 105),
-operators : new Color(10, 84, 63),
-'my blocks': new Color(150, 150, 150),
-
-other : new Color(50, 50, 50),
-sound : new Color(50, 50, 50), // we need to keep this color for the zoom blocks dialog
-};
-*/
 
 // Block specs
 
@@ -670,26 +578,13 @@ SpriteMorph.prototype.initBlocks = function() {
         defaults: [1]
     };
 
-    // Removing this until it works like it should
-    // You can still test negative geometry by giving negative
-    // values to the volumes of cubes, cuboids and spheres
-
-    /*
-       this.blocks.startNegativeGeometry =
-       {
-       type: 'command',
-       spec: 'start negative geometry',
-       category: 'shapes'
-       };
-       this.blocks.stopNegativeGeometry =
-       {
-       type: 'command',
-       spec: 'stop negative geometry',
-       category: 'shapes'
-       };
-       */
-
     // color
+    this.blocks.pickHue =
+    {
+        type: 'command', 
+        spec: 'set hue to %huewheel',	
+        category: 'colors'
+    };
     this.blocks.setHSLA =
     {
         type: 'command', 
@@ -839,6 +734,8 @@ SpriteMorph.prototype.blockTemplates = function(category) {
         //        blocks.push(block('stopNegativeGeometry'));
 
     } else if (cat === 'colors') {
+        blocks.push(block('pickHue'));
+        blocks.push('-');
         blocks.push(block('setHSLA'));
         blocks.push(block('changeHSLA'));
         blocks.push(block('getHSLA'));

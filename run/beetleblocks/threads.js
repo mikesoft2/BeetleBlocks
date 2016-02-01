@@ -589,6 +589,9 @@ Process.prototype.stopNegativeGeometry = function() {
     beetle.negative = false;
 }
 
+Process.prototype.pickHue = function(value) {
+    this.setHSLA('hue', value.hsv()[0] * 360);
+}
 Process.prototype.setHSLA = function(channel, value) {
     var beetle = this.homeContext.receiver.beetle,
         stage = this.homeContext.receiver.parentThatIsA(StageMorph),
