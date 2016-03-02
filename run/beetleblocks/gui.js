@@ -137,6 +137,11 @@ IDE_Morph.prototype.projectMenu = function () {
             'download the currently rendered 3D model\ninto an STL file ready to be printed'
             );
     submenu.addItem(
+            'STL (binary)',
+            function() { myself.downloadBinarySTL() },
+            'download the currently rendered 3D model\ninto an STL file ready to be printed'
+            );
+    submenu.addItem(
             'OBJ',
             function() { myself.downloadOBJ() },
             'download the currently rendered 3D model\ninto an OBJ file'
@@ -646,7 +651,7 @@ ProjectDialogMorph.prototype.shareProject = function () {
 };
 
 // STL export
-IDE_Morph.prototype.downloadSTL = function() {
+IDE_Morph.prototype.downloadBinarySTL = function() {
     var exporter = new THREE.STLBinaryExporter(),
         scene = copy(this.stage.scene),
         stlString,
@@ -658,6 +663,19 @@ IDE_Morph.prototype.downloadSTL = function() {
 
     saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_export') + '.stl'); 
 }
+
+IDE_Morph.prototype.downloadSTL = function() {
+    var exporter = new THREE.STLExporter(),
+        scene = copy(this.stage.scene),
+        stlString,
+        blob;
+
+    scene.children = scene.children.filter(function(each) { return each.name != 'beetle' });
+    stlString = exporter.parse(scene);
+    blob = new Blob([stlString], {type: 'text/plain'});
+    saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_export') + '.stl'); 
+}
+
 
 // OBJ export
 IDE_Morph.prototype.downloadOBJ = function() {
