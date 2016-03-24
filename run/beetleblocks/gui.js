@@ -981,6 +981,9 @@ ProjectDialogMorph.prototype.setSource = function (source) {
         case 'cloud':
             msg = myself.ide.showMessage('Updating\nproject list...');
             this.projectList = [];
+
+            msg.destroy(); // Get this out
+            /*
             SnapCloud.getProjectList(
                     function (projectList) {
                         myself.installCloudProjectList(projectList);
@@ -991,7 +994,8 @@ ProjectDialogMorph.prototype.setSource = function (source) {
                         myself.ide.cloudError().call(null, err, lbl);
                     }
                     );
-            return;
+            return;*/
+            break;
         case 'examples':
             this.projectList = this.getExamplesProjectList();
             break;

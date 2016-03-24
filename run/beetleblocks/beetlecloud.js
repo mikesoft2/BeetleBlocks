@@ -12,6 +12,11 @@ function BeetleCloud(url) {
     this.url = url;
 }
 
+BeetleCloud.prototype.clear = function () {
+    this.username = null;
+    this.password = null;
+}
+
 BeetleCloud.prototype.signup = function (
     username,
     email,
@@ -39,21 +44,22 @@ BeetleCloud.prototype.signup = function (
             'application/json'
         );
 
-        //request.withCredentials = true; // CORS! Should set this up in production
+        request.withCredentials = true;
 
         request.onreadystatechange = function () {
             if (request.readyState === 4) {
                 if (request.responseText) {
-                    if (request.responseText.indexOf('ERROR') === 0) {
+                    var response = JSON.parse(request.responseText);
+                    if (response.error) {
                         errorCall.call(
                             this,
-                            request.responseText,
+                            response.error,
                             'Signup'
                         );
                     } else {
                         callBack.call(
                             null,
-                            request.responseText,
+                            response.text,
                             'Signup'
                         );
                     }
@@ -67,6 +73,176 @@ BeetleCloud.prototype.signup = function (
             }
         };
         request.send(null);
+    } catch (err) {
+        errorCall.call(this, err.toString(), 'BeetleCloud');
+    }
+};
+
+BeetleCloud.prototype.login = function (
+    username,
+    password,
+    callBack,
+    errorCall
+) {
+    // both callBack and errorCall are two-argument functions
+    var request = new XMLHttpRequest(),
+        myself = this;
+
+    try {
+        request.open(
+            'GET',
+            this.url
+                + '/users/login?username=' 
+                + encodeURIComponent(username)
+                + '&password='
+                + encodeURIComponent(password),
+            true
+        );
+        request.setRequestHeader(
+            'Content-Type',
+            'application/json; charset=utf-8'
+        );
+
+        request.withCredentials = true;
+
+        request.onreadystatechange = function () {
+            if (request.readyState === 4) {
+                if (request.responseText) {
+                    var response = JSON.parse(request.responseText);
+                    if (!response.error) {
+                        myself.username = username;
+                        callBack.call(null, { username: username }, 'BeetleCloud');
+                    } else {
+                        errorCall.call(
+                            null,
+                            response.error,
+                            'connection failed'
+                        );
+                    }
+                } else {
+                    errorCall.call(
+                        null,
+                        myself.url,
+                        localize('could not connect to:')
+                    );
+                }
+            }
+        };
+        request.send();
+    } catch (err) {
+        errorCall.call(this, err.toString(), 'BeetleCloud');
+    }
+};
+
+BeetleCloud.prototype.logout = function (callBack, errorCall) {
+    var request = new XMLHttpRequest(),
+        myself = this;
+
+    this.clear();
+
+    try {
+        request.open(
+            'GET',
+            this.url + '/users/logout',
+            true
+        );
+        request.setRequestHeader(
+            'Content-Type',
+            'application/json; charset=utf-8'
+        );
+
+        request.withCredentials = true;
+
+        request.onreadystatechange = function () {
+            if (request.readyState === 4) {
+                if (request.responseText) {
+                    var response = JSON.parse(request.responseText);
+                    if (!response.error) {
+                        callBack.call(null, 'BeetleCloud');
+                    } else {
+                        errorCall.call(
+                            null,
+                            response.error,
+                            'logout failed'
+                        );
+                    }
+                } else {
+                    errorCall.call(
+                        null,
+                        myself.url,
+                        localize('could not log out!')
+                    );
+                }
+            }
+        };
+        request.send();
+    } catch (err) {
+        errorCall.call(this, err.toString(), 'BeetleCloud');
+    }
+
+};
+
+BeetleCloud.prototype.saveProject = function (ide, callBack, errorCall) {
+    var request = new XMLHttpRequest(),
+        myself = this,
+        pdata = ide.serializer.serialize(ide.stage);
+
+    if (!this.username) {
+        errorCall.call(this, 'You are not logged in', 'BeetleCloud');
+        return;
+    }
+
+    // check if serialized data can be parsed back again
+    try {
+        ide.serializer.parse(pdata);
+    } catch (err) {
+        ide.showMessage('Serialization of program data failed:\n' + err);
+        throw new Error('Serialization of program data failed:\n' + err);
+    }
+    
+    ide.showMessage('Uploading project...');
+
+    try {
+        request.open(
+            'POST',
+            this.url 
+            + '/projects/new?projectname='
+            + encodeURIComponent(ide.projectName)
+            + '&ispublic=true' // TO BE CHANGED!
+            + '&username='
+            + encodeURIComponent(myself.username),
+            true
+        );
+        request.setRequestHeader(
+            'Content-Type',
+            'application/json; charset=utf-8'
+        );
+
+        request.withCredentials = true;
+
+        request.onreadystatechange = function () {
+            if (request.readyState === 4) {
+                if (request.responseText) {
+                    var response = JSON.parse(request.responseText);
+                    if (!response.error) {
+                        callBack.call(null, 'BeetleCloud');
+                    } else {
+                        errorCall.call(
+                            null,
+                            response.error,
+                            'Saving failed'
+                        );
+                    }
+                } else {
+                    errorCall.call(
+                        null,
+                        myself.url,
+                        localize('Project could not be saved')
+                    );
+                }
+            }
+        };
+        request.send(pdata);
     } catch (err) {
         errorCall.call(this, err.toString(), 'BeetleCloud');
     }
@@ -107,6 +283,46 @@ IDE_Morph.prototype.createCloudAccount = function () {
         'http://beetleblocks.com/privacy',
         'Privacy...',
         'I have read and agree\nto the Terms of Service',
+        world,
+        myself.cloudIcon(),
+        myself.cloudMsg
+    );
+};
+
+IDE_Morph.prototype.initializeCloud = function () {
+    var myself = this,
+        world = this.world();
+    new DialogBoxMorph(
+        null,
+        function (user) {
+            SnapCloud.login(
+                user.username,
+                user.password,
+                function () {
+                    var str;
+                    if (user.choice) {
+                        str = SnapCloud.encodeDict(
+                            {
+                                username: user.username,
+                                token: user.token
+                            }
+                        );
+                        localStorage['-snap-user'] = str;
+                    }
+                    myself.source = 'cloud';
+                    myself.showMessage('now connected.', 2);
+                },
+                myself.cloudError()
+            );
+        }
+    ).withKey('cloudlogin').promptCredentials(
+        'Sign in',
+        'login',
+        null,
+        null,
+        null,
+        null,
+        'stay signed in on this computer\nuntil logging out',
         world,
         myself.cloudIcon(),
         myself.cloudMsg
