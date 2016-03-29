@@ -982,7 +982,7 @@ ProjectDialogMorph.prototype.setSource = function (source) {
             msg = myself.ide.showMessage('Updating\nproject list...');
             this.projectList = [];
 
-            msg.destroy();
+            //msg.destroy();
             SnapCloud.getProjectList(
                     function (projectList) {
                         myself.installCloudProjectList(projectList);
