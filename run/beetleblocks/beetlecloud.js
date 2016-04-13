@@ -278,11 +278,17 @@ BeetleCloud.prototype.getProjectList = function (callBack, errorCall) {
                 if (request.responseText) {
                     var response = JSON.parse(request.responseText);
                     if (!response.error) {
-                        response.forEach(function(eachProject) {
-                            // This looks absurd, but PostgreSQL doesn't respect case
-                            eachProject.ProjectName = eachProject.projectname; 
-                        });
-                        callBack.call(null, response);
+                        if (Object.keys(response).length > 0) {
+                            response.forEach(function(eachProject) {
+                                // This looks absurd, but PostgreSQL doesn't respect case
+                                eachProject.Public = eachProject.ispublic;
+                                eachProject.ProjectName = eachProject.projectname;
+                                eachProject.Thumbnail = eachProject.thumbnail;
+                                eachProject.Updated = eachProject.updated;
+                                eachProject.Notes = eachProject.notes;
+                            });
+                            callBack.call(null, response);
+                        }
                     } else {
                         errorCall.call(
                             null,
