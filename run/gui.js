@@ -69,7 +69,7 @@ XML_Element, WatcherMorph, BlockRemovalDialogMorph, saveAs, TableMorph*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.gui = '2016-February-24';
+modules.gui = '2016-March-16';
 
 // Declarations
 
@@ -2532,6 +2532,17 @@ IDE_Morph.prototype.settingsMenu = function () {
         'check for sprite\ninheritance features',
         false
     );
+    addPreference(
+        'Persist linked sublist IDs',
+        function () {
+            StageMorph.prototype.enableSublistIDs =
+                !StageMorph.prototype.enableSublistIDs;
+        },
+        StageMorph.prototype.enableSublistIDs,
+        'uncheck to disable\nsaving linked sublist identities',
+        'check to enable\nsaving linked sublist identities',
+        true
+    );
     menu.popup(world, pos);
 };
 
@@ -2804,7 +2815,7 @@ IDE_Morph.prototype.aboutSnap = function () {
         module, btn1, btn2, btn3, btn4, licenseBtn, translatorsBtn,
         world = this.world();
 
-    aboutTxt = 'Snap! 4.0.5\nBuild Your Own Blocks\n\n'
+    aboutTxt = 'Snap! 4.0.6\nBuild Your Own Blocks\n\n'
         + 'Copyright \u24B8 2016 Jens M\u00F6nig and '
         + 'Brian Harvey\n'
         + 'jens@moenig.org, bh@cs.berkeley.edu\n\n'
@@ -3022,6 +3033,7 @@ IDE_Morph.prototype.newProject = function () {
     StageMorph.prototype.codeHeaders = {};
     StageMorph.prototype.enableCodeMapping = false;
     StageMorph.prototype.enableInheritance = false;
+    StageMorph.prototype.enableSublistIDs = false;
     SpriteMorph.prototype.useFlatLineEnds = false;
     this.setProjectName('');
     this.projectNotes = '';
@@ -3529,6 +3541,7 @@ IDE_Morph.prototype.rawOpenProjectString = function (str) {
     StageMorph.prototype.codeHeaders = {};
     StageMorph.prototype.enableCodeMapping = false;
     StageMorph.prototype.enableInheritance = false;
+    StageMorph.prototype.enableSublistIDs = false;
     if (Process.prototype.isCatchingErrors) {
         try {
             this.serializer.openProject(
@@ -3572,6 +3585,7 @@ IDE_Morph.prototype.rawOpenCloudDataString = function (str) {
     StageMorph.prototype.codeHeaders = {};
     StageMorph.prototype.enableCodeMapping = false;
     StageMorph.prototype.enableInheritance = false;
+    StageMorph.prototype.enableSublistIDs = false;
     if (Process.prototype.isCatchingErrors) {
         try {
             model = this.serializer.parse(str);
