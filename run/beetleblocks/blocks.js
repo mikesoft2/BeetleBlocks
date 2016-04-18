@@ -116,15 +116,14 @@ HueSlotMorph.prototype.getUserColor = function () {
 BlockMorph.prototype.originalAlternateBlockColor = BlockMorph.prototype.alternateBlockColor;
 BlockMorph.prototype.alternateBlockColor = function () {
     this.originalAlternateBlockColor();
-    this.drawNew();
+    this.fixLayout();
 }
-
 
 // Increase inter-block space
 
 BlockMorph.prototype.originalSnap = BlockMorph.prototype.snap;
 BlockMorph.prototype.snap = function() {
-    this.originalSnap()
+    this.originalSnap();
     this.topBlock().fixLayout();
 };
 
