@@ -176,7 +176,7 @@ tempDict = {
 	'color %hsla':
 		'kleur %hsla',
 	'hue':
-		'toon',
+		'tint',
 	'saturation':
 		'verzadiging',
 	'lightness':
