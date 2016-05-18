@@ -206,7 +206,7 @@ BeetleCloud.prototype.saveProject = function (ide, callBack, errorCall) {
         request.open(
             'POST',
             this.url 
-            + '/projects/new?projectname='
+            + '/projects/save?projectname='
             + encodeURIComponent(ide.projectName)
             + '&ispublic=true' // TO BE CHANGED!
             + '&username='
@@ -247,6 +247,62 @@ BeetleCloud.prototype.saveProject = function (ide, callBack, errorCall) {
         errorCall.call(this, err.toString(), 'BeetleCloud');
     }
 };
+
+BeetleCloud.prototype.fetchProject = function (projectName, callBack, errorCall) {
+    var request = new XMLHttpRequest(),
+        myself = this;
+
+    if (!this.username) {
+        errorCall.call(this, 'You are not logged in', 'BeetleCloud');
+        return;
+    }
+
+    try {
+        request.open(
+            'GET',
+            this.url 
+            + '/users/'
+            + encodeURIComponent(myself.username)
+            + '/projects/'
+            + encodeURIComponent(projectName),
+            true
+        );
+        request.setRequestHeader(
+            'Content-Type',
+            'application/json; charset=utf-8'
+        );
+
+        request.withCredentials = true;
+
+        request.onreadystatechange = function () {
+            if (request.readyState === 4) {
+                if (request.responseText) {
+                    var response = JSON.parse(request.responseText);
+                    if (!response.error && response.contents) {
+                        callBack.call(null, response.contents);
+                    } else {
+                        errorCall.call(
+                            null,
+                            response.error,
+                            'Could not fetch project'
+                        );
+                    }
+                } else {
+                    errorCall.call(
+                        null,
+                        myself.url,
+                        localize('Could not fetch project')
+                    );
+                }
+            }
+        };
+        request.send();
+    } catch (err) {
+        errorCall.call(this, err.toString(), 'BeetleCloud');
+    }
+
+}
+
 
 BeetleCloud.prototype.getProjectList = function (callBack, errorCall) {
     var request = new XMLHttpRequest(),
@@ -391,6 +447,25 @@ IDE_Morph.prototype.initializeCloud = function () {
         myself.cloudIcon(),
         myself.cloudMsg
     );
+};
+
+ProjectDialogMorph.prototype.rawOpenCloudProject = function (proj) {
+    var myself = this;
+    SnapCloud.fetchProject(
+            proj.ProjectName, 
+            function (response) {
+                myself.ide.source = 'cloud';
+                myself.ide.droppedText(response);
+                if (proj.Public === 'true') {
+                    location.hash = '#present:Username=' +
+                        encodeURIComponent(SnapCloud.username) +
+                        '&ProjectName=' +
+                        encodeURIComponent(proj.ProjectName);
+                }
+            },
+            myself.ide.cloudError()
+            );
+    this.destroy();
 };
 
 
