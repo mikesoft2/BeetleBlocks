@@ -220,7 +220,16 @@ SnapSerializer.prototype.loadCostumes = nop;
 SnapSerializer.prototype.loadSounds = nop;
 
 StageMorph.prototype.toXML = function (serializer) {
-    var ide = this.parentThatIsA(IDE_Morph);
+    var thumbnail = this.thumbnail(SnapSerializer.prototype.thumbnailSize),
+        thumbdata,
+        ide = this.parentThatIsA(IDE_Morph);
+
+    // catch cross-origin tainting exception when using SVG costumes
+    try {
+        thumbdata = thumbnail.toDataURL('image/png');
+    } catch (error) {
+        thumbdata = null;
+    }
 
     function code(key) {
         var str = '';
@@ -242,6 +251,7 @@ StageMorph.prototype.toXML = function (serializer) {
     return serializer.format(
         '<project name="@" app="@" version="@">' +
             '<notes>$</notes>' +
+            '<thumbnail>$</thumbnail>' +
             '<stage name="@" width="@" height="@" threadsafe="@" ' +
             'codify="@" ' +
             'sublistIDs="@" ' +
@@ -260,6 +270,7 @@ StageMorph.prototype.toXML = function (serializer) {
         serializer.app,
         serializer.version,
         (ide && ide.projectNotes) ? ide.projectNotes : '',
+        thumbdata,
         this.name,
         StageMorph.prototype.dimensions.x,
         StageMorph.prototype.dimensions.y,
