@@ -534,7 +534,7 @@ SpriteMorph.prototype.initBlocks = function() {
         type: 'command', 
         spec: '2D text %s size: %n',
         category: 'shapes',
-        defaults: [localize('hello'), 10]
+        defaults: [localize('hello'), 2]
     };
     this.blocks.startDrawing =
     {
@@ -1087,6 +1087,8 @@ StageMorph.prototype.destroy = function() {
 
 StageMorph.prototype.originalInit = StageMorph.prototype.init;
 StageMorph.prototype.init = function(globals) {
+    var myself = this;
+
     this.originalInit(globals);
     this.initScene();
     this.initRenderer();
@@ -1099,6 +1101,12 @@ StageMorph.prototype.init = function(globals) {
     this.scene.add(this.myObjects);
 
     this.trailsCanvas = this.renderer.domElement;
+
+    (new THREE.FontLoader()).load(
+            'beetleblocks/assets/fonts/helvetiker_regular.typeface.json',
+            function (response) {
+                myself.font = response;
+            });
 };
 
 StageMorph.prototype.initScene = function() {
@@ -1170,15 +1178,15 @@ StageMorph.prototype.initScene = function() {
     this.scene.axes.push(this.scene.addLineToPointWithColor(p, 0xFF0000, 2));
 
     // Labels
-    var axes = { 
+    var loader = new THREE.TextureLoader(),
+        axes = { 
         x: { realAxis: 'Z', color: 0xFF0000 },
         y: { realAxis: 'X', color: 0x00E11E },
-        z: { realAxis: 'Y', color: 0x0000FF }};
+        z: { realAxis: 'Y', color: 0x0000FF }}
 
     Object.keys(axes).forEach(function(axis) {
-        var map = THREE.ImageUtils.loadTexture(
+        var map = loader.load(
                 'beetleblocks/assets/' + axis + '.png', 
-                THREE.UVMapping, 
                 function() { if (myself.renderer) { myself.reRender() }} ),
             material = new THREE.SpriteMaterial( { map: map, color: axes[axis].color } ),
             sprite = new THREE.Sprite( material );

@@ -414,7 +414,7 @@ Process.prototype.text = function(textString, height, depth) {
         var height = Number(height) * beetle.multiplierScale,
             depth = Number(depth) * beetle.multiplierScale;
             
-        textGeometry = new THREE.TextGeometry(textString, { font: 'helvetiker', size: height, height: depth });
+        textGeometry = new THREE.TextGeometry(textString, { font: stage.font, size: height, height: depth });
 
         beetle.cache.addGeometry('text', textGeometry, [textString, height, depth]);
     }
@@ -431,21 +431,7 @@ Process.prototype.text = function(textString, height, depth) {
 };
 
 Process.prototype.text2D = function(textString, size) {
-    var beetle = this.homeContext.receiver.beetle,
-        stage = this.homeContext.receiver.parentThatIsA(StageMorph),
-        scaledSize = Number(size) * beetle.multiplierScale,
-        fontShapes = THREE.FontUtils.generateShapes(textString, { size: scaledSize }),
-        geometry = new THREE.ShapeGeometry(fontShapes, { curveSegments: 20 });
-
-    var mesh = new THREE.Mesh(geometry, beetle.makeMaterial());
-
-    mesh.position.copy(beetle.position);
-    mesh.rotation.copy(beetle.rotation);	
-    mesh.geometry.center();
-    mesh.rotateY(-Math.PI/2);
-    stage.myObjects.add(mesh);
-
-    stage.reRender();
+    this.text(textString, size, 0);
 };
 
 Process.prototype.startExtrusion = function(extrudeStyle) {

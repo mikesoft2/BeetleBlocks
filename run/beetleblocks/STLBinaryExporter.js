@@ -8,81 +8,87 @@ THREE.STLBinaryExporter = function () {};
 
 THREE.STLBinaryExporter.prototype = {
 
-    constructor: THREE.STLBinaryExporter,
+	constructor: THREE.STLBinaryExporter,
 
-    parse: ( function () {
+	parse: ( function () {
 
-        var vector = new THREE.Vector3();
-        var normalMatrixWorld = new THREE.Matrix3();
+		var vector = new THREE.Vector3();
+		var normalMatrixWorld = new THREE.Matrix3();
 
-        return function parse( scene ) {
+		return function parse( scene ) {
 
-            var triangles = 0;
-            scene.traverse( function ( object ) {
+			// We collect objects first, as we may need to convert from BufferGeometry to Geometry
+			var objects = [];
+			var triangles = 0;
+			scene.traverse( function ( object ) {
 
-                if ( ! ( object instanceof THREE.Mesh ) ) return;
-                triangles += object.geometry.faces.length;
+				if ( ! ( object instanceof THREE.Mesh ) ) return;
 
-            } );
+				var geometry = object.geometry;
+				if ( geometry instanceof THREE.BufferGeometry ) {
 
-            var offset = 80; // skip header
-            var bufferLength = triangles * 2 + triangles * 3 * 4 * 4 + 80 + 4;
-            var arrayBuffer = new ArrayBuffer( bufferLength );
-            var output = new DataView( arrayBuffer );
-            output.setUint32( offset, triangles, true ); offset += 4;
+					geometry = new THREE.Geometry().fromBufferGeometry( geometry );
 
-            scene.traverse( function ( object ) {
+				}
 
-                if ( ! ( object instanceof THREE.Mesh ) ) return;
+				if ( ! ( geometry instanceof THREE.Geometry ) ) return;
+				triangles += geometry.faces.length;
 
-                var geometry = object.geometry;
-                if ( geometry instanceof THREE.BufferGeometry ) {
+				objects.push( {
 
-                    geometry = new THREE.Geometry().fromBufferGeometry( geometry );
+					geometry: geometry,
+					matrix: object.matrixWorld
 
-                }
+				} );
 
-                if ( ! ( geometry instanceof THREE.Geometry ) ) return;
+			} );
 
-                var matrixWorld = object.matrixWorld;
+			var offset = 80; // skip header
+			var bufferLength = triangles * 2 + triangles * 3 * 4 * 4 + 80 + 4;
+			var arrayBuffer = new ArrayBuffer( bufferLength );
+			var output = new DataView( arrayBuffer );
+			output.setUint32( offset, triangles, true ); offset += 4;
 
-                var vertices = geometry.vertices;
-                var faces = geometry.faces;
+			// Traversing our collected objects
+			objects.forEach( function ( object ) {
 
-                normalMatrixWorld.getNormalMatrix( matrixWorld );
+				var vertices = object.geometry.vertices;
+				var faces = object.geometry.faces;
 
-                for ( var i = 0, l = faces.length; i < l; i ++ ) {
+				normalMatrixWorld.getNormalMatrix( object.matrix );
 
-                    var face = faces[ i ];
+				for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
-                    vector.copy( face.normal ).applyMatrix3( normalMatrixWorld ).normalize();
+					var face = faces[ i ];
 
-                    output.setFloat32( offset, vector.x, true ); offset += 4; // normal
-                    output.setFloat32( offset, vector.y, true ); offset += 4;
-                    output.setFloat32( offset, vector.z, true ); offset += 4;
+					vector.copy( face.normal ).applyMatrix3( normalMatrixWorld ).normalize();
 
-                    var indices = [ face.a, face.b, face.c ];
+					output.setFloat32( offset, vector.x, true ); offset += 4; // normal
+					output.setFloat32( offset, vector.y, true ); offset += 4;
+					output.setFloat32( offset, vector.z, true ); offset += 4;
 
-                    for ( var j = 0; j < 3; j ++ ) {
+					var indices = [ face.a, face.b, face.c ];
 
-                        vector.copy( vertices[ indices[ j ] ] ).applyMatrix4( matrixWorld );
+					for ( var j = 0; j < 3; j ++ ) {
 
-                        output.setFloat32( offset, vector.x, true ); offset += 4; // vertices
-                        output.setFloat32( offset, vector.y, true ); offset += 4;
-                        output.setFloat32( offset, vector.z, true ); offset += 4;
+						vector.copy( vertices[ indices[ j ] ] ).applyMatrix4( object.matrix );
 
-                    }
+						output.setFloat32( offset, vector.x, true ); offset += 4; // vertices
+						output.setFloat32( offset, vector.y, true ); offset += 4;
+						output.setFloat32( offset, vector.z, true ); offset += 4;
 
-                    output.setUint16( offset, 0, true ); offset += 2; // attribute byte count
+					}
 
-                }
+					output.setUint16( offset, 0, true ); offset += 2; // attribute byte count
 
-            } );
+				}
 
-            return output;
+			} );
 
-        };
+			return output;
 
-    }() )
+		};
+
+	}() )
 
 };
