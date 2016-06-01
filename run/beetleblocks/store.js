@@ -1,5 +1,5 @@
 SnapSerializer.prototype.app = 'BeetleBlocks 1.0, http://beetleblocks.com';
-
+/*
 SnapSerializer.prototype.rawLoadProjectModel = function (xmlNode) {
     // private
     var myself = this,
@@ -14,7 +14,6 @@ SnapSerializer.prototype.rawLoadProjectModel = function (xmlNode) {
         throw 'Project uses newer version of Serializer';
     }
 
-    /* Project Info */
 
     this.objects = {};
     project.name = model.project.attributes.name;
@@ -37,7 +36,6 @@ SnapSerializer.prototype.rawLoadProjectModel = function (xmlNode) {
     model.globalVariables = model.project.childNamed('variables');
     project.globalVariables = new VariableFrame();
 
-    /* Stage */
 
     model.stage = model.project.require('stage');
     StageMorph.prototype.frameRate = 0;
@@ -103,7 +101,6 @@ SnapSerializer.prototype.rawLoadProjectModel = function (xmlNode) {
     }
     this.loadObject(project.stage, model.stage);
 
-    /* Sprites */
 
     model.sprites = model.stage.require('sprites');
     project.sprites[project.stage.name] = project.stage;
@@ -112,7 +109,6 @@ SnapSerializer.prototype.rawLoadProjectModel = function (xmlNode) {
         myself.loadValue(model);
     });
 
-    /* Global Variables */
 
     if (model.globalVariables) {
         this.loadVariables(
@@ -123,7 +119,6 @@ SnapSerializer.prototype.rawLoadProjectModel = function (xmlNode) {
 
     this.objects = {};
 
-    /* Watchers */
 
     model.sprites.childrenNamed('watcher').forEach(function (model) {
         var watcher, color, target, hidden, extX, extY;
@@ -313,3 +308,4 @@ SpriteMorph.prototype.toXML = function (serializer) {
             );
 };
 
+*/
