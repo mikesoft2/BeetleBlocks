@@ -305,10 +305,6 @@ IDE_Morph.prototype.settingsMenu = function () {
 
     menu = new MenuMorph(this);
     menu.addItem('Language...', 'languageMenu');
-    menu.addItem(
-            'Zoom blocks...',
-            'userSetBlocksScale'
-            );
     menu.addLine();
     addPreference(
             'Blurred shadows',
@@ -403,13 +399,6 @@ IDE_Morph.prototype.settingsMenu = function () {
             true
             );
     addPreference(
-            'Turbo mode',
-            'toggleFastTracking',
-            this.stage.isFastTracked,
-            'uncheck to run scripts\nat normal speed',
-            'check to prioritize\nscript execution'
-            );
-    addPreference(
         'Keyboard Editing',
         function () {
             ScriptsMorph.prototype.enableKeyboard =
@@ -467,23 +456,6 @@ IDE_Morph.prototype.settingsMenu = function () {
             this.stage.isThreadSafe,
             'uncheck to allow\nscript reentrance',
             'check to disallow\nscript reentrance'
-            );
-    addPreference(
-            'Prefer smooth animations',
-            'toggleVariableFrameRate',
-            StageMorph.prototype.frameRate,
-            'uncheck for greater speed\nat variable frame rates',
-            'check for smooth, predictable\nanimations across computers'
-            );
-    addPreference(
-            'Flat line ends',
-            function () {
-                SpriteMorph.prototype.useFlatLineEnds =
-                    !SpriteMorph.prototype.useFlatLineEnds;
-            },
-            SpriteMorph.prototype.useFlatLineEnds,
-            'uncheck for round ends of lines',
-            'check for flat ends of lines'
             );
     addPreference(
             'Codification support',
