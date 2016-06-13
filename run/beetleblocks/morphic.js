@@ -169,6 +169,7 @@ MenuHoverItemMorph.prototype.revealSubmenu = function() {
 }
 
 MenuHoverItemMorph.prototype.mouseEnter = MenuHoverItemMorph.prototype.revealSubmenu;
+MenuHoverItemMorph.prototype.mouseClickLeft = MenuHoverItemMorph.prototype.revealSubmenu;
 
 MenuHoverItemMorph.prototype.mouseLeave = function() {
     if (!this.submenu.boundingBox().containsPoint(world.hand.position())) {
