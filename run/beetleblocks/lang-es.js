@@ -153,6 +153,8 @@ tempDict = {
                 'líneas',
         'splines':
                 'curvas',
+        'curves':
+                'curvas',
 	'start extruding %drawStyle':
 		'empieza a extrudir %drawStyle',
 	'stop extruding':
