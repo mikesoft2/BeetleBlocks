@@ -367,7 +367,7 @@ SpriteMorph.prototype.categories =
         variables : new Color(191, 101, 36),
         lists : new Color(168, 66, 32),
         other : new Color(150, 150, 150),
-        'my blocks': new Color(4, 158, 235),
+        'my blocks': new Color(4, 158, 235)
     };
 
 

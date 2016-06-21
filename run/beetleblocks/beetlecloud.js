@@ -3,8 +3,8 @@
 
 var BeetleCloud;
 var SnapCloud = new BeetleCloud(
-    //'http://localhost:9090/api' // To be changed to HTTPS, and the actual URL
-    'http://45.55.194.180:9090/api' // To be changed to HTTPS, and the actual URL
+    'http://localhost:9090/api' // To be changed to HTTPS, and the actual URL
+    //'http://45.55.194.180:9090/api' // To be changed to HTTPS, and the actual URL
 );
 
 function BeetleCloud(url) {
@@ -302,8 +302,7 @@ BeetleCloud.prototype.fetchProject = function (projectName, callBack, errorCall)
         errorCall.call(this, err.toString(), 'BeetleCloud');
     }
 
-}
-
+};
 
 BeetleCloud.prototype.getProjectList = function (callBack, errorCall) {
     var request = new XMLHttpRequest(),
@@ -366,9 +365,14 @@ BeetleCloud.prototype.getProjectList = function (callBack, errorCall) {
     } catch (err) {
         errorCall.call(this, err.toString(), 'BeetleCloud');
     }
-
 };
 
+
+// Backwards compatibility with old cloud
+// To be removed when we finish moving to the new cloud
+BeetleCloud.prototype.parseResponse = function (usr) {
+    return [{ username: usr, password: 'nope' }];
+};
 
 // Overrides to be moved to the proper corresponding files after this goes live
 
@@ -422,13 +426,7 @@ IDE_Morph.prototype.initializeCloud = function () {
                 function () {
                     var str;
                     if (user.choice) {
-                        str = SnapCloud.encodeDict(
-                            {
-                                username: user.username,
-                                token: user.token
-                            }
-                        );
-                        localStorage['-snap-user'] = str;
+                        localStorage['-snap-user'] = user.username;
                     }
                     myself.source = 'cloud';
                     myself.showMessage('now connected.', 2);
