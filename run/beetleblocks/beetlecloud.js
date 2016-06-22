@@ -13,6 +13,9 @@ function BeetleCloud(url) {
     this.url = url;
 }
 
+BeetleCloud.prototype.parseDict = Cloud.prototype.parseDict;
+BeetleCloud.prototype.encodeDict = Cloud.prototype.encodeDict;
+
 BeetleCloud.prototype.clear = function () {
     this.username = null;
     this.password = null;
@@ -249,12 +252,31 @@ BeetleCloud.prototype.saveProject = function (ide, callBack, errorCall) {
     }
 };
 
-BeetleCloud.prototype.fetchProject = function (projectName, callBack, errorCall) {
-    var request = new XMLHttpRequest(),
-        myself = this;
+// Backwards compatibility with old cloud, to be removed
 
-    if (!this.username) {
-        errorCall.call(this, 'You are not logged in', 'BeetleCloud');
+BeetleCloud.prototype.getPublicProject = function (
+    id,
+    callBack,
+    errorCall
+) {
+    // id is Username=username&projectName=projectname,
+    // where the values are url-component encoded
+    // callBack is a single argument function, errorCall takes two args
+
+    var parsedId = id.split('&').map(function(each){return each.split('=')[1]}),
+        username = decodeURIComponent(parsedId[0]),
+        projectName = decodeURIComponent(parsedId[1]);
+
+    this.fetchProject(projectName, callBack, errorCall, username);
+};
+
+BeetleCloud.prototype.fetchProject = function (projectName, callBack, errorCall, publicUsername) {
+    var request = new XMLHttpRequest(),
+        myself = this,
+        username = publicUsername || this.username;
+
+    if (!username) {
+        errorCall.call(this, 'Project could not be fetched', 'BeetleCloud');
         return;
     }
 
@@ -263,7 +285,7 @@ BeetleCloud.prototype.fetchProject = function (projectName, callBack, errorCall)
             'GET',
             this.url 
             + '/users/'
-            + encodeURIComponent(myself.username)
+            + encodeURIComponent(username)
             + '/projects/'
             + encodeURIComponent(projectName),
             true
