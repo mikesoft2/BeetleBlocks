@@ -19,12 +19,20 @@ Process.prototype.clear = function() {
 
 Process.prototype.goHome = function() {
     var beetle = this.homeContext.receiver.beetle,
-        stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+        stage = this.homeContext.receiver.parentThatIsA(StageMorph),
+        p = new THREE.Vector3(),
+        startPoint = p.copy(beetle.position);
 
     beetle.reset();
 
     if (beetle.extruding) {
         this.addPointToExtrusion();
+    }
+
+    if (beetle.drawing) {
+        var p = new THREE.Vector3();
+        var endPoint = p.copy(beetle.position);
+        this.addLineGeom(startPoint, endPoint);
     }
 
     stage.reRender();
@@ -37,7 +45,7 @@ Process.prototype.setScale = function(scale) {
 
     beetle.multiplierScale = Math.max(0, Number(scale));
     ide.statusDisplay.refresh();
-}
+};
 
 Process.prototype.changeScale = function(delta) {
     var sprite = this.homeContext.receiver,
@@ -49,7 +57,7 @@ Process.prototype.changeScale = function(delta) {
     if (beetle.multiplierScale < 0) { beetle.multiplierScale = 0 };
 
     ide.statusDisplay.refresh();
-}
+};
 
 Process.prototype.reportScale = function() {
     var beetle = this.homeContext.receiver.beetle;
@@ -707,7 +715,9 @@ Process.prototype.pushPosition = function() {
 
 Process.prototype.popPosition = function() {
     var beetle = this.homeContext.receiver.beetle,
-        stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+        stage = this.homeContext.receiver.parentThatIsA(StageMorph),
+        p = new THREE.Vector3(),
+        startPoint = p.copy(beetle.position);
 
     if (beetle.posAndRotStack.length) {
         var posAndRot = beetle.posAndRotStack.pop();	
@@ -716,6 +726,12 @@ Process.prototype.popPosition = function() {
         beetle.rotation.set(posAndRot.rotation.x, posAndRot.rotation.y, posAndRot.rotation.z);
 
         if (beetle.extruding) { this.addPointToExtrusion() }
+
+        if (beetle.drawing) {
+            var p = new THREE.Vector3();
+            var endPoint = p.copy(beetle.position);
+            this.addLineGeom(startPoint, endPoint);
+        }
 
         stage.reRender();
     }
