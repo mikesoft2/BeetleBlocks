@@ -1296,3 +1296,7 @@ DialogBoxMorph.prototype.promptCredentials = function (
 
     this.popUp(world);
 };
+
+// store.js
+
+SnapSerializer.prototype.thumbnailSize = new Point(480, 360);
