@@ -1130,7 +1130,7 @@ ProjectDialogMorph.prototype.rawOpenCloudProject = function (proj) {
     this.destroy();
 };
 
-// Single Morph mode, no corral and no tabs in the scripting area
+// Single Sprite mode, no corral and no tabs in the scripting area
 
 IDE_Morph.prototype.createCorralBar = nop;
 IDE_Morph.prototype.createCorral = nop;
