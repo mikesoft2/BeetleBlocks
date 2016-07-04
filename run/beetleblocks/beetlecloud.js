@@ -326,6 +326,63 @@ BeetleCloud.prototype.fetchProject = function (projectName, callBack, errorCall,
 
 };
 
+BeetleCloud.prototype.deleteProject = function (projectName, callBack, errorCall) {
+    var request = new XMLHttpRequest(),
+        myself = this;
+
+    if (!this.username) {
+        errorCall.call(this, 'You are not logged in', 'BeetleCloud');
+        return;
+    }
+
+    try {
+        request.open(
+            'GET',
+            this.url 
+            + '/users/'
+            + encodeURIComponent(this.username)
+            + '/projects/'
+            + encodeURIComponent(projectName)
+            + '/delete',
+            true
+        );
+        request.setRequestHeader(
+            'Content-Type',
+            'application/json; charset=utf-8'
+        );
+
+        request.withCredentials = true;
+
+        request.onreadystatechange = function () {
+            if (request.readyState === 4) {
+                if (request.responseText) {
+                    var response = JSON.parse(request.responseText);
+                    if (!response.error && response.text) {
+                        callBack.call(null, response.text);
+                    } else {
+                        console.log(response);
+                        errorCall.call(
+                            null,
+                            response.error,
+                            'Could not delete project'
+                        );
+                    }
+                } else {
+                    errorCall.call(
+                        null,
+                        myself.url,
+                        localize('Could not delete project')
+                    );
+                }
+            }
+        };
+        request.send();
+    } catch (err) {
+        errorCall.call(this, err.toString(), 'BeetleCloud');
+    }
+
+}
+
 BeetleCloud.prototype.getProjectList = function (callBack, errorCall) {
     var request = new XMLHttpRequest(),
         myself = this;
@@ -737,8 +794,54 @@ ProjectDialogMorph.prototype.buildContents = function () {
         this.setExtent(new Point(840, 630));
     }
     this.fixLayout();
-}
+};
 
+ProjectDialogMorph.prototype.deleteProject = function () {
+    var myself = this,
+    proj,
+    idx,
+    name;
+
+    if (this.source === 'cloud') {
+        proj = this.listField.selected;
+        if (proj) {
+            this.ide.confirm(
+                    localize(
+                        'Are you sure you want to delete'
+                        ) + '\n"' + proj.ProjectName + '"?',
+                    'Delete Project',
+                    function () {
+                        SnapCloud.deleteProject(
+                                proj.ProjectName,
+                                function () {
+                                    myself.ide.hasChangedMedia = true;
+                                    idx = myself.projectList.indexOf(proj);
+                                    myself.projectList.splice(idx, 1);
+                                    myself.installCloudProjectList(myself.projectList);
+                                },
+                                function (err, lbl) {
+                                    myself.ide.cloudError().call(null, err, lbl);
+                                }
+                                );
+                    }
+                    );
+        }
+    } else { // 'local, examples'
+        if (this.listField.selected) {
+            name = this.listField.selected.name;
+            this.ide.confirm(
+                    localize(
+                        'Are you sure you want to delete'
+                        ) + '\n"' + name + '"?',
+                    'Delete Project',
+                    function () {
+                        delete localStorage['-snap-project-' + name];
+                        myself.setSource(myself.source); // refresh list
+                    }
+                    );
+        }
+    }
+};
 
 // widgets.js
 
