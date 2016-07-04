@@ -423,6 +423,8 @@ BeetleCloud.prototype.getProjectList = function (callBack, errorCall) {
                                 eachProject.Notes = eachProject.notes;
                             });
                             callBack.call(null, response);
+                        } else {
+                            callBack.call(null, []);
                         }
                     } else {
                         errorCall.call(
@@ -461,6 +463,12 @@ IDE_Morph.prototype.createCloudAccount = function () {
     var myself = this,
         world = this.world();
 
+    // We just redirect users to the web signup form.
+    // Keeping old code in case we change our mind though
+
+    window.open('/signup');
+
+    /*
     new DialogBoxMorph(
         null,
         function (user) {
@@ -491,6 +499,7 @@ IDE_Morph.prototype.createCloudAccount = function () {
         myself.cloudIcon(),
         myself.cloudMsg
     );
+    */
 };
 
 IDE_Morph.prototype.initializeCloud = function () {
