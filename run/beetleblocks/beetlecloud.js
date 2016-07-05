@@ -186,6 +186,61 @@ BeetleCloud.prototype.logout = function (callBack, errorCall) {
 
 };
 
+BeetleCloud.prototype.shareProject = function (shareOrNot, projectName, callBack, errorCall) {
+    var request = new XMLHttpRequest(),
+        myself = this;
+
+    if (!this.username) {
+        errorCall.call(this, 'You are not logged in', 'BeetleCloud');
+        return;
+    }
+
+    // check if serialized data can be parsed back again
+    
+    try {
+        request.open(
+            'GET',
+            this.url 
+            + '/users/' + encodeURIComponent(myself.username)
+            + '/projects/' + encodeURIComponent(projectName)
+            + '/visibility?ispublic=' + shareOrNot,
+            true
+        );
+        request.setRequestHeader(
+            'Content-Type',
+            'application/json; charset=utf-8'
+        );
+
+        request.withCredentials = true;
+
+        request.onreadystatechange = function () {
+            if (request.readyState === 4) {
+                if (request.responseText) {
+                    var response = JSON.parse(request.responseText);
+                    if (!response.error) {
+                        callBack.call(null, 'BeetleCloud');
+                    } else {
+                        errorCall.call(
+                            null,
+                            response.error,
+                            (shareOrNot ? 'S' : 'Uns') + 'haring failed'
+                        );
+                    }
+                } else {
+                    errorCall.call(
+                        null,
+                        myself.url,
+                        localize('Project could not be ' + (shareOrNot ? 's' : 'uns') + 'hared')
+                    );
+                }
+            }
+        };
+        request.send();
+    } catch (err) {
+        errorCall.call(this, err.toString(), 'BeetleCloud');
+    }
+};
+
 BeetleCloud.prototype.saveProject = function (ide, callBack, errorCall) {
     var request = new XMLHttpRequest(),
         myself = this,
@@ -212,7 +267,7 @@ BeetleCloud.prototype.saveProject = function (ide, callBack, errorCall) {
             this.url 
             + '/projects/save?projectname='
             + encodeURIComponent(ide.projectName)
-            + '&ispublic=true' // TO BE CHANGED!
+            + '&ispublic=false'
             + '&username='
             + encodeURIComponent(myself.username),
             true
@@ -416,7 +471,7 @@ BeetleCloud.prototype.getProjectList = function (callBack, errorCall) {
                         if (Object.keys(response).length > 0) {
                             response.forEach(function(eachProject) {
                                 // This looks absurd, but PostgreSQL doesn't respect case
-                                eachProject.Public = eachProject.ispublic;
+                                eachProject.Public = eachProject.ispublic ? 'true' : 'false'; // compatibility with old cloud
                                 eachProject.ProjectName = eachProject.projectname;
                                 eachProject.Thumbnail = eachProject.thumbnail;
                                 eachProject.Updated = eachProject.updated;
@@ -849,6 +904,89 @@ ProjectDialogMorph.prototype.deleteProject = function () {
                     }
                     );
         }
+    }
+};
+
+ProjectDialogMorph.prototype.shareProject = function () {
+    var myself = this,
+    ide = this.ide,
+    proj = this.listField.selected,
+    entry = this.listField.active;
+
+    if (proj) {
+        this.ide.confirm(
+                localize(
+                    'Are you sure you want to publish'
+                    ) + '\n"' + proj.ProjectName + '"?',
+                'Share Project',
+                function () {
+                    myself.ide.showMessage('sharing\nproject...');
+                    SnapCloud.shareProject(
+                            true, // make public
+                            proj.ProjectName,
+                            function () {
+                                proj.Public = 'true';
+                                myself.unshareButton.show();
+                                myself.shareButton.hide();
+                                entry.label.isBold = true;
+                                entry.label.drawNew();
+                                entry.label.changed();
+                                myself.buttons.fixLayout();
+                                myself.drawNew();
+                                myself.ide.showMessage('shared.', 2);
+                            },
+                            myself.ide.cloudError()
+                            );
+                    // Set the Shared URL if the project is currently open
+                    if (proj.ProjectName === ide.projectName) {
+                        var usr = SnapCloud.username,
+                            projectId = 'Username=' +
+                                encodeURIComponent(usr.toLowerCase()) +
+                                '&ProjectName=' +
+                                encodeURIComponent(proj.ProjectName);
+                        location.hash = 'present:' + projectId;
+                    }
+                }
+        );
+    }
+};
+
+ProjectDialogMorph.prototype.unshareProject = function () {
+    var myself = this,
+    ide = this.ide,
+    proj = this.listField.selected,
+    entry = this.listField.active;
+
+    if (proj) {
+        this.ide.confirm(
+                localize(
+                    'Are you sure you want to unpublish'
+                    ) + '\n"' + proj.ProjectName + '"?',
+                'Unshare Project',
+                function () {
+                    myself.ide.showMessage('unsharing\nproject...');
+                    SnapCloud.shareProject(
+                            false, // make not public
+                            proj.ProjectName,
+                            function () {
+                                proj.Public = 'false';
+                                myself.shareButton.show();
+                                myself.unshareButton.hide();
+                                entry.label.isBold = false;
+                                entry.label.drawNew();
+                                entry.label.changed();
+                                myself.buttons.fixLayout();
+                                myself.drawNew();
+                                myself.ide.showMessage('unshared.', 2);
+                            },
+                            myself.ide.cloudError()
+                            );
+                    // Remove the shared URL if the project is open.
+                    if (proj.ProjectName === ide.projectName) {
+                        location.hash = '';
+                    }
+                }
+        );
     }
 };
 
