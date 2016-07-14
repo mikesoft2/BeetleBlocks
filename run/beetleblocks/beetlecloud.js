@@ -267,9 +267,9 @@ BeetleCloud.prototype.saveProject = function (ide, callBack, errorCall) {
             this.url 
             + '/projects/save?projectname='
             + encodeURIComponent(ide.projectName)
-            + '&ispublic=false'
             + '&username='
-            + encodeURIComponent(myself.username),
+            + encodeURIComponent(myself.username)
+            + '&ispublic=false', // When updating an existing project we don't care about this param
             true
         );
         request.setRequestHeader(
@@ -522,39 +522,6 @@ IDE_Morph.prototype.createCloudAccount = function () {
     // Keeping old code in case we change our mind though
 
     window.open('/signup');
-
-    /*
-    new DialogBoxMorph(
-        null,
-        function (user) {
-            SnapCloud.signup(
-                user.username,
-                user.email,
-                user.password,
-                function (txt, title) {
-                    new DialogBoxMorph().inform(
-                        title,
-                        txt,
-                        world,
-                        myself.cloudIcon(null, new Color(0, 180, 0))
-                    );
-                },
-                myself.cloudError()
-            );
-        }
-    ).withKey('cloudsignup').promptCredentials(
-        'Sign up',
-        'signup',
-        'http://beetleblocks.com/tos',
-        'Terms of Service...',
-        'http://beetleblocks.com/privacy',
-        'Privacy...',
-        'I have read and agree\nto the Terms of Service',
-        world,
-        myself.cloudIcon(),
-        myself.cloudMsg
-    );
-    */
 };
 
 IDE_Morph.prototype.initializeCloud = function () {
@@ -811,6 +778,233 @@ IDE_Morph.prototype.openIn = function (world) {
     }
 };
 
+IDE_Morph.prototype.projectMenu = function () {
+    var menu,
+        myself = this,
+        world = this.world(),
+        pos = this.controlBar.projectButton.bottomLeft(),
+        graphicsName = this.currentSprite instanceof SpriteMorph ?
+            'Costumes' : 'Backgrounds',
+        shiftClicked = (world.currentKey === 16);
+
+    menu = new MenuMorph(this);
+    menu.addItem('New', 'createNewProject');
+    menu.addItem('Open...', 'openProjectsBrowser');
+    menu.addItem(
+            'Import project or blocks',
+            function () {
+                var inp = document.createElement('input');
+                if (myself.filePicker) {
+                    document.body.removeChild(myself.filePicker);
+                    myself.filePicker = null;
+                }
+                inp.type = 'file';
+                inp.style.color = "transparent";
+                inp.style.backgroundColor = "transparent";
+                inp.style.border = "none";
+                inp.style.outline = "none";
+                inp.style.position = "absolute";
+                inp.style.top = "0px";
+                inp.style.left = "0px";
+                inp.style.width = "0px";
+                inp.style.height = "0px";
+                inp.addEventListener(
+                    "change",
+                    function () {
+                        document.body.removeChild(inp);
+                        myself.filePicker = null;
+                        world.hand.processDrop(inp.files);
+                    },
+                    false
+                    );
+                document.body.appendChild(inp);
+                myself.filePicker = inp;
+                inp.click();
+            },
+            'file menu import hint' // looks up the actual text in the translator
+                );
+    menu.addItem('Save                                       Ctrl+S', 'save');
+    menu.addItem('Save As...', 'saveProjectsBrowser');
+    //menu.addItem('Save and share', 'saveAndShare');
+    menu.addLine();
+    menu.addItem('Download project as...', 'saveProjectToDisk');
+    menu.addItem(
+            'Download My Blocks as...',
+            function () { myself.exportGlobalBlocks(); },
+            'show global custom block definitions as XML\nin a new browser window'
+            );
+
+    if (shiftClicked) {
+        menu.addItem(
+                'Export all scripts as pic...',
+                function () { myself.exportScriptsPicture(); },
+                'show a picture of all scripts\nand block definitions',
+                new Color(100, 0, 0)
+                );
+    }
+    menu.addItem(
+            'Download 2D lines as...',
+            function() { myself.downloadSVG() },
+            'download the currently rendered 2D lines\ninto an SVG file'
+            );
+
+    var submenu = new MenuMorph(myself);
+    submenu.addItem(
+            'STL',
+            function() { myself.downloadSTL() },
+            'download the currently rendered 3D model\ninto an STL file ready to be printed'
+            );
+    submenu.addItem(
+            'STL (binary)',
+            function() { myself.downloadBinarySTL() },
+            'download the currently rendered 3D model\ninto an STL file ready to be printed'
+            );
+    submenu.addItem(
+            'OBJ',
+            function() { myself.downloadOBJ() },
+            'download the currently rendered 3D model\ninto an OBJ file'
+            );
+
+    menu.addHoverItem(
+            'Download 3D model as...          ▶',
+            submenu
+            );
+
+    if (SnapCloud.username) {
+        menu.addLine();
+        menu.addItem('My Profile', function () { window.open('/users/' + SnapCloud.username , true) });
+        menu.addItem('My Projects', function () { window.open('/myprojects', true) });
+    }
+    menu.addLine();
+
+    menu.addItem('Project notes...', 'editProjectNotes');
+    menu.addItem(
+            'Libraries...',
+            function () {
+                // read a list of libraries from an external file,
+                var libMenu = new MenuMorph(this, 'Import library'),
+                libUrl = 'libraries/LIBRARIES';
+
+                function loadLib(name) {
+                    var url = 'libraries/'
+                        + name
+                        + '.xml';
+                    myself.droppedText(myself.getURL(url), name);
+                }
+
+                myself.getURL(libUrl).split('\n').forEach(function (line) {
+                    if (line.length > 0) {
+                        libMenu.addItem(
+                                line.substring(line.indexOf('\t') + 1),
+                                function () { loadLib(line.substring(0, line.indexOf('\t'))) }
+                                );
+                    }
+                });
+
+                libMenu.popup(world, pos);
+            },
+            'Select categories of additional blocks to add to this project.'
+            );
+
+    menu.addLine();
+
+    if (shiftClicked) {
+        menu.addItem(
+                'Cloud url...',
+                'setCloudURL',
+                null,
+                new Color(100, 0, 0)
+                );
+        menu.addLine();
+    }
+    if (!SnapCloud.username) {
+        menu.addItem(
+                'Login',
+                'initializeCloud'
+                );
+        menu.addItem(
+                'Create an account',
+                'createCloudAccount'
+                );
+        menu.addItem(
+                'Reset Password...',
+                'resetCloudPassword'
+                );
+    } else {
+        menu.addItem(
+                localize('Logout') + ' / ' + SnapCloud.username,
+                'logout'
+                );
+        menu.addItem(
+                'Create an account',
+                'createCloudAccount'
+                );
+        menu.addItem(
+                'Change Password...',
+                'changeCloudPassword'
+                );
+    }
+    menu.addItem(
+            'Start tutorial',
+            function() {
+                myself.startTutorial(world);
+            }
+            );
+
+    if (shiftClicked) {
+        menu.addLine();
+        menu.addItem(
+                'open shared project from cloud...',
+                function () {
+                    myself.prompt('Author name…', function (usr) {
+                        myself.prompt('Project name...', function (prj) {
+                            var id = 'Username=' +
+                            encodeURIComponent(usr.toLowerCase()) +
+                            '&ProjectName=' +
+                            encodeURIComponent(prj);
+                        myself.showMessage(
+                            'Fetching project\nfrom the cloud...'
+                            );
+                        SnapCloud.getPublicProject(
+                            id,
+                            function (projectData) {
+                                var msg;
+                                if (!Process.prototype.isCatchingErrors) {
+                                    window.open(
+                                        'data:text/xml,' + projectData
+                                        );
+                                }
+                                myself.nextSteps([
+                                    function () {
+                                        msg = myself.showMessage(
+                                            'Opening project...'
+                                            );
+                                    },
+                                    function () {nop(); }, // yield (Chrome)
+                                    function () {
+                                        myself.rawOpenCloudDataString(
+                                            projectData
+                                            );
+                                    },
+                                    function () {
+                                        msg.destroy();
+                                    }
+                                    ]);
+                            },
+                            myself.cloudError()
+                                );
+
+                        }, null, 'project');
+                    }, null, 'project');
+                },
+                null,
+                new Color(100, 0, 0)
+                    );
+    }
+
+ 
+    menu.popup(world, pos);
+}
 ProjectDialogMorph.prototype.rawOpenCloudProject = function (proj) {
     var myself = this;
     SnapCloud.fetchProject(
