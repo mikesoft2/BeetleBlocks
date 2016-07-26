@@ -63,42 +63,13 @@ BeetleCloud.prototype.get = function (path, callBack, errorCall, errorMsg) {
 
 };
 
-BeetleCloud.prototype.getCurrentUser = function (callback, errorCallback) {
-    this.get('/user', callback, errorCallback, 'Could not retrieve current user');
-};
-
-BeetleCloud.prototype.checkCredentials = function (callback, errorCallback) {
-    var myself = this;
-    this.getCurrentUser(
-            function (user) { 
-                if (user.username) {
-                    myself.username = user.username;
-                }
-                if (callback) { callback.call(null, user); }
-            },
-            errorCallback);
-};
-
-BeetleCloud.prototype.signup = function (
-    username,
-    email,
-    password,
-    callBack,
-    errorCall
-) {
-    // both callBack and errorCall are two-argument functions
+BeetleCloud.prototype.post = function (path, body, callBack, errorCall, errorMsg) {
     var request = new XMLHttpRequest(),
         myself = this;
     try {
         request.open(
             'POST',
-            this.url
-                + '/users/new?username=' 
-                + encodeURIComponent(username)
-                + '&password='
-                + encodeURIComponent(password)
-                + '&email=' 
-                + encodeURIComponent(email),
+            this.url + path,
             true
         );
         request.setRequestHeader(
@@ -116,28 +87,45 @@ BeetleCloud.prototype.signup = function (
                         errorCall.call(
                             this,
                             response.error,
-                            'Signup'
+                            'BeetleCloud'
                         );
                     } else {
                         callBack.call(
                             null,
                             response.text,
-                            'Signup'
+                            'BeetleCloud'
                         );
                     }
                 } else {
                     errorCall.call(
                         null,
-                        myself.url + '/users/new',
+                        myself.url + path,
                         localize('could not connect to:')
                     );
                 }
             }
         };
-        request.send(null);
+        request.send(body);
     } catch (err) {
         errorCall.call(this, err.toString(), 'BeetleCloud');
     }
+
+};
+
+BeetleCloud.prototype.getCurrentUser = function (callback, errorCallback) {
+    this.get('/user', callback, errorCallback, 'Could not retrieve current user');
+};
+
+BeetleCloud.prototype.checkCredentials = function (callback, errorCallback) {
+    var myself = this;
+    this.getCurrentUser(
+            function (user) { 
+                if (user.username) {
+                    myself.username = user.username;
+                }
+                if (callback) { callback.call(null, user); }
+            },
+            errorCallback);
 };
 
 BeetleCloud.prototype.logout = function (callBack, errorCall) {
@@ -165,69 +153,42 @@ BeetleCloud.prototype.shareProject = function (shareOrNot, projectName, callBack
 };
 
 BeetleCloud.prototype.saveProject = function (ide, callBack, errorCall) {
-    var request = new XMLHttpRequest(),
-        myself = this,
-        pdata = ide.serializer.serialize(ide.stage);
+    var myself = this;
 
-    if (!this.username) {
-        errorCall.call(this, 'You are not logged in', 'BeetleCloud');
-        return;
-    }
-
-    // check if serialized data can be parsed back again
-    try {
-        ide.serializer.parse(pdata);
-    } catch (err) {
-        ide.showMessage('Serialization of program data failed:\n' + err);
-        throw new Error('Serialization of program data failed:\n' + err);
-    }
-    
-    ide.showMessage('Uploading project...');
-
-    try {
-        request.open(
-            'POST',
-            this.url 
-            + '/projects/save?projectname='
-            + encodeURIComponent(ide.projectName)
-            + '&username='
-            + encodeURIComponent(myself.username)
-            + '&ispublic=false', // When updating an existing project we don't care about this param
-            true
-        );
-        request.setRequestHeader(
-            'Content-Type',
-            'application/json; charset=utf-8'
-        );
-
-        request.withCredentials = true;
-
-        request.onreadystatechange = function () {
-            if (request.readyState === 4) {
-                if (request.responseText) {
-                    var response = JSON.parse(request.responseText);
-                    if (!response.error) {
-                        callBack.call(null, 'BeetleCloud');
-                    } else {
-                        errorCall.call(
-                            null,
-                            response.error,
-                            'Saving failed'
-                        );
+    this.checkCredentials(
+            function (user) {
+                if (user.username) {
+                    var pdata = ide.serializer.serialize(ide.stage);
+                    // check if serialized data can be parsed back again
+                    try {
+                        ide.serializer.parse(pdata);
+                    } catch (err) {
+                        ide.showMessage('Serialization of program data failed:\n' + err);
+                        throw new Error('Serialization of program data failed:\n' + err);
                     }
+
+                    ide.showMessage('Uploading project...'); 
+
+                    myself.post(
+                            '/projects/save?projectname='
+                            + encodeURIComponent(ide.projectName)
+                            + '&username='
+                            + encodeURIComponent(myself.username)
+                            + '&ispublic=false', // path
+                            pdata, // body
+                            callBack,
+                            errorCall,
+                            'Project could not be saved' // error message
+                            )
+
                 } else {
-                    errorCall.call(
-                        null,
-                        myself.url,
-                        localize('Project could not be saved')
-                    );
+                    errorCall.call(this, 'You are not logged in', 'BeetleCloud');
+                    return;
                 }
-            }
-        };
-        request.send(pdata);
-    } catch (err) {
-        errorCall.call(this, err.toString(), 'BeetleCloud');
-    }
+            },
+            errorCall
+            );
+
 };
 
 // Backwards compatibility with old cloud, to be removed
