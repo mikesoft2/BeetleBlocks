@@ -783,7 +783,7 @@ ProjectDialogMorph.prototype.rawOpenCloudProject = function (proj) {
 
 ProjectDialogMorph.prototype.originalBuildContents = ProjectDialogMorph.prototype.buildContents;
 ProjectDialogMorph.prototype.buildContents = function () {
-    var notification;
+    var notification, myself = this;
 
     SnapCloud.checkCredentials(
             function (user) {
