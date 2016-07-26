@@ -1,25 +1,83 @@
 // Beetle Blocks cloud
 // Inspired in Snap! cloud
 
-var BeetleCloud;
-var SnapCloud = new BeetleCloud(
-    //'http://localhost:9090/api' // To be changed to HTTPS, and the actual URL
-    'http://45.55.194.180:9090/api' // To be changed to HTTPS, and the actual URL
-);
+function BeetleCloud (url) {
+    this.init(url);
+};
 
-function BeetleCloud(url) {
-    this.username = null;
-    this.password = null; // Sent over HTTPS to be later hashed and checked against the DB at server side
+BeetleCloud.prototype.init = function (url) {
     this.url = url;
-}
+    this.checkCredentials();
+};
 
 BeetleCloud.prototype.parseDict = Cloud.prototype.parseDict;
 BeetleCloud.prototype.encodeDict = Cloud.prototype.encodeDict;
 
 BeetleCloud.prototype.clear = function () {
     this.username = null;
-    this.password = null;
-}
+};
+
+BeetleCloud.prototype.get = function (path, callBack, errorCall, errorMsg) {
+    var request = new XMLHttpRequest(),
+        myself = this;
+
+    try {
+        request.open(
+            'GET',
+            this.url + path,
+            true
+        );
+        request.setRequestHeader(
+            'Content-Type',
+            'application/json; charset=utf-8'
+        );
+
+        request.withCredentials = true;
+
+        request.onreadystatechange = function () {
+            if (request.readyState === 4) {
+                if (request.responseText) {
+                    var response = JSON.parse(request.responseText);
+                    if (!response.error) {
+                        callBack.call(null, response);
+                    } else {
+                        errorCall.call(
+                            null,
+                            response.error,
+                            errorMsg
+                        );
+                    }
+                } else {
+                    errorCall.call(
+                        null,
+                        myself.url,
+                        errorMsg
+                    );
+                }
+            }
+        };
+        request.send();
+    } catch (err) {
+        errorCall.call(this, err.toString(), 'BeetleCloud');
+    }
+
+};
+
+BeetleCloud.prototype.getCurrentUser = function (callback, errorCallback) {
+    this.get('/user', callback, errorCallback, 'Could not retrieve current user');
+};
+
+BeetleCloud.prototype.checkCredentials = function (callback, errorCallback) {
+    var myself = this;
+    this.getCurrentUser(
+            function (user) { 
+                if (user.username) {
+                    myself.username = user.username;
+                }
+                if (callback) { callback.call(null, user); }
+            },
+            errorCallback);
+};
 
 BeetleCloud.prototype.signup = function (
     username,
@@ -82,163 +140,28 @@ BeetleCloud.prototype.signup = function (
     }
 };
 
-BeetleCloud.prototype.login = function (
-    username,
-    password,
-    callBack,
-    errorCall
-) {
-    // both callBack and errorCall are two-argument functions
-    var request = new XMLHttpRequest(),
-        myself = this;
-
-    try {
-        request.open(
-            'GET',
-            this.url
-                + '/users/login?username=' 
-                + encodeURIComponent(username)
-                + '&password='
-                + encodeURIComponent(password),
-            true
-        );
-        request.setRequestHeader(
-            'Content-Type',
-            'application/json; charset=utf-8'
-        );
-
-        request.withCredentials = true;
-
-        request.onreadystatechange = function () {
-            if (request.readyState === 4) {
-                if (request.responseText) {
-                    var response = JSON.parse(request.responseText);
-                    if (!response.error) {
-                        myself.username = username;
-                        callBack.call(null, { username: username }, 'BeetleCloud');
-                    } else {
-                        errorCall.call(
-                            null,
-                            response.error,
-                            'connection failed'
-                        );
-                    }
-                } else {
-                    errorCall.call(
-                        null,
-                        myself.url,
-                        localize('could not connect to:')
-                    );
-                }
-            }
-        };
-        request.send();
-    } catch (err) {
-        errorCall.call(this, err.toString(), 'BeetleCloud');
-    }
-};
-
 BeetleCloud.prototype.logout = function (callBack, errorCall) {
-    var request = new XMLHttpRequest(),
-        myself = this;
-
-    this.clear();
-
-    try {
-        request.open(
-            'GET',
-            this.url + '/users/logout',
-            true
-        );
-        request.setRequestHeader(
-            'Content-Type',
-            'application/json; charset=utf-8'
-        );
-
-        request.withCredentials = true;
-
-        request.onreadystatechange = function () {
-            if (request.readyState === 4) {
-                if (request.responseText) {
-                    var response = JSON.parse(request.responseText);
-                    if (!response.error) {
-                        callBack.call(null, 'BeetleCloud');
-                    } else {
-                        errorCall.call(
-                            null,
-                            response.error,
-                            'logout failed'
-                        );
-                    }
-                } else {
-                    errorCall.call(
-                        null,
-                        myself.url,
-                        localize('could not log out!')
-                    );
-                }
-            }
-        };
-        request.send();
-    } catch (err) {
-        errorCall.call(this, err.toString(), 'BeetleCloud');
-    }
-
+    this.get('/users/logout', callBack, errorCall, 'logout failed');
 };
 
 BeetleCloud.prototype.shareProject = function (shareOrNot, projectName, callBack, errorCall) {
-    var request = new XMLHttpRequest(),
-        myself = this;
+    var myself = this;
 
-    if (!this.username) {
-        errorCall.call(this, 'You are not logged in', 'BeetleCloud');
-        return;
-    }
-
-    // check if serialized data can be parsed back again
-    
-    try {
-        request.open(
-            'GET',
-            this.url 
-            + '/users/' + encodeURIComponent(myself.username)
-            + '/projects/' + encodeURIComponent(projectName)
-            + '/visibility?ispublic=' + shareOrNot,
-            true
-        );
-        request.setRequestHeader(
-            'Content-Type',
-            'application/json; charset=utf-8'
-        );
-
-        request.withCredentials = true;
-
-        request.onreadystatechange = function () {
-            if (request.readyState === 4) {
-                if (request.responseText) {
-                    var response = JSON.parse(request.responseText);
-                    if (!response.error) {
-                        callBack.call(null, 'BeetleCloud');
-                    } else {
-                        errorCall.call(
-                            null,
-                            response.error,
-                            (shareOrNot ? 'S' : 'Uns') + 'haring failed'
-                        );
-                    }
+    this.checkCredentials(
+            function (user) {
+                if (user.username) { 
+                    myself.get('/users/' + encodeURIComponent(user.username)
+                            + '/projects/' + encodeURIComponent(projectName)
+                            + '/visibility?ispublic=' + shareOrNot, // path
+                            callBack, // ok callback
+                            errorCall, // error callback
+                            (shareOrNot ? 'S' : 'Uns') + 'haring failed'); // error message
                 } else {
-                    errorCall.call(
-                        null,
-                        myself.url,
-                        localize('Project could not be ' + (shareOrNot ? 's' : 'uns') + 'hared')
-                    );
+                    errorCall.call(this, 'You are not logged in', 'BeetleCloud');
                 }
-            }
-        };
-        request.send();
-    } catch (err) {
-        errorCall.call(this, err.toString(), 'BeetleCloud');
-    }
+            },
+            errorCall
+            );
 };
 
 BeetleCloud.prototype.saveProject = function (ide, callBack, errorCall) {
@@ -326,181 +249,90 @@ BeetleCloud.prototype.getPublicProject = function (
 };
 
 BeetleCloud.prototype.fetchProject = function (projectName, callBack, errorCall, publicUsername) {
-    var request = new XMLHttpRequest(),
-        myself = this,
-        username = publicUsername || this.username;
+    var myself = this;
 
-    if (!username) {
-        errorCall.call(this, 'Project could not be fetched', 'BeetleCloud');
-        return;
-    }
-
-    try {
-        request.open(
-            'GET',
-            this.url 
-            + '/users/'
-            + encodeURIComponent(username)
-            + '/projects/'
-            + encodeURIComponent(projectName),
-            true
-        );
-        request.setRequestHeader(
-            'Content-Type',
-            'application/json; charset=utf-8'
-        );
-
-        request.withCredentials = true;
-
-        request.onreadystatechange = function () {
-            if (request.readyState === 4) {
-                if (request.responseText) {
-                    var response = JSON.parse(request.responseText);
-                    if (!response.error && response.contents) {
-                        callBack.call(null, response.contents);
-                    } else {
-                        errorCall.call(
-                            null,
-                            response.error,
-                            'Could not fetch project'
-                        );
-                    }
+    this.checkCredentials(
+            function (user) {
+                var username = publicUsername || user.username;
+                if (!username) {
+                    errorCall.call(this, 'Project could not be fetched', 'BeetleCloud');
+                    return;
                 } else {
-                    errorCall.call(
-                        null,
-                        myself.url,
-                        localize('Could not fetch project')
-                    );
+                    myself.get(
+                            '/users/'
+                            + encodeURIComponent(username)
+                            + '/projects/'
+                            + encodeURIComponent(projectName),
+                            function (response) { callBack.call(null, response.contents); },
+                            errorCall,
+                            'Could not fetch project'
+                            )
                 }
-            }
-        };
-        request.send();
-    } catch (err) {
-        errorCall.call(this, err.toString(), 'BeetleCloud');
-    }
-
+            },
+            errorCall
+            );
 };
 
 BeetleCloud.prototype.deleteProject = function (projectName, callBack, errorCall) {
-    var request = new XMLHttpRequest(),
-        myself = this;
+    var myself = this;
 
-    if (!this.username) {
-        errorCall.call(this, 'You are not logged in', 'BeetleCloud');
-        return;
-    }
-
-    try {
-        request.open(
-            'GET',
-            this.url 
-            + '/users/'
-            + encodeURIComponent(this.username)
-            + '/projects/'
-            + encodeURIComponent(projectName)
-            + '/delete',
-            true
-        );
-        request.setRequestHeader(
-            'Content-Type',
-            'application/json; charset=utf-8'
-        );
-
-        request.withCredentials = true;
-
-        request.onreadystatechange = function () {
-            if (request.readyState === 4) {
-                if (request.responseText) {
-                    var response = JSON.parse(request.responseText);
-                    if (!response.error && response.text) {
-                        callBack.call(null, response.text);
-                    } else {
-                        console.log(response);
-                        errorCall.call(
-                            null,
-                            response.error,
-                            'Could not delete project'
-                        );
-                    }
+    this.checkCredentials(
+            function (user) {
+                if (!user.username) {
+                    errorCall.call(this, 'You are not logged in', 'BeetleCloud');
+                    return;
                 } else {
-                    errorCall.call(
-                        null,
-                        myself.url,
-                        localize('Could not delete project')
-                    );
+                    myself.get(
+                            '/users/'
+                            + encodeURIComponent(user.username)
+                            + '/projects/'
+                            + encodeURIComponent(projectName)
+                            + '/delete',
+                            function (response) { callBack.call(null, response.text); },
+                            errorCall,
+                            'Could not delete project'
+                            );
                 }
-            }
-        };
-        request.send();
-    } catch (err) {
-        errorCall.call(this, err.toString(), 'BeetleCloud');
-    }
-
+            },
+            errorCall
+            );
 }
 
 BeetleCloud.prototype.getProjectList = function (callBack, errorCall) {
-    var request = new XMLHttpRequest(),
-        myself = this;
+    var myself = this;
 
-    if (!this.username) {
-        errorCall.call(this, 'You are not logged in', 'BeetleCloud');
-        return;
-    }
-
-    try {
-        request.open(
-            'GET',
-            this.url 
-            + '/users/'
-            + encodeURIComponent(myself.username)
-            + '/projects',
-            true
-        );
-        request.setRequestHeader(
-            'Content-Type',
-            'application/json; charset=utf-8'
-        );
-
-        request.withCredentials = true;
-
-        request.onreadystatechange = function () {
-            if (request.readyState === 4) {
-                if (request.responseText) {
-                    var response = JSON.parse(request.responseText);
-                    if (!response.error) {
-                        if (Object.keys(response).length > 0) {
-                            response.forEach(function(eachProject) {
-                                // This looks absurd, but PostgreSQL doesn't respect case
-                                eachProject.Public = eachProject.ispublic ? 'true' : 'false'; // compatibility with old cloud
-                                eachProject.ProjectName = eachProject.projectname;
-                                eachProject.Thumbnail = eachProject.thumbnail;
-                                eachProject.Updated = eachProject.updated;
-                                eachProject.Notes = eachProject.notes;
-                            });
-                            callBack.call(null, response);
-                        } else {
-                            callBack.call(null, []);
-                        }
-                    } else {
-                        errorCall.call(
-                            null,
-                            response.error,
-                            'Could not fetch project list'
-                        );
-                    }
+    this.checkCredentials(
+            function (user) {
+                if (!user.username) {
+                    errorCall.call(this, 'You are not logged in', 'BeetleCloud');
+                    return;
                 } else {
-                    errorCall.call(
-                        null,
-                        myself.url,
-                        localize('Could not fetch project list')
-                    );
+                    myself.get(
+                            '/users/'
+                            + encodeURIComponent(myself.username)
+                            + '/projects',
+                            function (response) { 
+                                if (Object.keys(response).length > 0) {
+                                    response.forEach(function(eachProject) {
+                                        // This looks absurd, but PostgreSQL doesn't respect case
+                                        eachProject.Public = eachProject.ispublic ? 'true' : 'false'; // compatibility with old cloud
+                                        eachProject.ProjectName = eachProject.projectname;
+                                        eachProject.Thumbnail = eachProject.thumbnail;
+                                        eachProject.Updated = eachProject.updated;
+                                        eachProject.Notes = eachProject.notes;
+                                    });
+                                    callBack.call(null, response);
+                                } else {
+                                    callBack.call(null, []);
+                                } 
+                            },
+                            errorCall,
+                            'Could not fetch project list'
+                            );
                 }
-            }
-        };
-        request.send();
-    } catch (err) {
-        errorCall.call(this, err.toString(), 'BeetleCloud');
-    }
+            },
+            errorCall
+            );
 };
 
 
@@ -510,52 +342,22 @@ BeetleCloud.prototype.parseResponse = function (usr) {
     return [{ username: usr, password: 'nope' }];
 };
 
+var SnapCloud = new BeetleCloud(
+    'http://localhost:9090/api' // To be changed to HTTPS, and the actual URL
+    //'http://45.55.194.180:9090/api' // To be changed to HTTPS, and the actual URL
+);
+
+
 // Overrides to be moved to the proper corresponding files after this goes live
 
 // gui.js
 
 IDE_Morph.prototype.createCloudAccount = function () {
-    var myself = this,
-        world = this.world();
-
-    // We just redirect users to the web signup form.
-    // Keeping old code in case we change our mind though
-
     window.open('/signup');
 };
 
 IDE_Morph.prototype.initializeCloud = function () {
-    var myself = this,
-        world = this.world();
-    new DialogBoxMorph(
-        null,
-        function (user) {
-            SnapCloud.login(
-                user.username,
-                user.password,
-                function () {
-                    var str;
-                    if (user.choice) {
-                        localStorage['-snap-user'] = user.username;
-                    }
-                    myself.source = 'cloud';
-                    myself.showMessage('now connected.', 2);
-                },
-                myself.cloudError()
-            );
-        }
-    ).withKey('cloudlogin').promptCredentials(
-        'Sign in',
-        'login',
-        null,
-        null,
-        null,
-        null,
-        'stay signed in on this computer\nuntil logging out',
-        world,
-        myself.cloudIcon(),
-        myself.cloudMsg
-    );
+    window.open('/login');
 };
 
 // In the BeetleCloud we allow uppercase characters in usernames
@@ -787,224 +589,226 @@ IDE_Morph.prototype.projectMenu = function () {
             'Costumes' : 'Backgrounds',
         shiftClicked = (world.currentKey === 16);
 
-    menu = new MenuMorph(this);
-    menu.addItem('New', 'createNewProject');
-    menu.addItem('Open...', 'openProjectsBrowser');
-    menu.addItem(
-            'Import project or blocks',
-            function () {
-                var inp = document.createElement('input');
-                if (myself.filePicker) {
-                    document.body.removeChild(myself.filePicker);
-                    myself.filePicker = null;
-                }
-                inp.type = 'file';
-                inp.style.color = "transparent";
-                inp.style.backgroundColor = "transparent";
-                inp.style.border = "none";
-                inp.style.outline = "none";
-                inp.style.position = "absolute";
-                inp.style.top = "0px";
-                inp.style.left = "0px";
-                inp.style.width = "0px";
-                inp.style.height = "0px";
-                inp.addEventListener(
-                    "change",
-                    function () {
-                        document.body.removeChild(inp);
-                        myself.filePicker = null;
-                        world.hand.processDrop(inp.files);
-                    },
-                    false
-                    );
-                document.body.appendChild(inp);
-                myself.filePicker = inp;
-                inp.click();
-            },
-            'file menu import hint' // looks up the actual text in the translator
-                );
-    menu.addItem('Save                                       Ctrl+S', 'save');
-    menu.addItem('Save As...', 'saveProjectsBrowser');
-    //menu.addItem('Save and share', 'saveAndShare');
-    menu.addLine();
-    menu.addItem('Download project as...', 'saveProjectToDisk');
-    menu.addItem(
-            'Download My Blocks as...',
-            function () { myself.exportGlobalBlocks(); },
-            'show global custom block definitions as XML\nin a new browser window'
-            );
+    SnapCloud.checkCredentials(function (user) {
 
-    if (shiftClicked) {
+        menu = new MenuMorph(myself);
+        menu.addItem('New', 'createNewProject');
+        menu.addItem('Open...', 'openProjectsBrowser');
         menu.addItem(
-                'Export all scripts as pic...',
-                function () { myself.exportScriptsPicture(); },
-                'show a picture of all scripts\nand block definitions',
-                new Color(100, 0, 0)
-                );
-    }
-    menu.addItem(
-            'Download 2D lines as...',
-            function() { myself.downloadSVG() },
-            'download the currently rendered 2D lines\ninto an SVG file'
-            );
-
-    var submenu = new MenuMorph(myself);
-    submenu.addItem(
-            'STL',
-            function() { myself.downloadSTL() },
-            'download the currently rendered 3D model\ninto an STL file ready to be printed'
-            );
-    submenu.addItem(
-            'STL (binary)',
-            function() { myself.downloadBinarySTL() },
-            'download the currently rendered 3D model\ninto an STL file ready to be printed'
-            );
-    submenu.addItem(
-            'OBJ',
-            function() { myself.downloadOBJ() },
-            'download the currently rendered 3D model\ninto an OBJ file'
-            );
-
-    menu.addHoverItem(
-            'Download 3D model as...          ▶',
-            submenu
-            );
-
-    if (SnapCloud.username) {
-        menu.addLine();
-        menu.addItem('My Profile', function () { window.open('/users/' + SnapCloud.username , true) });
-        menu.addItem('My Projects', function () { window.open('/myprojects', true) });
-    }
-    menu.addLine();
-
-    menu.addItem('Project notes...', 'editProjectNotes');
-    menu.addItem(
-            'Libraries...',
-            function () {
-                // read a list of libraries from an external file,
-                var libMenu = new MenuMorph(this, 'Import library'),
-                libUrl = 'libraries/LIBRARIES';
-
-                function loadLib(name) {
-                    var url = 'libraries/'
-                        + name
-                        + '.xml';
-                    myself.droppedText(myself.getURL(url), name);
-                }
-
-                myself.getURL(libUrl).split('\n').forEach(function (line) {
-                    if (line.length > 0) {
-                        libMenu.addItem(
-                                line.substring(line.indexOf('\t') + 1),
-                                function () { loadLib(line.substring(0, line.indexOf('\t'))) }
-                                );
-                    }
-                });
-
-                libMenu.popup(world, pos);
-            },
-            'Select categories of additional blocks to add to this project.'
-            );
-
-    menu.addLine();
-
-    if (shiftClicked) {
-        menu.addItem(
-                'Cloud url...',
-                'setCloudURL',
-                null,
-                new Color(100, 0, 0)
-                );
-        menu.addLine();
-    }
-    if (!SnapCloud.username) {
-        menu.addItem(
-                'Login',
-                'initializeCloud'
-                );
-        menu.addItem(
-                'Create an account',
-                'createCloudAccount'
-                );
-        menu.addItem(
-                'Reset Password...',
-                'resetCloudPassword'
-                );
-    } else {
-        menu.addItem(
-                localize('Logout') + ' / ' + SnapCloud.username,
-                'logout'
-                );
-        menu.addItem(
-                'Create an account',
-                'createCloudAccount'
-                );
-        menu.addItem(
-                'Change Password...',
-                'changeCloudPassword'
-                );
-    }
-    menu.addItem(
-            'Start tutorial',
-            function() {
-                myself.startTutorial(world);
-            }
-            );
-
-    if (shiftClicked) {
-        menu.addLine();
-        menu.addItem(
-                'open shared project from cloud...',
+                'Import project or blocks',
                 function () {
-                    myself.prompt('Author name…', function (usr) {
-                        myself.prompt('Project name...', function (prj) {
-                            var id = 'Username=' +
-                            encodeURIComponent(usr.toLowerCase()) +
-                            '&ProjectName=' +
-                            encodeURIComponent(prj);
-                        myself.showMessage(
-                            'Fetching project\nfrom the cloud...'
-                            );
-                        SnapCloud.getPublicProject(
-                            id,
-                            function (projectData) {
-                                var msg;
-                                if (!Process.prototype.isCatchingErrors) {
-                                    window.open(
-                                        'data:text/xml,' + projectData
-                                        );
-                                }
-                                myself.nextSteps([
-                                    function () {
-                                        msg = myself.showMessage(
-                                            'Opening project...'
-                                            );
-                                    },
-                                    function () {nop(); }, // yield (Chrome)
-                                    function () {
-                                        myself.rawOpenCloudDataString(
-                                            projectData
-                                            );
-                                    },
-                                    function () {
-                                        msg.destroy();
-                                    }
-                                    ]);
+                    var inp = document.createElement('input');
+                    if (myself.filePicker) {
+                        document.body.removeChild(myself.filePicker);
+                        myself.filePicker = null;
+                    }
+                    inp.type = 'file';
+                    inp.style.color = "transparent";
+                    inp.style.backgroundColor = "transparent";
+                    inp.style.border = "none";
+                    inp.style.outline = "none";
+                    inp.style.position = "absolute";
+                    inp.style.top = "0px";
+                    inp.style.left = "0px";
+                    inp.style.width = "0px";
+                    inp.style.height = "0px";
+                    inp.addEventListener(
+                            "change",
+                            function () {
+                                document.body.removeChild(inp);
+                                myself.filePicker = null;
+                                world.hand.processDrop(inp.files);
                             },
-                            myself.cloudError()
-                                );
-
-                        }, null, 'project');
-                    }, null, 'project');
+                            false
+                            );
+                    document.body.appendChild(inp);
+                    myself.filePicker = inp;
+                    inp.click();
                 },
-                null,
-                new Color(100, 0, 0)
+                'file menu import hint' // looks up the actual text in the translator
                     );
-    }
+        menu.addItem('Save                                       Ctrl+S', 'save');
+        menu.addItem('Save As...', 'saveProjectsBrowser');
+        //menu.addItem('Save and share', 'saveAndShare');
+        menu.addLine();
+        menu.addItem('Download project as...', 'saveProjectToDisk');
+        menu.addItem(
+                'Download My Blocks as...',
+                function () { myself.exportGlobalBlocks(); },
+                'show global custom block definitions as XML\nin a new browser window'
+                );
 
- 
-    menu.popup(world, pos);
-}
+        if (shiftClicked) {
+            menu.addItem(
+                    'Export all scripts as pic...',
+                    function () { myself.exportScriptsPicture(); },
+                    'show a picture of all scripts\nand block definitions',
+                    new Color(100, 0, 0)
+                    );
+        }
+        menu.addItem(
+                'Download 2D lines as...',
+                function() { myself.downloadSVG() },
+                'download the currently rendered 2D lines\ninto an SVG file'
+                );
+
+        var submenu = new MenuMorph(myself);
+        submenu.addItem(
+                'STL',
+                function() { myself.downloadSTL() },
+                'download the currently rendered 3D model\ninto an STL file ready to be printed'
+                );
+        submenu.addItem(
+                'STL (binary)',
+                function() { myself.downloadBinarySTL() },
+                'download the currently rendered 3D model\ninto an STL file ready to be printed'
+                );
+        submenu.addItem(
+                'OBJ',
+                function() { myself.downloadOBJ() },
+                'download the currently rendered 3D model\ninto an OBJ file'
+                );
+
+        menu.addHoverItem(
+                'Download 3D model as...          ▶',
+                submenu
+                );
+
+        if (SnapCloud.username) {
+            menu.addLine();
+            menu.addItem('My Profile', function () { window.open('/users/' + SnapCloud.username , true) });
+            menu.addItem('My Projects', function () { window.open('/myprojects', true) });
+        }
+        menu.addLine();
+
+        menu.addItem('Project notes...', 'editProjectNotes');
+        menu.addItem(
+                'Libraries...',
+                function () {
+                    // read a list of libraries from an external file,
+                    var libMenu = new MenuMorph(myself, 'Import library'),
+                    libUrl = 'libraries/LIBRARIES';
+
+                    function loadLib(name) {
+                        var url = 'libraries/'
+                            + name
+                            + '.xml';
+                        myself.droppedText(myself.getURL(url), name);
+                    }
+
+                    myself.getURL(libUrl).split('\n').forEach(function (line) {
+                        if (line.length > 0) {
+                            libMenu.addItem(
+                                    line.substring(line.indexOf('\t') + 1),
+                                    function () { loadLib(line.substring(0, line.indexOf('\t'))) }
+                                    );
+                        }
+                    });
+
+                    libMenu.popup(world, pos);
+                },
+                'Select categories of additional blocks to add to this project.'
+                    );
+
+        menu.addLine();
+
+        if (shiftClicked) {
+            menu.addItem(
+                    'Cloud url...',
+                    'setCloudURL',
+                    null,
+                    new Color(100, 0, 0)
+                    );
+            menu.addLine();
+        }
+        if (!SnapCloud.username) {
+            menu.addItem(
+                    'Login',
+                    'initializeCloud'
+                    );
+            menu.addItem(
+                    'Create an account',
+                    'createCloudAccount'
+                    );
+            menu.addItem(
+                    'Reset Password...',
+                    'resetCloudPassword'
+                    );
+        } else {
+            menu.addItem(
+                    localize('Logout') + ' / ' + SnapCloud.username,
+                    'logout'
+                    );
+            menu.addItem(
+                    'Create an account',
+                    'createCloudAccount'
+                    );
+            menu.addItem(
+                    'Change Password...',
+                    'changeCloudPassword'
+                    );
+        }
+        menu.addItem(
+                'Start tutorial',
+                function() {
+                    myself.startTutorial(world);
+                }
+                );
+
+        if (shiftClicked) {
+            menu.addLine();
+            menu.addItem(
+                    'open shared project from cloud...',
+                    function () {
+                        myself.prompt('Author name…', function (usr) {
+                            myself.prompt('Project name...', function (prj) {
+                                var id = 'Username=' +
+                                    encodeURIComponent(usr.toLowerCase()) +
+                                    '&ProjectName=' +
+                                    encodeURIComponent(prj);
+                                myself.showMessage(
+                                        'Fetching project\nfrom the cloud...'
+                                        );
+                                SnapCloud.getPublicProject(
+                                        id,
+                                        function (projectData) {
+                                            var msg;
+                                            if (!Process.prototype.isCatchingErrors) {
+                                                window.open(
+                                                        'data:text/xml,' + projectData
+                                                        );
+                                            }
+                                            myself.nextSteps([
+                                                    function () {
+                                                        msg = myself.showMessage(
+                                                                'Opening project...'
+                                                                );
+                                                    },
+                                                    function () {nop(); }, // yield (Chrome)
+                                                    function () {
+                                                        myself.rawOpenCloudDataString(
+                                                                projectData
+                                                                );
+                                                    },
+                                                    function () {
+                                                        msg.destroy();
+                                                    }
+                                            ]);
+                                        },
+                                        myself.cloudError()
+                                            );
+
+                            }, null, 'project');
+                        }, null, 'project');
+                    },
+                    null,
+                    new Color(100, 0, 0)
+                        );
+        }
+        menu.popup(world, pos); 
+    });
+};
+
 ProjectDialogMorph.prototype.rawOpenCloudProject = function (proj) {
     var myself = this;
     SnapCloud.fetchProject(
