@@ -627,7 +627,7 @@ IDE_Morph.prototype.projectMenu = function () {
         menu.addItem(
                 'Migrate from the old cloud', 
                 function () { window.open('/migration', true) },
-                'Attempt to perform an automatic\nmigration of all your projects\nin the old cloud');*/
+                'Attempt to perform an automatic\nmigration of all your projects\nin the old cloud');
 
         menu.addLine();
 
