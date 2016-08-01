@@ -304,22 +304,14 @@ BeetleCloud.prototype.parseResponse = function (usr) {
 };
 
 var SnapCloud = new BeetleCloud(
-    //'http://localhost:9090/api' // To be changed to HTTPS, and the actual URL
-    'http://45.55.194.180:9090/api' // To be changed to HTTPS, and the actual URL
+    'http://localhost:9090/api' // To be changed to HTTPS, and the actual URL
+    //'http://45.55.194.180:9090/api' // To be changed to HTTPS, and the actual URL
 );
 
 
 // Overrides to be moved to the proper corresponding files after this goes live
 
 // gui.js
-
-IDE_Morph.prototype.createCloudAccount = function () {
-    window.open('/signup');
-};
-
-IDE_Morph.prototype.initializeCloud = function () {
-    window.open('/login');
-};
 
 // In the BeetleCloud we allow uppercase characters in usernames
 // so we need to override this function
@@ -608,17 +600,17 @@ IDE_Morph.prototype.projectMenu = function () {
         var submenu = new MenuMorph(myself);
         submenu.addItem(
                 'STL',
-                function() { myself.downloadSTL() },
+                function () { myself.downloadSTL() },
                 'download the currently rendered 3D model\ninto an STL file ready to be printed'
                 );
         submenu.addItem(
                 'STL (binary)',
-                function() { myself.downloadBinarySTL() },
+                function () { myself.downloadBinarySTL() },
                 'download the currently rendered 3D model\ninto an STL file ready to be printed'
                 );
         submenu.addItem(
                 'OBJ',
-                function() { myself.downloadOBJ() },
+                function () { myself.downloadOBJ() },
                 'download the currently rendered 3D model\ninto an OBJ file'
                 );
 
@@ -629,9 +621,14 @@ IDE_Morph.prototype.projectMenu = function () {
 
         if (SnapCloud.username) {
             menu.addLine();
-            menu.addItem('My Profile', function () { window.open('/users/' + SnapCloud.username , true) });
+            menu.addItem('My Profile', function () { window.open('/users/' + SnapCloud.username, true) });
             menu.addItem('My Projects', function () { window.open('/myprojects', true) });
         }
+        menu.addItem(
+                'Migrate from the old cloud', 
+                function () { window.open('/migration', true) },
+                'Attempt to perform an automatic\nmigration of all your projects\nin the old cloud');*/
+
         menu.addLine();
 
         menu.addItem('Project notes...', 'editProjectNotes');
@@ -677,11 +674,11 @@ IDE_Morph.prototype.projectMenu = function () {
         if (!SnapCloud.username) {
             menu.addItem(
                     'Login',
-                    'initializeCloud'
+                    function () { window.open('/login'); }
                     );
             menu.addItem(
                     'Create an account',
-                    'createCloudAccount'
+                    function () { window.open('/signup'); }
                     );
             menu.addItem(
                     'Reset Password...',
@@ -691,14 +688,6 @@ IDE_Morph.prototype.projectMenu = function () {
             menu.addItem(
                     localize('Logout') + ' / ' + SnapCloud.username,
                     'logout'
-                    );
-            menu.addItem(
-                    'Create an account',
-                    'createCloudAccount'
-                    );
-            menu.addItem(
-                    'Change Password...',
-                    'changeCloudPassword'
                     );
         }
         menu.addItem(
@@ -760,25 +749,6 @@ IDE_Morph.prototype.projectMenu = function () {
         }
         menu.popup(world, pos); 
     });
-};
-
-ProjectDialogMorph.prototype.rawOpenCloudProject = function (proj) {
-    var myself = this;
-    SnapCloud.fetchProject(
-            proj.ProjectName, 
-            function (response) {
-                myself.ide.source = 'cloud';
-                myself.ide.droppedText(response);
-                if (proj.Public === 'true') {
-                    location.hash = '#present:Username=' +
-                        encodeURIComponent(SnapCloud.username) +
-                        '&ProjectName=' +
-                        encodeURIComponent(proj.ProjectName);
-                }
-            },
-            myself.ide.cloudError()
-            );
-    this.destroy();
 };
 
 ProjectDialogMorph.prototype.originalBuildContents = ProjectDialogMorph.prototype.buildContents;
