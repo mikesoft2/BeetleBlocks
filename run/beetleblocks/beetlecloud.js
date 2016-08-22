@@ -305,7 +305,7 @@ BeetleCloud.prototype.parseResponse = function (usr) {
 
 var SnapCloud = new BeetleCloud(
     //'http://localhost:9090/api' // To be changed to HTTPS, and the actual URL
-    'http://45.55.194.180:9090/api' // To be changed to HTTPS, and the actual URL
+    'http://45.55.194.180/api' // To be changed to HTTPS, and the actual URL
 );
 
 
