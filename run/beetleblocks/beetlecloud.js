@@ -538,7 +538,6 @@ IDE_Morph.prototype.projectMenu = function () {
 
         menu = new MenuMorph(myself);
         menu.addItem('New', 'createNewProject');
-        menu.addItem('Open...', 'openProjectsBrowser');
         menu.addItem(
                 'Import project or blocks',
                 function () {
@@ -572,9 +571,21 @@ IDE_Morph.prototype.projectMenu = function () {
                 },
                 'file menu import hint' // looks up the actual text in the translator
                     );
+
+        if (SnapCloud.username) {
+            menu.addLine();
+            menu.addItem('My Profile', function () { window.open('/users/' + SnapCloud.username, true) });
+            menu.addItem('My Projects', function () { window.open('/myprojects', true) });
+        }
+        menu.addItem(
+                'Migrate from the old cloud', 
+                function () { window.open('/migration', true) },
+                'Attempt to perform an automatic\nmigration of all your projects\nin the old cloud');
+
+        menu.addLine();
         menu.addItem('Save                                       Ctrl+S', 'save');
         menu.addItem('Save As...', 'saveProjectsBrowser');
-        //menu.addItem('Save and share', 'saveAndShare');
+
         menu.addLine();
         menu.addItem('Download project as...', 'saveProjectToDisk');
         menu.addItem(
@@ -619,19 +630,7 @@ IDE_Morph.prototype.projectMenu = function () {
                 submenu
                 );
 
-        if (SnapCloud.username) {
-            menu.addLine();
-            menu.addItem('My Profile', function () { window.open('/users/' + SnapCloud.username, true) });
-            menu.addItem('My Projects', function () { window.open('/myprojects', true) });
-        }
-        menu.addItem(
-                'Migrate from the old cloud', 
-                function () { window.open('/migration', true) },
-                'Attempt to perform an automatic\nmigration of all your projects\nin the old cloud');
 
-        menu.addLine();
-
-        menu.addItem('Project notes...', 'editProjectNotes');
         menu.addItem(
                 'Libraries...',
                 function () {
