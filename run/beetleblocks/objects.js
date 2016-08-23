@@ -1,10 +1,10 @@
 // THREE additions
 
-THREE.Object3D.prototype.addLineToPointWithColor = function(point, color, thickness) {
+THREE.Object3D.prototype.addLineToPointWithColor = function (point, color, thickness) {
     return this.addLineFromPointToPointWithColor(new THREE.Vector3(), point, color, thickness)
-}
+};
 
-THREE.Object3D.prototype.addLineFromPointToPointWithColor = function(originPoint, destinationPoint, color, thickness) {
+THREE.Object3D.prototype.addLineFromPointToPointWithColor = function (originPoint, destinationPoint, color, thickness) {
     geometry = new THREE.Geometry();
     geometry.vertices.push(originPoint);
     geometry.vertices.push(destinationPoint);
@@ -12,12 +12,12 @@ THREE.Object3D.prototype.addLineFromPointToPointWithColor = function(originPoint
     var line = new THREE.Line(geometry, lineMaterial);
     this.add(line);
     return line;
-}
+};
 
 // Negative geometry
 
 THREE.Object3D.prototype.originalAdd = THREE.Object3D.prototype.add;
-THREE.Object3D.prototype.add = function(object, negative, scene) {
+THREE.Object3D.prototype.add = function (object, negative, scene) {
     if (!negative) {
         this.originalAdd(object);
     } else {
@@ -67,7 +67,7 @@ THREE.Object3D.prototype.add = function(object, negative, scene) {
             if (i == 0) { break };
         }
     }
-}
+};
 
 // Caches
 
@@ -77,42 +77,42 @@ Cache.prototype = {};
 Cache.prototype.constructor = Cache;
 Cache.uber = Object.prototype;
 
-function Cache() {
+function Cache () {
     this.init();
-}
+};
 
-Cache.prototype.init = function() {
+Cache.prototype.init = function () {
     this.materials = [];
     this.geometries = { box: [], sphere: [], tube: [], text: [] };
-}
+};
 
-Cache.prototype.clear = function() {
+Cache.prototype.clear = function () {
     this.init();
-}
+};
 
-Cache.prototype.addMaterial = function(material) {
+Cache.prototype.addMaterial = function (material) {
     this.materials.push(material);
-}
+};
 
 Cache.prototype.findMaterial = function (color, opacity) {
     return detect(
             this.materials, 
-            function(each) { 
+            function (each) { 
                 return each.color.equals(color) && each.opacity === opacity;
             });
-}
+};
 
-Cache.prototype.addGeometry = function(type, geometry, params) {
+Cache.prototype.addGeometry = function (type, geometry, params) {
     this.geometries[type].push({ params: params, geometry: geometry });
-}
+};
 
 Cache.prototype.findGeometry = function (type, params) {
 
     var geometry = detect(
             this.geometries[type], 
-            function(each) { 
+            function (each) { 
                 return (each.params.length === params.length) 
-                    && each.params.every(function(element, index) {
+                    && each.params.every(function (element, index) {
                         return element === params[index]; 
                     })
             });
@@ -122,10 +122,10 @@ Cache.prototype.findGeometry = function (type, params) {
     } else { 
         return null;
     }
-}
+};
 
 // SpriteMorph
-SpriteMorph.prototype.initBeetle = function() {
+SpriteMorph.prototype.initBeetle = function () {
     var myself = this;
 
     this.beetle = new THREE.Object3D();
@@ -142,9 +142,9 @@ SpriteMorph.prototype.initBeetle = function() {
     this.beetle.shape.material = material;
 
     var loader = new THREE.OBJLoader();
-    loader.load('beetleblocks/assets/meshes/beetle-color-standing.obj', function(object) {
+    loader.load('beetleblocks/assets/meshes/beetle-color-standing.obj', function (object) {
             myself.beetle.standingShape.add(object);
-            object.traverse(function(child) { 
+            object.traverse(function (child) { 
                 if (child instanceof THREE.Mesh) { 
                     child.material = material;
                 }
@@ -152,9 +152,9 @@ SpriteMorph.prototype.initBeetle = function() {
             object.rotation.set(Math.PI, 0, -Math.PI / 2);
     });
 
-    loader.load('beetleblocks/assets/meshes/beetle-color-flying.obj', function(object) {
+    loader.load('beetleblocks/assets/meshes/beetle-color-flying.obj', function (object) {
             myself.beetle.flyingShape.add(object);
-            object.traverse(function(child) { 
+            object.traverse(function (child) { 
                 if (child instanceof THREE.Mesh) { 
                     child.material = material;
                 }
@@ -162,9 +162,9 @@ SpriteMorph.prototype.initBeetle = function() {
             object.rotation.set(Math.PI, 0, -Math.PI / 2);
     });
 
-    loader.load('beetleblocks/assets/meshes/beetle-body-standing.obj', function(object) {
+    loader.load('beetleblocks/assets/meshes/beetle-body-standing.obj', function (object) {
             myself.beetle.standingShape.add(object);
-            object.traverse(function(child) { 
+            object.traverse(function (child) { 
                 if (child instanceof THREE.Mesh) { 
                     child.material = new THREE.MeshLambertMaterial({ color: 0x888888 })
                 }
@@ -172,9 +172,9 @@ SpriteMorph.prototype.initBeetle = function() {
             object.rotation.set(Math.PI, 0, -Math.PI / 2);
     });
 
-    loader.load('beetleblocks/assets/meshes/beetle-body-flying.obj', function(object) {
+    loader.load('beetleblocks/assets/meshes/beetle-body-flying.obj', function (object) {
             myself.beetle.flyingShape.add(object);
-            object.traverse(function(child) { 
+            object.traverse(function (child) { 
                 if (child instanceof THREE.Mesh) { 
                     child.material = new THREE.MeshLambertMaterial({ color: 0x888888 }) 
                 }
@@ -182,8 +182,8 @@ SpriteMorph.prototype.initBeetle = function() {
             object.rotation.set(Math.PI, 0, -Math.PI / 2);
     });
 
-    loader.load('beetleblocks/assets/meshes/beetle-white.obj', function(object) {
-            object.traverse(function(child) { 
+    loader.load('beetleblocks/assets/meshes/beetle-white.obj', function (object) {
+            object.traverse(function (child) { 
                 if (child instanceof THREE.Mesh) { 
                     child.material = new THREE.MeshBasicMaterial({ color: 0xEEEEEE }) 
                 }
@@ -193,9 +193,9 @@ SpriteMorph.prototype.initBeetle = function() {
             myself.beetle.flyingShape.add(object.clone());
     });
 
-    loader.load('beetleblocks/assets/meshes/beetle-black-standing.obj', function(object) {
+    loader.load('beetleblocks/assets/meshes/beetle-black-standing.obj', function (object) {
             myself.beetle.standingShape.add(object);
-            object.traverse(function(child) { 
+            object.traverse(function (child) { 
                 if (child instanceof THREE.Mesh) { 
                     child.material = new THREE.MeshBasicMaterial({ color: 0x111111 }) 
                 }
@@ -203,9 +203,9 @@ SpriteMorph.prototype.initBeetle = function() {
             object.rotation.set(Math.PI, 0, -Math.PI / 2);
     });
 
-    loader.load('beetleblocks/assets/meshes/beetle-black-flying.obj', function(object) {
+    loader.load('beetleblocks/assets/meshes/beetle-black-flying.obj', function (object) {
             myself.beetle.flyingShape.add(object);
-            object.traverse(function(child) { 
+            object.traverse(function (child) { 
                 if (child instanceof THREE.Mesh) { 
                     child.material = new THREE.MeshBasicMaterial({ color: 0x111111 }) 
                 }
@@ -213,7 +213,7 @@ SpriteMorph.prototype.initBeetle = function() {
             object.rotation.set(Math.PI, 0, -Math.PI / 2);
     });
 
-    this.beetle.applyCostume = function() {
+    this.beetle.applyCostume = function () {
         if (this.position.y > 0 && !this.flying) {
             this.flying = true;
             this.shape.remove(this.standingShape);
@@ -225,7 +225,7 @@ SpriteMorph.prototype.initBeetle = function() {
         }
     }
 
-    this.beetle.setCostume = function(name) {
+    this.beetle.setCostume = function (name) {
         this.shape.remove(this.shape.children[0]);
         this.shape.add(this[name + 'Shape']);
     }
@@ -236,7 +236,7 @@ SpriteMorph.prototype.initBeetle = function() {
         h: 180,
         s: 50,
         l: 50,
-        set: function(h, s, l) {
+        set: function (h, s, l) {
             this.h = h;
             this.s = s;
             this.l = l;
@@ -249,7 +249,7 @@ SpriteMorph.prototype.initBeetle = function() {
         myself.beetle.shape.material.opacity = 1;
     }
 
-    this.beetle.color.update = function() {
+    this.beetle.color.update = function () {
         hsl = myself.beetle.color.state;
         this.setHSL(hsl.h/360, hsl.s/100, hsl.l/100);
         myself.beetle.shape.material.color = this;
@@ -278,7 +278,7 @@ SpriteMorph.prototype.initBeetle = function() {
     this.beetle.negative = false;
 
     // reset
-    this.beetle.reset = function() {	
+    this.beetle.reset = function () {	
         this.position.set(0, 0, 0);
         this.rotation.set(0, 0, 0);
         this.flying = false;
@@ -287,7 +287,7 @@ SpriteMorph.prototype.initBeetle = function() {
     }
 
     // visibility
-    this.beetle.toggleVisibility = function() {
+    this.beetle.toggleVisibility = function () {
         this.shape.visible = !this.shape.visible;
         myself.parentThatIsA(StageMorph).reRender();
     }
@@ -295,7 +295,7 @@ SpriteMorph.prototype.initBeetle = function() {
     this.beetle.cache = new Cache();
 
     // material "factory"
-    this.beetle.makeMaterial = function() {
+    this.beetle.makeMaterial = function () {
 
         var material = this.cache.findMaterial(this.color, this.shape.material.opacity);
          
@@ -334,13 +334,13 @@ SpriteMorph.prototype.initBeetle = function() {
     p = new THREE.Vector3(0,0,1);
     this.beetle.axes.push(this.beetle.addLineToPointWithColor(p, 0xFF0000));
 
-}
+};
 
 SpriteMorph.prototype.originalInit = SpriteMorph.prototype.init;
-SpriteMorph.prototype.init = function(globals) {
+SpriteMorph.prototype.init = function (globals) {
     this.initBeetle();
     this.originalInit(globals);
-}
+};
 
 // Definition of new BeetleBlocks categories
 SpriteMorph.prototype.categories =
@@ -374,7 +374,7 @@ SpriteMorph.prototype.categories =
 // Block specs
 
 SpriteMorph.prototype.originalInitBlocks = SpriteMorph.prototype.initBlocks;
-SpriteMorph.prototype.initBlocks = function() {
+SpriteMorph.prototype.initBlocks = function () {
 
     var myself = this;
     this.originalInitBlocks();
@@ -613,13 +613,13 @@ SpriteMorph.prototype.initBlocks = function() {
         spec: 'request user input %s',
         category: 'sensing'
     };
-}
+};
 
 SpriteMorph.prototype.initBlocks();
 
 // We do not proxy blockTemplates anymore, as we've changed practically everything
 
-SpriteMorph.prototype.blockTemplates = function(category) {
+SpriteMorph.prototype.blockTemplates = function (category) {
     var blocks = [], myself = this, varNames, button,
         cat = category || 'motion', txt;
 
@@ -1026,7 +1026,7 @@ SpriteMorph.prototype.blockTemplates = function(category) {
     }
 
     return blocks;
-}
+};
 
 // Enable cloning
 // Still _a lot_ of work left to get this working
@@ -1059,15 +1059,15 @@ SpriteMorph.prototype.fullCopy = function () {
 
     this.parentThatIsA(StageMorph).scene.add(c.beetle);
     return c;
-}
+};
 
 SpriteMorph.prototype.originalDestroy = SpriteMorph.prototype.destroy;
-SpriteMorph.prototype.destroy = function() {
+SpriteMorph.prototype.destroy = function () {
     var stage = this.parentThatIsA(StageMorph);
     stage.scene.remove(this.beetle);
     this.originalDestroy();
     stage.reRender();
-}
+};
 
 // Single Sprite mode
 
@@ -1076,17 +1076,17 @@ SpriteMorph.prototype.drawNew = function () { this.hide() }
 // StageMorph
 
 StageMorph.prototype.originalDestroy = StageMorph.prototype.destroy;
-StageMorph.prototype.destroy = function() {
+StageMorph.prototype.destroy = function () {
     var myself = this;
     this.clearAll();
-    this.children.forEach(function(eachSprite) {
+    this.children.forEach(function (eachSprite) {
         myself.removeChild(eachSprite);
     });
     this.originalDestroy();
-}
+};
 
 StageMorph.prototype.originalInit = StageMorph.prototype.init;
-StageMorph.prototype.init = function(globals) {
+StageMorph.prototype.init = function (globals) {
     var myself = this;
 
     this.originalInit(globals);
@@ -1109,7 +1109,7 @@ StageMorph.prototype.init = function(globals) {
             });
 };
 
-StageMorph.prototype.initScene = function() {
+StageMorph.prototype.initScene = function () {
     var myself = this;
     this.scene = new THREE.Scene();
     this.scene.axes = [];
@@ -1120,12 +1120,12 @@ StageMorph.prototype.initScene = function() {
     this.scene.grid.interval = new Point(1, 1);
 
     // Grid
-    this.scene.grid.draw = function() {
+    this.scene.grid.draw = function () {
 
         var color = this.lines ? this.lines[0].material.color : this.defaultColor;
 
         if (this.lines) {
-            this.lines.forEach(function(eachLine){
+            this.lines.forEach(function (eachLine){
                 myself.scene.remove(eachLine)
             });
         }
@@ -1151,21 +1151,21 @@ StageMorph.prototype.initScene = function() {
         myself.reRender();
     }
 
-    this.scene.grid.setInterval = function(aPoint) {
+    this.scene.grid.setInterval = function (aPoint) {
         this.interval = aPoint;
         this.draw();
     }
 
-    this.scene.grid.setColor = function(color) {
-        this.lines.forEach(function(eachLine) {
+    this.scene.grid.setColor = function (color) {
+        this.lines.forEach(function (eachLine) {
             eachLine.material.color.setHex(color);
         })
     };
 
-    this.scene.grid.toggle = function() {
+    this.scene.grid.toggle = function () {
         var myInnerSelf = this;
         this.visible = !this.visible;
-        this.lines.forEach(function(line){ line.visible = myInnerSelf.visible });
+        this.lines.forEach(function (line){ line.visible = myInnerSelf.visible });
         myself.reRender();
     }
 
@@ -1184,10 +1184,10 @@ StageMorph.prototype.initScene = function() {
         y: { realAxis: 'X', color: 0x00E11E },
         z: { realAxis: 'Y', color: 0x0000FF }}
 
-    Object.keys(axes).forEach(function(axis) {
+    Object.keys(axes).forEach(function (axis) {
         var map = loader.load(
                 'beetleblocks/assets/' + axis + '.png', 
-                function() { if (myself.renderer) { myself.reRender() }} ),
+                function () { if (myself.renderer) { myself.reRender() }} ),
             material = new THREE.SpriteMaterial( { map: map, color: axes[axis].color } ),
             sprite = new THREE.Sprite( material );
 
@@ -1201,16 +1201,16 @@ StageMorph.prototype.initScene = function() {
         myself.scene.add(sprite);
     })
 
-}
+};
 
-StageMorph.prototype.clearAll = function() {
+StageMorph.prototype.clearAll = function () {
     for (var i = this.myObjects.children.length - 1; i >= 0; i--) {
         this.myObjects.remove(this.myObjects.children[i]);
     }
     this.renderer.clear();
-}
+};
 
-StageMorph.prototype.initRenderer = function() {
+StageMorph.prototype.initRenderer = function () {
     var myself = this;
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -1226,62 +1226,62 @@ StageMorph.prototype.initRenderer = function() {
     this.renderer.showingAxes = true;
     this.renderer.isParallelProjection = false;
 
-    this.renderer.toggleWireframe = function() {
+    this.renderer.toggleWireframe = function () {
         var myInnerSelf = this;
         this.isWireframeMode = !this.isWireframeMode;
-        myself.myObjects.children.forEach(function(eachObject) {
+        myself.myObjects.children.forEach(function (eachObject) {
             eachObject.material.wireframe = myInnerSelf.isWireframeMode;
         });
         myself.reRender();
     }
 
-    this.renderer.toggleAxes = function() {
+    this.renderer.toggleAxes = function () {
         var myInnerSelf = this;
         this.showingAxes = !this.showingAxes;
 
-        myself.scene.labels.forEach(function(label){ label.visible = myInnerSelf.showingAxes });
-        myself.scene.axes.forEach(function(line){ line.visible = myInnerSelf.showingAxes });
-        myself.children.forEach(function(morph) {
+        myself.scene.labels.forEach(function (label){ label.visible = myInnerSelf.showingAxes });
+        myself.scene.axes.forEach(function (line){ line.visible = myInnerSelf.showingAxes });
+        myself.children.forEach(function (morph) {
             if (morph instanceof SpriteMorph) {
-                morph.beetle.axes.forEach(function(line){ line.visible = myInnerSelf.showingAxes });
+                morph.beetle.axes.forEach(function (line){ line.visible = myInnerSelf.showingAxes });
             }
         })
         myself.reRender();
     }
 
-    this.renderer.toggleParallelProjection = function() {
+    this.renderer.toggleParallelProjection = function () {
         this.isParallelProjection = !this.isParallelProjection;
         myself.initCamera();
     }
-}
+};
 
 
-StageMorph.prototype.render = function() {
+StageMorph.prototype.render = function () {
     this.pointLight.position.copy(this.camera.position); // lights move with the camera
     this.directionalLight.position.copy(this.camera.position);
     this.renderer.render(this.scene, this.camera);
 };
 
-StageMorph.prototype.renderCycle = function() {
+StageMorph.prototype.renderCycle = function () {
     if (this.renderer.changed) {
         this.render();
         this.changed();
         this.parentThatIsA(IDE_Morph).statusDisplay.refresh();
         this.renderer.changed = false;
     }
-}
+};
 
-StageMorph.prototype.reRender = function() {
+StageMorph.prototype.reRender = function () {
     this.renderer.changed = true;
-}
+};
 
-StageMorph.prototype.initCamera = function() {
+StageMorph.prototype.initCamera = function () {
     var myself = this,
         threeLayer;
 
     if (this.scene.camera) { this.scene.remove(this.camera) };
 
-    var createCamera = function() {
+    var createCamera = function () {
         threeLayer = document.createElement('div');
 
         if (myself.renderer.isParallelProjection) { 
@@ -1302,16 +1302,16 @@ StageMorph.prototype.initCamera = function() {
 
         // We need to implement zooming ourselves for parallel projection
 
-        myself.camera.zoomIn = function() {
+        myself.camera.zoomIn = function () {
             this.zoomFactor /= 1.1;
             this.applyZoom();
         }
-        myself.camera.zoomOut = function() {
+        myself.camera.zoomOut = function () {
             this.zoomFactor *= 1.1;
             this.applyZoom();
         }
 
-        myself.camera.applyZoom = function() {
+        myself.camera.applyZoom = function () {
             var zoom = myself.camera ? myself.camera.zoomFactor : 82,
                 width = Math.max(myself.width(), 480),
                 height = Math.max(myself.height(), 360);
@@ -1322,10 +1322,10 @@ StageMorph.prototype.initCamera = function() {
             this.updateProjectionMatrix();	
         }
 
-        myself.camera.reset = function() {
+        myself.camera.reset = function () {
 
             myself.controls = new THREE.OrbitControls(this, threeLayer);
-            myself.controls.addEventListener('change', function(event) { myself.render });
+            myself.controls.addEventListener('change', function (event) { myself.render });
 
             if (myself.renderer.isParallelProjection) {
                 this.zoomFactor = 82;
@@ -1340,7 +1340,7 @@ StageMorph.prototype.initCamera = function() {
             myself.reRender();
         }
 
-        myself.camera.fitScene = function() {
+        myself.camera.fitScene = function () {
 
             var boundingBox = new THREE.Box3().setFromObject(myself.myObjects),
                 boundingSphere = boundingBox.getBoundingSphere(),
@@ -1362,9 +1362,9 @@ StageMorph.prototype.initCamera = function() {
     createCamera();
     this.scene.add(this.camera);
     this.camera.reset();
-}
+};
 
-StageMorph.prototype.initLights = function() {
+StageMorph.prototype.initLights = function () {
     this.directionalLight = new THREE.DirectionalLight(0x4c4c4c, 1);
     this.directionalLight.position.set(this.camera.position);
     this.scene.add(this.directionalLight);
@@ -1372,10 +1372,10 @@ StageMorph.prototype.initLights = function() {
     this.pointLight = new THREE.PointLight(0xffffff, 1, 2000);
     this.pointLight.position.set(this.camera.position);
     this.scene.add(this.pointLight);
-}
+};
 
 StageMorph.prototype.originalStep = StageMorph.prototype.step;
-StageMorph.prototype.step = function() {
+StageMorph.prototype.step = function () {
     this.originalStep();
 
     // update Beetleblocks, if needed
@@ -1384,7 +1384,7 @@ StageMorph.prototype.step = function() {
 
 StageMorph.prototype.referencePos = null;
 
-StageMorph.prototype.mouseScroll = function(y, x) {
+StageMorph.prototype.mouseScroll = function (y, x) {
     if (this.renderer.isParallelProjection) {
         if (y > 0) {
             this.camera.zoomOut();
@@ -1402,15 +1402,15 @@ StageMorph.prototype.mouseScroll = function(y, x) {
     this.reRender();
 };
 
-StageMorph.prototype.mouseDownLeft = function(pos) {
+StageMorph.prototype.mouseDownLeft = function (pos) {
     this.referencePos = pos;
 };
 
-StageMorph.prototype.mouseDownRight = function(pos) {
+StageMorph.prototype.mouseDownRight = function (pos) {
     this.referencePos = pos;
 };
 
-StageMorph.prototype.mouseMove = function(pos, button) {
+StageMorph.prototype.mouseMove = function (pos, button) {
 
     if (this.referencePos === null) { return };
 
@@ -1434,18 +1434,18 @@ StageMorph.prototype.mouseMove = function(pos, button) {
     this.reRender();
 };
 
-StageMorph.prototype.mouseLeave = function() {
+StageMorph.prototype.mouseLeave = function () {
     this.referencePos = null;
-}
+};
 
 StageMorph.prototype.originalAdd = StageMorph.prototype.add;
-StageMorph.prototype.add = function(morph) {
+StageMorph.prototype.add = function (morph) {
     this.originalAdd(morph);
     if (morph instanceof SpriteMorph) {
         this.scene.add(morph.beetle);
         this.reRender();
     }
-}
+};
 
 // We'll never need to clear the pen trails in BeetleBlocks, it only causes the renderer to disappear
 StageMorph.prototype.clearPenTrails = nop;
@@ -1510,7 +1510,7 @@ StageMorph.prototype.originalSetScale = StageMorph.prototype.setScale;
 StageMorph.prototype.setScale = function (number) {
     this.scaleChanged = true;
     this.originalSetScale(number);
-}
+};
 
 // Contextual menu
 StageMorph.prototype.userMenu = function () {

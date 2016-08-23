@@ -25,13 +25,13 @@ IDE_Morph.prototype.createLogo = function () {
     this.originalCreateLogo();
     this.logo.texture = 'beetleblocks/logo.png';
     this.logo.drawNew();
-}
+};
 
 IDE_Morph.prototype.originalNewProject = IDE_Morph.prototype.newProject;
 IDE_Morph.prototype.newProject = function () {
     this.originalNewProject();
     this.createStatusDisplay();
-}
+};
 
 IDE_Morph.prototype.originalRemoveSprite = IDE_Morph.prototype.removeSprite;
 IDE_Morph.prototype.removeSprite = function (sprite) {
@@ -39,13 +39,13 @@ IDE_Morph.prototype.removeSprite = function (sprite) {
     stage.scene.remove(sprite.beetle);
     stage.reRender();
     this.originalRemoveSprite(sprite);
-}
+};
 
 IDE_Morph.prototype.originalCreateStage = IDE_Morph.prototype.createStage;
-IDE_Morph.prototype.createStage = function() {
+IDE_Morph.prototype.createStage = function () {
     this.originalCreateStage();
     this.setStageSize(1);
-}
+};
 
 // Force flat design
 IDE_Morph.prototype.setDefaultDesign = IDE_Morph.prototype.setFlatDesign; 
@@ -57,7 +57,7 @@ IDE_Morph.prototype.init = function(isAutoFill) {
     // Borders are actually just paddings, so we set the bg white to get them to be white
     this.backgroundColor = new Color(255,255,255);
     this.setColor(this.backgroundColor);
-}
+};
 
 // Overriding these functions as we cannot proxy them. They don't return a menu, they create one and pop it up
 IDE_Morph.prototype.projectMenu = function () {
@@ -126,24 +126,24 @@ IDE_Morph.prototype.projectMenu = function () {
     }
     menu.addItem(
             'Download 2D lines as...',
-            function() { myself.downloadSVG() },
+            function () { myself.downloadSVG() },
             'download the currently rendered 2D lines\ninto an SVG file'
             );
 
     var submenu = new MenuMorph(myself);
     submenu.addItem(
             'STL',
-            function() { myself.downloadSTL() },
+            function () { myself.downloadSTL() },
             'download the currently rendered 3D model\ninto an STL file ready to be printed'
             );
     submenu.addItem(
             'STL (binary)',
-            function() { myself.downloadBinarySTL() },
+            function () { myself.downloadBinarySTL() },
             'download the currently rendered 3D model\ninto an STL file ready to be printed'
             );
     submenu.addItem(
             'OBJ',
-            function() { myself.downloadOBJ() },
+            function () { myself.downloadOBJ() },
             'download the currently rendered 3D model\ninto an OBJ file'
             );
 
@@ -222,7 +222,7 @@ IDE_Morph.prototype.projectMenu = function () {
     }
     menu.addItem(
             'Start tutorial',
-            function() {
+            function () {
                 myself.startTutorial(world);
             }
             );
@@ -280,7 +280,7 @@ IDE_Morph.prototype.projectMenu = function () {
 
  
     menu.popup(world, pos);
-}
+};
 
 IDE_Morph.prototype.settingsMenu = function () {
     var menu,
@@ -474,7 +474,7 @@ IDE_Morph.prototype.settingsMenu = function () {
     menu.addLine();
     menu.addItem(
             'Set background color', 
-            function() { 
+            function () { 
                 this.pickColor(null, function(color) { 
                     colorString = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
                             myself.saveSetting('bgcolor', colorString);
@@ -484,7 +484,7 @@ IDE_Morph.prototype.settingsMenu = function () {
                     });
     menu.addItem(
             'Reset background color', 
-            function() { 
+            function () { 
                 myself.saveSetting('bgcolor', 0xe6e6e6);
                 stage.renderer.setClearColor(0xe6e6e6, 1);
                 stage.reRender();
@@ -492,7 +492,7 @@ IDE_Morph.prototype.settingsMenu = function () {
     menu.addLine();
     menu.addItem(
         'Set grid interval',
-        function() {
+        function () {
             new DialogBoxMorph(
                     this,
                     function(point) { stage.scene.grid.setInterval(point) },
@@ -510,7 +510,7 @@ IDE_Morph.prototype.settingsMenu = function () {
         });
     menu.addItem(
             'Set grid color', 
-            function() { 
+            function () { 
                 this.pickColor(null, function(color) { 
                     stage.scene.grid.setColor('0x' + color.r.toString(16) + color.g.toString(16) + color.b.toString(16));
                     stage.reRender();
@@ -519,7 +519,7 @@ IDE_Morph.prototype.settingsMenu = function () {
     menu.popup(world, pos);
 };
 
-IDE_Morph.prototype.saveProjectToDisk = function() {
+IDE_Morph.prototype.saveProjectToDisk = function () {
     var data,
         blob;
 
@@ -535,9 +535,9 @@ IDE_Morph.prototype.saveProjectToDisk = function() {
 
     blob = new Blob([data], {type: 'text/xml;charset=utf-8'});
     saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_project') + '.xml');
-}
+};
 
-IDE_Morph.prototype.saveAndShare = function() {
+IDE_Morph.prototype.saveAndShare = function () {
     var myself = this,
         projectName = this.projectName;
 
@@ -570,7 +570,7 @@ IDE_Morph.prototype.saveAndShare = function() {
             this.cloudError()
         )
     }
-}
+};
 
 ProjectDialogMorph.prototype.shareProject = function () {
     var myself = this,
@@ -623,7 +623,7 @@ ProjectDialogMorph.prototype.shareProject = function () {
 };
 
 // STL export
-IDE_Morph.prototype.downloadBinarySTL = function() {
+IDE_Morph.prototype.downloadBinarySTL = function () {
     var exporter = new THREE.STLBinaryExporter(),
         scene = copy(this.stage.scene),
         stlString,
@@ -634,9 +634,9 @@ IDE_Morph.prototype.downloadBinarySTL = function() {
     blob = new Blob([stlString], {type: 'text/plain;charset=utf-8'});
 
     saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_export') + '.stl'); 
-}
+};
 
-IDE_Morph.prototype.downloadSTL = function() {
+IDE_Morph.prototype.downloadSTL = function () {
     var exporter = new THREE.STLExporter(),
         scene = copy(this.stage.scene),
         stlString,
@@ -646,11 +646,11 @@ IDE_Morph.prototype.downloadSTL = function() {
     stlString = exporter.parse(scene);
     blob = new Blob([stlString], {type: 'text/plain'});
     saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_export') + '.stl'); 
-}
+};
 
 
 // OBJ export
-IDE_Morph.prototype.downloadOBJ = function() {
+IDE_Morph.prototype.downloadOBJ = function () {
     var exporter = new THREE.OBJExporter(),
         scene = copy(this.stage.scene),
         objString, 
@@ -661,10 +661,10 @@ IDE_Morph.prototype.downloadOBJ = function() {
     blob = new Blob([objString], {type: 'text/plain;charset=utf-8'});
 
     saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_export') + '.obj'); 
-}
+};
 
 // SVG export
-IDE_Morph.prototype.downloadSVG = function() {
+IDE_Morph.prototype.downloadSVG = function () {
     var lines = [];
     this.stage.myObjects.children.forEach(
             function(element, index, ar){
@@ -797,7 +797,7 @@ IDE_Morph.prototype.downloadSVG = function() {
 
     blob = new Blob([svgStr], {type: 'text/plain;charset=utf-8'});
     saveAs(blob, (this.projectName ? this.projectName : 'beetleblocks_export') + '.svg'); 
-}
+};
 
 
 // IDE_Morph.prototype.createControlBar proxy
@@ -816,7 +816,7 @@ IDE_Morph.prototype.createControlBar = function () {
 
     this.controlBar.stageSizeButton.labelString = new SymbolMorph('normalStage', 14);
     this.controlBar.stageSizeButton.action = 'setSmallStageSize';
-    this.controlBar.stageSizeButton.query = function(){};
+    this.controlBar.stageSizeButton.query = function () {};
 
     button = new ToggleButtonMorph(
             null, //colors,
@@ -833,7 +833,7 @@ IDE_Morph.prototype.createControlBar = function () {
     button.labelShadowOffset = new Point(-1, -1);
     button.labelShadowColor = colors[1];
     button.labelColor = this.buttonLabelColor;
-    button.query = function(){};
+    button.query = function () {};
     button.contrast = this.buttonContrast;
     button.drawNew();
     button.fixLayout();
@@ -857,7 +857,7 @@ IDE_Morph.prototype.createControlBar = function () {
     button.labelShadowOffset = new Point(-1, -1);
     button.labelShadowColor = colors[1];
     button.labelColor = this.buttonLabelColor;
-    button.query = function(){};
+    button.query = function () {};
     button.contrast = this.buttonContrast;
     button.drawNew();
     button.fixLayout();
@@ -886,18 +886,18 @@ IDE_Morph.prototype.createControlBar = function () {
 
         this.updateLabel();
     };
-}
+};
 
 IDE_Morph.prototype.setLargeStageSize = function () {
     this.setStageSize(1.5);
-}
+};
 IDE_Morph.prototype.setNormalStageSize = function () {
     this.setStageSize(1);
-}
+};
 
 IDE_Morph.prototype.setSmallStageSize = function () {
     this.setStageSize(0.5);
-}
+};
 
 IDE_Morph.prototype.setStageSize = function (ratio) {
     this.setStageExtent(new Point(480 * ratio, 360 * ratio))
@@ -918,7 +918,7 @@ IDE_Morph.prototype.setStageExtent = function (ext) {
 
     this.stage.renderer.setSize(ext.x, ext.y);
     this.stage.reRender();
-}
+};
 
 // Examples now pulls from local
 ProjectDialogMorph.prototype.getExamplesProjectList = function () {
@@ -1088,14 +1088,14 @@ IDE_Morph.prototype.rawOpenProjectString = function (str) {
     this.originalRawOpenProjectString(str);
     this.createStatusDisplay();
     this.setStageSize(1);
-}
+};
 
 IDE_Morph.prototype.originalRawOpenCloudDataString = IDE_Morph.prototype.rawOpenCloudDataString;
 IDE_Morph.prototype.rawOpenCloudDataString = function (str) {
     this.originalRawOpenCloudDataString(str);
     this.createStatusDisplay();
     this.setStageSize(1);
-}
+};
 
 ProjectDialogMorph.prototype.rawOpenCloudProject = function (proj) {
     var myself = this;
@@ -1220,7 +1220,7 @@ IDE_Morph.prototype.createSpriteEditor = function () {
     this.spriteEditor.add(equalButton);
     this.spriteEditor.add(minusButton);
 
-    this.spriteEditor.fixLayout = function() {
+    this.spriteEditor.fixLayout = function () {
         var padding = 5;
 
         minusButton.setLeft(this.left() + this.width() - minusButton.width() - padding);
@@ -1236,25 +1236,25 @@ IDE_Morph.prototype.createSpriteEditor = function () {
     }
 
     this.spriteEditor.fixLayout();
-}
+};
 
-IDE_Morph.prototype.scaleBlocksUp = function() {
+IDE_Morph.prototype.scaleBlocksUp = function () {
     this.setBlocksScale(Math.min(SyntaxElementMorph.prototype.scale + 0.25, 12));
-}
+};
 
-IDE_Morph.prototype.scaleBlocksDown = function() {
+IDE_Morph.prototype.scaleBlocksDown = function () {
     this.setBlocksScale(Math.max(SyntaxElementMorph.prototype.scale - 0.25, 1));
-}
+};
 
-IDE_Morph.prototype.resetBlocksScale = function() {
+IDE_Morph.prototype.resetBlocksScale = function () {
     this.setBlocksScale(1);
-}
+};
 
 IDE_Morph.prototype.originalCreatePalette = IDE_Morph.prototype.createPalette;
 IDE_Morph.prototype.createPalette = function(forSearching){
     this.originalCreatePalette(forSearching);
     this.palette.color = new Color(230, 230, 230);
-}
+};
 
 IDE_Morph.prototype.createStatusDisplay = function () {
     var frame,
@@ -1376,7 +1376,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
         });
     };
 
-    this.statusDisplay.step = function() {
+    this.statusDisplay.step = function () {
         // update watchers
         current = Date.now();
         elapsed = current - this.lastWatcherUpdate;
@@ -1401,7 +1401,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 
     var resetCameraButton = new PushButtonMorph(
             null,
-            function() { stage.camera.reset() },
+            function () { stage.camera.reset() },
             'Reset Camera'
             );
     resetCameraButton.columns = 3;
@@ -1439,7 +1439,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 
     var fitCameraButton = new PushButtonMorph(
             null,
-            function() { stage.camera.fitScene() },
+            function () { stage.camera.fitScene() },
             'Zoom to fit'
             );
     fitCameraButton.columns = 3;
@@ -1520,7 +1520,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     elements.push(space);
 
     element = new StringMorph();
-    element.update = function() { this.text = 'x: ' + beetle.position.z.toFixed(2).toString().replace('.00','') }; 
+    element.update = function () { this.text = 'x: ' + beetle.position.z.toFixed(2).toString().replace('.00','') }; 
     element.newColumn = true;
     elements.push(element);
 
@@ -1539,7 +1539,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     elements.push(space);
 
     element = new StringMorph();
-    element.update = function() { this.text = 'x:' + degrees(beetle.rotation.z * -1).toFixed(2).toString().replace('.00','') };
+    element.update = function () { this.text = 'x:' + degrees(beetle.rotation.z * -1).toFixed(2).toString().replace('.00','') };
     elements.push(element);
 
     var space = new Morph();
@@ -1550,7 +1550,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 
     elements.push('Scale: ');
     element = new StringMorph();
-    element.update = function() {
+    element.update = function () {
         this.text = beetle.multiplierScale.toString() 
             + ' (' + (beetle.multiplierScale * 100).toString() + '%)'
     }
@@ -1564,7 +1564,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     elements.push(space);
 
     element = new StringMorph();
-    element.update = function() { this.text = 'y: ' + beetle.position.x.toFixed(2).toString().replace('.00','') }; 
+    element.update = function () { this.text = 'y: ' + beetle.position.x.toFixed(2).toString().replace('.00','') }; 
     element.newColumn = true;
     elements.push(element);
 
@@ -1575,7 +1575,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     elements.push(space);
 
     element = new StringMorph();
-    element.update = function() { this.text = 'y:' + degrees(beetle.rotation.x * -1).toFixed(2).toString().replace('.00','') };
+    element.update = function () { this.text = 'y:' + degrees(beetle.rotation.x * -1).toFixed(2).toString().replace('.00','') };
     element.newLines = 1;
     elements.push(element);
 
@@ -1586,7 +1586,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     elements.push(space);
 
     element = new StringMorph();
-    element.update = function() { this.text = 'z: ' + beetle.position.y.toFixed(2).toString().replace('.00','') }; 
+    element.update = function () { this.text = 'z: ' + beetle.position.y.toFixed(2).toString().replace('.00','') }; 
     element.newColumn = true;
     elements.push(element);
 
@@ -1597,7 +1597,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     elements.push(space);
 
     element = new StringMorph();
-    element.update = function() { this.text = 'z:' + degrees(beetle.rotation.y).toFixed(2).toString().replace('.00','') };
+    element.update = function () { this.text = 'z:' + degrees(beetle.rotation.y).toFixed(2).toString().replace('.00','') };
     element.newLines = 2;
     elements.push(element);
 
@@ -1605,7 +1605,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     
     elements.push('HSL: ');
     element = new StringMorph();
-    element.update = function() {
+    element.update = function () {
         this.text = beetle.color.state.h.toFixed(2).toString().replace('.00','') + ', ' 
             + beetle.color.state.s.toFixed(2).toString().replace('.00','') + ', ' 
             + beetle.color.state.l.toFixed(2).toString().replace('.00','') + ' '
@@ -1613,7 +1613,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
     elements.push(element);
 
     element = new Morph();
-    element.update = function() {
+    element.update = function () {
         this.setColor(new Color(beetle.color.r * 255, beetle.color.g * 255, beetle.color.b * 255));
     }
     element.setWidth(30);
@@ -1623,7 +1623,7 @@ IDE_Morph.prototype.createStatusDisplay = function () {
 
     elements.push('Opacity: ');
     element = new StringMorph();
-    element.update = function() {
+    element.update = function () {
         this.text = (beetle.shape.material.opacity * 100).toFixed(2).toString().replace('.00','') + '%'
     }
     elements.push(element);
@@ -1769,7 +1769,7 @@ IDE_Morph.prototype.originalSetLanguage = IDE_Morph.prototype.setLanguage;
 IDE_Morph.prototype.setLanguage = function(lang, callback) {
     var myself = this;
 
-    myself.originalSetLanguage(lang, function() {
+    myself.originalSetLanguage(lang, function () {
         var translation = document.getElementById('bb-language'),
             src = 'beetleblocks/lang-' + lang + '.js',
             myInnerSelf = this;

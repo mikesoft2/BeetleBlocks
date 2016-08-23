@@ -155,6 +155,8 @@ BeetleCloud.prototype.shareProject = function (shareOrNot, projectName, callBack
 BeetleCloud.prototype.saveProject = function (ide, callBack, errorCall) {
     var myself = this;
 
+    ide.stage.reRender();
+
     this.checkCredentials(
             function (user) {
                 if (user.username) {
