@@ -11,7 +11,9 @@ Beetle Blocks is a project by [Eric Rosenbaum](http://ericrosenbaum.com), [Duks 
 and [Bernat Romagosa](http://bromagosa.github.io), with additional software development by [Jens Mönig](http://github.com/jmoenig).
 
 #Try it here:
-[beetleblocks.com](http://beetleblocks.com)
+## [beetleblocks.com](http://beetleblocks.com)
+
+#Acknowledgements
 
 Beetle Blocks is based on [Snap<i>!</i> Build Your Own Blocks](http://snap.berkeley.edu), a visual, blocks based programming language
 inspired by [Scratch](http://scratch.mit.edu) written by Jens Mönig (jens@moenig.org) and Brian Harvey (bh@cs.berkeley.edu).
@@ -31,7 +33,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#Third party packages
+##Third party packages
 
 Beetle Blocks uses [ThreeJS](http://threejs.org) as its 3D rendering engine.
 For constructive solid geometry, it uses the [ThreeCSG](https://github.com/chandlerprall/ThreeCSG) plugin.
