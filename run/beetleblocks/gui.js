@@ -48,7 +48,7 @@ IDE_Morph.prototype.createStage = function () {
 };
 
 // Force flat design
-IDE_Morph.prototype.setDefaultDesign = IDE_Morph.prototype.setFlatDesign; 
+/*IDE_Morph.prototype.setDefaultDesign = IDE_Morph.prototype.setFlatDesign; 
 
 IDE_Morph.prototype.originalInit = IDE_Morph.prototype.init;
 IDE_Morph.prototype.init = function(isAutoFill) {
@@ -57,7 +57,7 @@ IDE_Morph.prototype.init = function(isAutoFill) {
     // Borders are actually just paddings, so we set the bg white to get them to be white
     this.backgroundColor = new Color(255,255,255);
     this.setColor(this.backgroundColor);
-};
+};*/
 
 // Overriding these functions as we cannot proxy them. They don't return a menu, they create one and pop it up
 IDE_Morph.prototype.projectMenu = function () {
