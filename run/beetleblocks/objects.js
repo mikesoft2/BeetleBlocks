@@ -361,7 +361,7 @@ SpriteMorph.prototype.categories =
         shapes : new Color(48, 137, 151),
         colors : new Color(101, 61, 122),
         sound : new Color(207, 74, 217), // we need to keep this color for the zoom blocks dialog
-        control : new Color(80, 80, 80),
+        control : new Color(230, 168, 34),
         sensing : new Color(130, 130, 130),
         operators : new Color(94, 144, 52),
         variables : new Color(191, 101, 36),
